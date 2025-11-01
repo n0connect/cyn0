@@ -1,0 +1,68 @@
+# Qt Build Files
+*.o
+*.obj
+*.user
+*.autosave
+moc_*
+qrc_*
+ui_*.h
+Makefile*
+*.pro.user*
+.qmake.stash
+*.moc
+
+# Build directories
+build/
+build-*/
+debug/
+release/
+*.app/Contents/MacOS/Cyn0
+x64/
+
+# Qt Creator
+*.pro.user
+*.pro.user.*
+*.creator.user
+
+# macOS
+.DS_Store
+*.dSYM
+*.app.dSYM
+
+# Windows
+*.exe
+*.dll
+*.pdb
+*.ilk
+*.exp
+*.lib
+
+# Linux
+*.so
+*.so.*
+
+# Personal data (user-generated)
+personal_notes.json
+backups/
+*.backup
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# Qt Meta Object Compiler
+moc_predefs.h
+
+# Resources (compiled)
+qrc_*.cpp
+
+# Generated UI headers
+ui_*.h

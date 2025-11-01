@@ -1,0 +1,14 @@
+{
+    "Linux Terminal Commands": {
+        "desc": "Temel terminal komutları",
+        "file": "linux/terminal_commands.json"
+    },
+    "Linux Privilege Escalation": {
+        "desc": "Yetki yükseltme teknikleri",
+        "file": "linux/privilege_escalation.json"
+    },
+    "Linux Extras": {
+        "desc": "Ek notlar, araçlar, vb.",
+        "file": "linux/extras.json"
+    }
+}

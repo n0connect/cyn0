@@ -1,0 +1,94 @@
+{
+    "ghost": {
+        "desc": "Android Debug Bridge (ADB) üzerinden Android cihazlara bağlantı aracı",
+        "category": "Mobile Penetration Testing",
+        "installation": "sudo pip3 install git+https://github.com/EntySec/Ghost --break-system-packages",
+        "usage": [
+            "ghost connect \"ip\"",
+            "interact 0"
+        ],
+        "features": ["ADB bağlantısı", "Android kontrolü", "Keycode gönderme"],
+        "note": "Android Debug Bridge gerektirir"
+    },
+    "remmina": {
+        "desc": "VNC görüntüleyici ve uzak masaüstü istemcisi",
+        "category": "Remote Access",
+        "usage": "VNC bağlantıları için",
+        "protocols": ["VNC", "RDP", "SSH", "SFTP"],
+        "note": "Shodan dork'ları ile birlikte kullanılabilir"
+    },
+    "hping": {
+        "desc": "İleri düzey ağ paket oluşturucu ve analiz aracı",
+        "category": "Network Analysis",
+        "usage": "Özel TCP/UDP/ICMP paketleri gönderme",
+        "features": ["Paket crafting", "Port tarama", "Traceroute", "DoS testi"],
+        "note": "İleri düzey bilgi gerektirir",
+        "warning": "Ağ trafiği analizi için güçlü araç"
+    },
+    "fing": {
+        "desc": "Ağ keşif ve tarama aracı",
+        "category": "Network Discovery",
+        "usage": "Ağdaki cihazları keşfetme",
+        "features": ["Device discovery", "Port scanning", "Service detection"],
+        "platform": "Mobile ve desktop"
+    },
+    "apache_solr": {
+        "url": "https://solr.apache.org/",
+        "desc": "Apache Solr arama platformu",
+        "category": "Search Platform",
+        "vulnerability": "Çeşitli RCE zafiyetleri",
+        "note": "Açık Solr instance'ları güvenlik riski oluşturur"
+    },
+    "android_keycodes": {
+        "desc": "Android cihazlarda tuş kodları",
+        "category": "Mobile Testing",
+        "usage": "Ghost tool ile birlikte kullanım",
+        "examples": [
+            "KEYCODE_HOME (3)",
+            "KEYCODE_BACK (4)",
+            "KEYCODE_MENU (82)",
+            "KEYCODE_POWER (26)"
+        ],
+        "note": "ADB shell input keyevent komutları"
+    },
+    "target_examples": {
+        "medeczane_sgk": {
+            "url": "https://medeczane.sgk.gov.tr/eczane/login.jsp",
+            "desc": "SGK eczane sistemi login sayfası",
+            "category": "Target Example",
+            "note": "Analiz örneği"
+        },
+        "search_0t_rock": {
+            "url": "search.0t.rock",
+            "desc": "Özel arama motoru",
+            "category": "Search Engine",
+            "note": "Alternatif arama platformu"
+        }
+    },
+    "nmap_advanced_scripts": {
+        "vuln_scan": {
+            "command": "nmap --script=vuln",
+            "desc": "NSE zafiyet tarama scriptleri",
+            "examples": ["nmap --script=vuln 192.168.23.130"]
+        },
+        "smb_scripts": {
+            "protocols": "nmap -p 445 --script=smb-protocols,smb-os-discovery",
+            "vulnerabilities": "nmap -p 445 --script=smb-vuln*",
+            "examples": [
+                "nmap -p 445 --script=smb-protocols,smb-os-discovery 172.20.1.90",
+                "nmap -p 445 --script=smb-vuln* 172.20.1.90"
+            ]
+        },
+        "netbios_scan": {
+            "command": "nmap -sU -sV -T4 --script nbstat.nse -p137 -Pn -n",
+            "desc": "NetBIOS bilgi toplama",
+            "output_info": "NetBIOS name, user, MAC address",
+            "example": "nmap -sU -sV -T4 --script nbstat.nse -p137 -Pn -n 172.20.1.90"
+        },
+        "http_scripts": {
+            "enumeration": "--script=http-enum,http-vuln*",
+            "desc": "HTTP servis analizi ve zafiyet tarama",
+            "usage": "nmap -p 80,443 --script=http-enum,http-vuln* <Hedef_IP>"
+        }
+    }
+}

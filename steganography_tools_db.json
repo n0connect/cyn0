@@ -1,0 +1,366 @@
+{
+    "steghide": {
+        "desc": "Steganography program to hide data in image and audio files",
+        "category": "Steganography",
+        "usage": [
+            "steghide embed -cf image.jpg -ef secret.txt -sf output.jpg",
+            "steghide extract -sf stego_image.jpg -xf extracted_data.txt",
+            "steghide info stego_image.jpg"
+        ],
+        "flags": {
+            "embed": "Embed data into cover file",
+            "extract": "Extract data from stego file", 
+            "info": "Get info about stego file",
+            "-cf": "Cover file (original image/audio)",
+            "-ef": "Embed file (file to hide)",
+            "-sf": "Stego file (output file with hidden data)",
+            "-xf": "Extract file (output file for extracted data)",
+            "-p": "Passphrase for encryption",
+            "-e": "Encryption algorithm",
+            "-z": "Compression level (1-9)",
+            "-Z": "Disable compression",
+            "-K": "Do not encrypt",
+            "-N": "Do not embed checksum",
+            "-q": "Quiet mode",
+            "-v": "Verbose mode"
+        },
+        "supported_formats": {
+            "images": ["JPEG", "BMP", "WAV", "AU"],
+            "audio": ["WAV", "AU"]
+        },
+        "encryption_algorithms": [
+            "rijndael-128",
+            "rijndael-192", 
+            "rijndael-256",
+            "arcfour",
+            "blowfish",
+            "cast-128",
+            "cast-256",
+            "des",
+            "gost",
+            "loki97",
+            "mars",
+            "rc2",
+            "rc5",
+            "rc6",
+            "safer",
+            "serpent",
+            "skipjack",
+            "twofish",
+            "xtea"
+        ],
+        "examples": [
+            {
+                "desc": "Hide text file in JPEG image",
+                "command": "steghide embed -cf cover.jpg -ef secret.txt -sf stego.jpg -p mypassword"
+            },
+            {
+                "desc": "Extract hidden data",
+                "command": "steghide extract -sf stego.jpg -xf output.txt -p mypassword"
+            },
+            {
+                "desc": "Get information about stego file",
+                "command": "steghide info stego.jpg"
+            },
+            {
+                "desc": "Embed without encryption",
+                "command": "steghide embed -cf image.bmp -ef data.zip -sf output.bmp -K"
+            }
+        ],
+        "notes": [
+            "Uses LSB (Least Significant Bit) technique",
+            "Password protected encryption",
+            "Maintains file format integrity"
+        ],
+        "security_risk": "Low - Data hiding technique",
+        "platform": ["Linux", "Windows", "macOS"],
+        "required_permissions": "File access"
+    },
+    "stegcracker": {
+        "desc": "Steganography brute-force utility to uncover hidden data inside files",
+        "category": "Steganography Cracking",
+        "usage": [
+            "stegcracker image.jpg wordlist.txt",
+            "stegcracker audio.wav /usr/share/wordlists/rockyou.txt",
+            "stegcracker stego_file.jpg -o output_file.txt"
+        ],
+        "flags": {
+            "-o": "Output file for extracted data",
+            "-t": "Number of threads",
+            "-c": "Check if file contains hidden data",
+            "-q": "Quiet mode",
+            "-V": "Show version"
+        },
+        "supported_tools": [
+            "steghide",
+            "Other steganography tools"
+        ],
+        "examples": [
+            {
+                "desc": "Brute force steghide password",
+                "command": "stegcracker suspicious_image.jpg /usr/share/wordlists/rockyou.txt"
+            },
+            {
+                "desc": "Multi-threaded cracking",
+                "command": "stegcracker stego.jpg wordlist.txt -t 8"
+            },
+            {
+                "desc": "Check for hidden data",
+                "command": "stegcracker -c potentially_stego.bmp"
+            }
+        ],
+        "wordlists": [
+            "/usr/share/wordlists/rockyou.txt",
+            "/usr/share/wordlists/fasttrack.txt",
+            "/usr/share/seclists/Passwords/"
+        ],
+        "notes": [
+            "Multithreaded password cracking",
+            "Works with steghide protected files",
+            "Progress indication"
+        ],
+        "security_risk": "Medium - Password cracking tool",
+        "platform": ["Linux", "macOS"],
+        "required_permissions": "File access"
+    },
+    "zsteg": {
+        "desc": "Detect stegano-hidden data in PNG & BMP images",
+        "category": "Steganography Detection",
+        "usage": [
+            "zsteg image.png",
+            "zsteg image.bmp --all",
+            "zsteg suspicious.png --lsb"
+        ],
+        "flags": {
+            "--all": "Try all known methods",
+            "--lsb": "Least significant bit analysis",
+            "--msb": "Most significant bit analysis", 
+            "--order": "Bit order (xy, yx, xY, Xy)",
+            "--bits": "Number of bits",
+            "--channel": "Color channel (r, g, b, rgb, bgr, etc)",
+            "--limit": "Limit bytes to analyze",
+            "--strings": "Find strings",
+            "--extract": "Extract data to file",
+            "-v": "Verbose output",
+            "-E": "Specify extraction method"
+        },
+        "detection_methods": [
+            "LSB steganography",
+            "MSB steganography", 
+            "Bit plane analysis",
+            "Color palette analysis",
+            "Statistical analysis"
+        ],
+        "supported_formats": ["PNG", "BMP"],
+        "examples": [
+            {
+                "desc": "Analyze PNG image",
+                "command": "zsteg challenge.png"
+            },
+            {
+                "desc": "Try all extraction methods",
+                "command": "zsteg image.bmp --all"
+            },
+            {
+                "desc": "Extract specific LSB data",
+                "command": "zsteg stego.png --lsb --extract b1,bgr,lsb,xy"
+            },
+            {
+                "desc": "Search for strings",
+                "command": "zsteg image.png --strings"
+            }
+        ],
+        "notes": [
+            "Ruby dilinde yazılmış",
+            "PNG ve BMP özel desteği",
+            "CTF yarışmalarında popüler"
+        ],
+        "security_risk": "Low - Analysis tool",
+        "platform": ["Linux", "macOS", "Windows"],
+        "required_permissions": "File access"
+    },
+    "exiftool": {
+        "desc": "Platform-independent library and application for reading and writing meta information",
+        "category": "Metadata Analysis",
+        "usage": [
+            "exiftool image.jpg",
+            "exiftool -all= clean_image.jpg",
+            "exiftool -Comment='Hidden message' image.jpg"
+        ],
+        "flags": {
+            "-a": "Allow duplicate tag names",
+            "-G": "Group names for each tag",
+            "-s": "Short output format",
+            "-S": "Very short output format",
+            "-t": "Tab-delimited output",
+            "-T": "Table output format",
+            "-csv": "CSV output format",
+            "-json": "JSON output format",
+            "-xml": "XML output format",
+            "-html": "HTML output format",
+            "-all=": "Delete all metadata",
+            "-overwrite_original": "Overwrite original file",
+            "-r": "Recursively process directories",
+            "-ext": "Process files with specific extension",
+            "-k": "Preserve file modification date"
+        },
+        "metadata_types": [
+            "EXIF data",
+            "IPTC data", 
+            "XMP data",
+            "GPS coordinates",
+            "Camera settings",
+            "Creation date/time",
+            "Software information",
+            "Comments and descriptions"
+        ],
+        "supported_formats": [
+            "JPEG", "TIFF", "PNG", "GIF", "BMP", "RAW",
+            "PDF", "PostScript", "MP3", "MP4", "AVI",
+            "MOV", "Office documents", "And many more"
+        ],
+        "examples": [
+            {
+                "desc": "View all metadata",
+                "command": "exiftool -all photo.jpg"
+            },
+            {
+                "desc": "Remove all metadata",
+                "command": "exiftool -all= -overwrite_original sensitive_photo.jpg"
+            },
+            {
+                "desc": "Extract GPS coordinates",
+                "command": "exiftool -GPSLatitude -GPSLongitude image.jpg"
+            },
+            {
+                "desc": "Add comment metadata",
+                "command": "exiftool -Comment='Secret message here' image.jpg"
+            },
+            {
+                "desc": "JSON output format",
+                "command": "exiftool -json image.jpg"
+            }
+        ],
+        "privacy_concerns": [
+            "GPS location data",
+            "Camera serial numbers",
+            "Personal information",
+            "Software versions",
+            "Creation timestamps"
+        ],
+        "notes": [
+            "600+ farklı dosya formatı desteği",
+            "Metadata ekleme/çıkarma/düzenleme",
+            "Privacy için metadata temizleme"
+        ],
+        "security_risk": "Low - Information disclosure potential",
+        "platform": ["Linux", "Windows", "macOS"],
+        "required_permissions": "File access"
+    },
+    "stegoveritas": {
+        "desc": "Comprehensive steganography analysis tool with multiple detection methods",
+        "category": "Steganography Analysis",
+        "usage": [
+            "stegoveritas image.png",
+            "stegoveritas -meta image.jpg",
+            "stegoveritas -steghide -wordlist passwords.txt image.bmp"
+        ],
+        "flags": {
+            "-meta": "Check file metadata",
+            "-imageTransform": "Image transformation analysis",
+            "-bruteforce": "Brute force analysis",
+            "-steghide": "Steghide analysis",
+            "-outDir": "Output directory",
+            "-carve": "File carving",
+            "-trailing": "Check trailing data",
+            "-exif": "EXIF data analysis",
+            "-xmp": "XMP data analysis",
+            "-wordlist": "Wordlist for brute forcing"
+        },
+        "analysis_methods": [
+            "LSB analysis",
+            "Bit plane analysis", 
+            "Statistical analysis",
+            "Metadata examination",
+            "File carving",
+            "Steghide detection",
+            "Image transformations",
+            "Trailing data analysis"
+        ],
+        "examples": [
+            {
+                "desc": "Comprehensive analysis",
+                "command": "stegoveritas suspicious_image.png"
+            },
+            {
+                "desc": "Metadata only analysis",
+                "command": "stegoveritas -meta document.pdf"
+            },
+            {
+                "desc": "Steghide brute force",
+                "command": "stegoveritas -steghide -wordlist /usr/share/wordlists/rockyou.txt hidden.jpg"
+            }
+        ],
+        "output_features": [
+            "HTML report generation",
+            "Image transformations saved",
+            "Extracted files organized",
+            "Detailed analysis logs"
+        ],
+        "notes": [
+            "Multiple analysis methods combined",
+            "Automated report generation",
+            "CTF friendly tool"
+        ],
+        "security_risk": "Low - Analysis tool",
+        "platform": ["Linux", "macOS"],
+        "required_permissions": "File access"
+    },
+    "spectrograms": {
+        "desc": "Audio spectrogram analysis for hidden visual data in audio files",
+        "category": "Audio Steganography",
+        "usage": [
+            "sox audio.wav -n spectrogram",
+            "audacity (GUI) - Generate spectrogram view",
+            "python -c \"import matplotlib.pyplot as plt; import scipy.io.wavfile as wav; ...\""
+        ],
+        "tools": {
+            "sox": "Command-line audio processing",
+            "audacity": "GUI audio editor with spectrogram",
+            "sonic_visualiser": "Advanced audio analysis",
+            "python_libraries": "matplotlib, scipy, librosa"
+        },
+        "analysis_types": [
+            "Frequency domain analysis",
+            "Time-frequency representation", 
+            "Hidden images in spectrograms",
+            "SSTV (Slow Scan TV) signals",
+            "Morse code patterns"
+        ],
+        "examples": [
+            {
+                "desc": "Generate spectrogram with Sox",
+                "command": "sox audio.wav -n spectrogram -o spectrogram.png"
+            },
+            {
+                "desc": "Python spectrogram analysis",
+                "command": "python -c \"import matplotlib.pyplot as plt; import numpy as np; from scipy.io import wavfile; sr, data = wavfile.read('audio.wav'); plt.specgram(data, Fs=sr); plt.savefig('spec.png')\""
+            }
+        ],
+        "hidden_data_types": [
+            "Visual patterns",
+            "Text in frequency domain",
+            "Images encoded as audio",
+            "Morse code",
+            "SSTV transmissions"
+        ],
+        "notes": [
+            "Audio files can hide visual data",
+            "Spectrogram reveals frequency patterns",
+            "Common in CTF challenges"
+        ],
+        "security_risk": "Low - Analysis technique",
+        "platform": ["Linux", "Windows", "macOS"],
+        "required_permissions": "File access"
+    }
+}

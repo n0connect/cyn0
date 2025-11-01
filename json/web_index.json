@@ -1,0 +1,58 @@
+{
+    "SQL Injection": {
+        "desc": "SQL Injection exploitation, WAF bypass, NoSQL injection teknikleri",
+        "file": "web_sql_injection_db.json"
+    },
+    "XSS (Cross-Site Scripting)": {
+        "desc": "XSS payloadları, mutation XSS, WAF bypass teknikleri",
+        "file": "web_xss_payloads.json"
+    },
+    "SSTI (Server-Side Template Injection)": {
+        "desc": "Template injection - Jinja2, Django, ERB, Freemarker, Thymeleaf",
+        "file": "web_ssti_database.json"
+    },
+    "Command Injection": {
+        "desc": "OS command injection, Unicode bypass, reverse shell teknikleri",
+        "file": "web_command_injection.json"
+    },
+    "LFI/RFI Exploitation": {
+        "desc": "Local/Remote File Inclusion, PHP wrappers, log poisoning",
+        "file": "web_lfi_rfi_exploitation.json"
+    },
+    "SSRF (Server-Side Request Forgery)": {
+        "desc": "SSRF exploitation, cloud metadata, internal network access",
+        "file": "web_ssrf_exploitation.json"
+    },
+    "XXE (XML External Entity)": {
+        "desc": "XXE exploitation, blind XXE, SVG/DOCX XXE, billion laughs",
+        "file": "web_xxe_exploitation.json"
+    },
+    "GraphQL Security": {
+        "desc": "GraphQL introspection, IDOR, batching attacks, injection",
+        "file": "web_graphql_exploitation.json"
+    },
+    "JWT & API Security": {
+        "desc": "JWT attacks, API security, None algorithm, IDOR, mass assignment",
+        "file": "web_jwt_api_security.json"
+    },
+    "CORS Misconfiguration": {
+        "desc": "CORS exploitation, origin bypass, credential theft",
+        "file": "web_cors_misconfiguration.json"
+    },
+    "OAuth 2.0 Attacks": {
+        "desc": "OAuth exploitation, redirect URI bypass, token theft, PKCE bypass",
+        "file": "web_oauth_attacks.json"
+    },
+    "WebSocket Security": {
+        "desc": "WebSocket CSWSH, message manipulation, authentication bypass",
+        "file": "web_websocket_security.json"
+    },
+    "File Upload Bypass": {
+        "desc": "File upload exploitation, extension bypass, ImageMagick, Zip Slip",
+        "file": "web_file_upload_bypass.json"
+    },
+    "WAF Bypass Techniques": {
+        "desc": "Web Application Firewall bypass - SQLi, XSS, command injection",
+        "file": "web_waf_bypass_techniques.json"
+    }
+}

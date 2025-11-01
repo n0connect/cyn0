@@ -1,0 +1,116 @@
+{
+    "xsser": {
+        "desc": "Cross Site Scripter (XSS) automatic detection and exploitation framework",
+        "category": "XSS Testing",
+        "usage": [
+            "xsser --url 'http://target.com/search.php?q=XSS'",
+            "xsser --url 'http://target.com/form.php' --data 'name=XSS&email=test@test.com'",
+            "xsser --crawl 10 --url http://target.com"
+        ],
+        "flags": {
+            "--url": "Target URL",
+            "--data": "Data to send via POST",
+            "--crawl": "Number of urls to crawl",
+            "--crawl-get": "Crawl only GET requests",
+            "--crawl-post": "Crawl only POST requests",
+            "--forms": "Process forms",
+            "--cookie": "HTTP Cookie header",
+            "--user-agent": "HTTP User-Agent header",
+            "--referer": "HTTP Referer header",
+            "--headers": "Extra HTTP headers",
+            "--auth-type": "HTTP Authentication type",
+            "--auth-cred": "HTTP Authentication credentials",
+            "--check-tor": "Check to see if Tor is used",
+            "--force-ssl": "Force usage of SSL/HTTPS",
+            "--timeout": "Select your timeout",
+            "--retries": "Retries when connection timeout",
+            "--threads": "Maximum number of concurrent HTTP requests",
+            "--delay": "Delay in seconds between each HTTP request",
+            "--tcp-nodelay": "Use TCP_NODELAY",
+            "--follow-redirects": "Follow server redirects",
+            "--follow-limit": "Set limit for redirection",
+            "--payload": "OWN XSS VECTOR",
+            "--auto": "Automatic testing",
+            "--Cem": "Cross-site External Malware",
+            "--Dcp": "Data Control Protocol",
+            "--Dom": "Document Object Model",
+            "--Inducedcode": "Induced XSS code",
+            "--fuzz": "Enable fuzzing testing",
+            "--script": "XSS testing via <script> tags",
+            "--cookie-inject": "Cookie injection",
+            "--xsa": "XSS Auditor evasion",
+            "--reverse-check": "Establish a reverse connection",
+            "--heuristic": "Launch heuristic testing",
+            "--html": "Generate HTML report",
+            "--xml": "Generate XML report"
+        },
+        "payload_types": [
+            "Script injection",
+            "Cookie stealing",
+            "Redirection",
+            "Phishing",
+            "Keylogging",
+            "CSRF attacks",
+            "Information disclosure"
+        ],
+        "examples": [
+            {
+                "desc": "Basic XSS testing",
+                "command": "xsser --url 'http://target.com/search.php?q=XSS' --auto"
+            },
+            {
+                "desc": "POST form testing",
+                "command": "xsser --url 'http://target.com/login.php' --data 'username=XSS&password=test' --auto"
+            },
+            {
+                "desc": "Comprehensive crawling and testing",
+                "command": "xsser --crawl 50 --url http://target.com --auto --heuristic"
+            },
+            {
+                "desc": "Custom payload testing",
+                "command": "xsser --url 'http://target.com/?input=XSS' --payload '<script>alert(\"XSS\")</script>'"
+            }
+        ],
+        "evasion_techniques": [
+            "Encoding bypass",
+            "Filter bypass",
+            "WAF bypass",
+            "Browser-specific payloads",
+            "Context-aware payloads"
+        ],
+        "notes": [
+            "100+ XSS attack vectors",
+            "WAF bypass techniques",
+            "Browser exploit pack integration",
+            "Supports multiple injection contexts",
+            "Real-time vulnerability scanning",
+            "Automated payload generation"
+        ],
+        "security_risk": "High - Can execute malicious payloads",
+        "platform": ["Linux", "macOS"],
+        "requirements": [
+            "Python 2.7+",
+            "BeautifulSoup",
+            "Requests library"
+        ],
+        "installation": {
+            "method": "git",
+            "url": "https://github.com/epsylon/xsser",
+            "commands": [
+                "git clone https://github.com/epsylon/xsser.git",
+                "cd xsser",
+                "python setup.py install"
+            ]
+        },
+        "output_formats": [
+            "HTML",
+            "XML", 
+            "TXT",
+            "Console"
+        ],
+        "version": "1.8.4",
+        "author": "psy",
+        "license": "GPL v3",
+        "last_updated": "2024-01-15"
+    }
+}

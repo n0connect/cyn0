@@ -1,0 +1,23 @@
+{
+   
+    "cook-master.zip": {
+        "desc": "An overpower wordlist generator, splitter, merger, finder, saver, create words permutation and combinations, apply different encoding/decoding and everything you need.",
+        "category": "Source",
+        "type": "Wordlist Generator"
+    },
+    "fuzz.txt-master.zip": {
+        "desc": "There's Nothing so Permanent as Temporary",
+        "category": "Source",
+        "type": "Website FUZZ"
+    },
+    "PayloadsAllTheThings": {
+        "desc": "A list of useful payloads and bypasses for Web Application Security. Feel free to improve with your payloads and techniques !",
+        "category": "Source",
+        "type": "Cyber Security Generals"
+    },
+    "SecLists-master.zip": {
+        "desc": "SecLists is the security tester's companion. It's a collection of multiple types of lists used during security assessments, collected in one place. List types include usernames, passwords, URLs, sensitive data patterns, fuzzing payloads, web shells, and many more.",
+        "category": "Source",
+        "type": "Password&BruteForce and Cyber Security Generals"
+    }
+}

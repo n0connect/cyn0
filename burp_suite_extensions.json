@@ -1,0 +1,59 @@
+{
+  "turbo_intruder": {
+    "desc": "Güçlü HTTP saldırı aracı, hızlı HTTP istekleri gönderme",
+    "category": "Burp Suite Extension",
+    "type": "Attack Tool",
+    "purpose": "Gelişmiş HTTP saldırıları için hızlı istek gönderme",
+    "usage": "Rate limiting bypass, brute force, custom attacks",
+    "risk": "High"
+  },
+  "sqlmap_for_burp": {
+    "desc": "SQLMap aracının Burp Suite entegrasyonu",
+    "category": "Burp Suite Extension",
+    "type": "SQL Injection Tool",
+    "purpose": "SQL injection zafiyetlerini otomatik tespit ve sömürme",
+    "usage": "Automated SQL injection testing",
+    "risk": "Critical"
+  },
+  "autorize": {
+    "desc": "Otomatik yetkilendirme kontrolü yapan araç",
+    "category": "Burp Suite Extension",
+    "type": "Authorization Testing",
+    "purpose": "Erişim kontrolü zafiyetlerini keşfetme",
+    "usage": "IDOR, privilege escalation testing",
+    "risk": "High"
+  },
+  "active_scan_plus": {
+    "desc": "Burp Suite'in tarama yeteneklerini geliştiren eklenti",
+    "category": "Burp Suite Extension",
+    "type": "Scanner Enhancement",
+    "purpose": "Daha geniş kapsamlı güvenlik zafiyeti tespiti",
+    "usage": "Enhanced vulnerability scanning",
+    "risk": "Medium"
+  },
+  "403_bypasser": {
+    "desc": "HTTP 403 Forbidden kısıtlamalarını aşma testi",
+    "category": "Burp Suite Extension",
+    "type": "Access Control Bypass",
+    "purpose": "Erişim kısıtlamalarını otomatik test etme",
+    "usage": "403 bypass techniques automation",
+    "methods": ["PATCH", "PUT", "DELETE", "GET", "POST"],
+    "risk": "Medium"
+  },
+  "http_methods": {
+    "desc": "Web uygulamalarında kullanılan HTTP metodları",
+    "category": "HTTP Protocol",
+    "type": "HTTP Methods",
+    "methods": {
+      "GET": "Veri alma",
+      "POST": "Veri gönderme", 
+      "PUT": "Veri güncelleme/oluşturma",
+      "DELETE": "Veri silme",
+      "PATCH": "Kısmi veri güncelleme",
+      "HEAD": "Sadece header bilgisi alma",
+      "OPTIONS": "Desteklenen metodları öğrenme"
+    },
+    "purpose": "HTTP protokol metodları ve bypass teknikleri",
+    "risk": "Variable"
+  }
+}

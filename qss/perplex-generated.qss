@@ -1,0 +1,238 @@
+/* Genel QWidget stili - temiz, açık renkli arka plan ve hafif yuvarlatılmış köşeler */
+QWidget {
+    background-color: #F9F9F9;
+    border-radius: 8px;
+    color: #1D1D1F;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 13px;
+}
+
+/* QPushButton - macOS tarzı, hafif gölgesiz, yumuşak renk geçişleri */
+QPushButton {
+    background-color: #E0E0E0;
+    border: 1px solid #C6C6C8;
+    border-radius: 8px;
+    padding: 6px 12px;
+    color: #1D1D1F;
+    min-width: 80px;
+    min-height: 28px;
+    font-weight: 600;
+}
+
+QPushButton:hover {
+    background-color: #D1D1D6;
+    border-color: #A1A1A6;
+}
+
+QPushButton:pressed {
+    background-color: #B0B0B5;
+    border-color: #8E8E93;
+}
+
+/* QLineEdit - sade, ince kenarlık ve yuvarlatılmış köşeler */
+QLineEdit {
+    background-color: #FFFFFF;
+    border: 1px solid #C6C6C8;
+    border-radius: 8px;
+    padding: 6px 8px;
+    color: #1D1D1F;
+}
+
+QLineEdit:focus {
+    border: 1.5px solid #007AFF; /* macOS/iOS mavi vurgusu */
+    background-color: #FFFFFF;
+}
+
+/* QComboBox - sade, temiz kenarlık, ok işareti */
+QComboBox {
+    background-color: #FFFFFF;
+    border: 1px solid #C6C6C8;
+    border-radius: 8px;
+    padding: 6px 30px 6px 8px;
+    color: #1D1D1F;
+    min-height: 28px;
+}
+
+QComboBox:hover {
+    border-color: #A1A1A6;
+}
+
+QComboBox:focus {
+    border-color: #007AFF;
+}
+
+/* Ok işaretinin konumu ve görünümü */
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 24px;
+    border-left: 1px solid #C6C6C8;
+    border-radius: 0 8px 8px 0;
+    background-color: transparent;
+}
+
+QComboBox::down-arrow {
+    image: url(:/icons/down-arrow-macos.svg); /* macOS tarzı ok ikonu, uygulamanızda uygun ikonla değiştirin */
+    width: 12px;
+    height: 12px;
+}
+
+/* QCheckBox - macOS tarzı, yuvarlak kutu ve mavi işaret */
+QCheckBox {
+    spacing: 8px;
+    color: #1D1D1F;
+    font-weight: 500;
+}
+
+QCheckBox::indicator {
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid #C6C6C8;
+    border-radius: 5px;
+    background: #FFFFFF;
+}
+
+QCheckBox::indicator:checked {
+    background-color: #007AFF;
+    border-color: #007AFF;
+}
+
+QCheckBox::indicator:checked::after {
+    content: "";
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* QRadioButton - yuvarlak, mavi dolgu */
+QRadioButton {
+    spacing: 8px;
+    color: #1D1D1F;
+    font-weight: 500;
+}
+
+QRadioButton::indicator {
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid #C6C6C8;
+    border-radius: 9px;
+    background: #FFFFFF;
+}
+
+QRadioButton::indicator:checked {
+    background-color: #007AFF;
+    border-color: #007AFF;
+}
+
+QRadioButton::indicator:checked::after {
+    content: "";
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 4px;
+}
+
+/* QProgressBar - macOS/iOS tarzı, yuvarlatılmış ve temiz */
+QProgressBar {
+    border: 1px solid #C6C6C8;
+    border-radius: 8px;
+    background-color: #E5E5EA;
+    height: 16px;
+    text-align: center;
+    color: #1D1D1F;
+    font-weight: 600;
+}
+
+QProgressBar::chunk {
+    background-color: #007AFF;
+    border-radius: 8px;
+}
+
+/* QSlider - yatay, macOS/iOS tarzı */
+QSlider::groove:horizontal {
+    border: 1px solid #C6C6C8;
+    height: 6px;
+    background: #E5E5EA;
+    border-radius: 3px;
+}
+
+QSlider::handle:horizontal {
+    background: #FFFFFF;
+    border: 1.5px solid #007AFF;
+    width: 18px;
+    height: 18px;
+    margin: -7px 0;
+    border-radius: 9px;
+}
+
+/* QScrollArea ve QScrollBar - sade, minimal */
+QScrollArea {
+    background-color: #F9F9F9;
+    border-radius: 8px;
+}
+
+QScrollBar:vertical {
+    background: transparent;
+    width: 12px;
+    margin: 0px 0px 0px 0px;
+}
+
+QScrollBar::handle:vertical {
+    background: #C6C6C8;
+    min-height: 30px;
+    border-radius: 6px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #A1A1A6;
+}
+
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical {
+    height: 0;
+    subcontrol-origin: margin;
+}
+
+QScrollBar:horizontal {
+    background: transparent;
+    height: 12px;
+    margin: 0px 0px 0px 0px;
+}
+
+QScrollBar::handle:horizontal {
+    background: #C6C6C8;
+    min-width: 30px;
+    border-radius: 6px;
+}
+
+QScrollBar::handle:horizontal:hover {
+    background: #A1A1A6;
+}
+
+QScrollBar::add-line:horizontal,
+QScrollBar::sub-line:horizontal {
+    width: 0;
+    subcontrol-origin: margin;
+}
+
+/* QTextBrowser - macOS/iOS okunabilirliği ve estetik */
+QTextBrowser {
+    background-color: #FFFFFF;
+    border: 1px solid #C6C6C8;
+    border-radius: 8px;
+    padding: 12px;
+    color: #1D1D1F;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    selection-background-color: #007AFF;
+    selection-color: white;
+}

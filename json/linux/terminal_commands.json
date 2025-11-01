@@ -1,0 +1,9 @@
+{
+    "ls": {
+        "desc": "Dosya ve dizinleri listeler",
+        "usage": "ls [seçenekler] [dizin]",
+        "params": ["-l (detaylı)", "-a (gizli dosyalar)", "-h (okunabilir boyut)"],
+        "examples": ["ls -la", "ls -lh /home"],
+        "platform": "Linux/Unix"
+    }
+}

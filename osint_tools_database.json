@@ -1,0 +1,127 @@
+{
+    "temp_mail": {
+        "url": "https://temp-mail.org/",
+        "desc": "Geçici email adresi oluşturucu",
+        "category": "Privacy Tools",
+        "usage": "Kayıt işlemleri için geçici email",
+        "note": "Anonimlik için kullanılır"
+    },
+    "whois_com": {
+        "url": "https://www.whois.com/",
+        "desc": "Domain bilgileri sorgulama",
+        "category": "Domain Intelligence",
+        "usage": "Domain sahibi ve kayıt bilgileri",
+        "info": "Registrar, kayıt tarihi, süre bilgileri"
+    },
+    "who_is": {
+        "url": "https://www.who.is/",
+        "desc": "Alternatif domain bilgi sorgulama",
+        "category": "Domain Intelligence", 
+        "usage": "Domain detaylı analizi",
+        "note": "Whois.com'a alternatif"
+    },
+    "web_check": {
+        "url": "https://web-check.xyz/",
+        "desc": "Kapsamlı web sitesi analizi",
+        "category": "Website Analysis",
+        "usage": "SSL, DNS, güvenlik kontrolü",
+        "features": ["SSL analizi", "DNS kayıtları", "Güvenlik başlıkları"]
+    },
+    "dnslytics": {
+        "url": "https://dnslytics.com/",
+        "desc": "DNS ve domain analizi",
+        "category": "DNS Intelligence",
+        "usage": "DNS kayıtları ve bağlantılı siteler",
+        "special_feature": "Google Analytics ID (UA-) ile bağlantılı siteleri bulma"
+    },
+    "crt_sh": {
+        "url": "https://crt.sh/",
+        "desc": "SSL sertifika kayıtları veritabanı",
+        "category": "SSL Intelligence",
+        "usage": "Subdomain keşfi için sertifika kayıtları",
+        "note": "Certificate Transparency logları"
+    },
+    "rocketreach": {
+        "url": "rocketreach.co",
+        "desc": "Profesyonel iletişim bilgileri",
+        "category": "Social Intelligence", 
+        "usage": "Email ve telefon bilgileri",
+        "note": "LinkedIn benzeri profesyonel ağ"
+    },
+    "tinfoleak": {
+        "url": "tinfoleak.com",
+        "desc": "Twitter OSINT aracı",
+        "category": "Social Media Intelligence",
+        "usage": "Twitter hesap analizi",
+        "features": ["Konum bilgileri", "Aktivite analizi", "Bağlantı analizi"]
+    },
+    "instantusername": {
+        "url": "instantusername.com",
+        "desc": "Kullanıcı adı kullanılabilirlik kontrolü",
+        "category": "Username Intelligence",
+        "usage": "Çoklu platform kullanıcı adı arama",
+        "note": "Sosyal medya platformlarında arama"
+    },
+    "osint_framework": {
+        "url": "osintframework.com",
+        "desc": "OSINT araçları koleksiyonu",
+        "category": "Tool Collection",
+        "usage": "Kapsamlı OSINT araç listesi",
+        "note": "Kategori bazında organize edilmiş araçlar"
+    },
+    "geolocation": {
+        "url": "geolocation.com",
+        "desc": "IP geolocation servisi",
+        "category": "Location Intelligence",
+        "usage": "IP adresinden konum tespiti",
+        "info": "Ülke, şehir, ISP bilgileri"
+    },
+    "exif_tools": {
+        "url": "exif.tools",
+        "desc": "Görüntü metadata analizi",
+        "category": "Image Intelligence",
+        "usage": "Fotoğraf EXIF verilerini çıkarma",
+        "data_types": ["GPS koordinatları", "Kamera bilgileri", "Tarih/saat"]
+    },
+    "haveibeenpwned": {
+        "url": "https://haveibeenpwned.com/",
+        "desc": "Veri ihlali kontrolü",
+        "category": "Breach Intelligence",
+        "usage": "Email adresinin veri ihlallerinde olup olmadığını kontrol",
+        "note": "Troy Hunt tarafından geliştirilen servis"
+    },
+    "intelx": {
+        "url": "https://intelx.io/",
+        "desc": "Gelişmiş OSINT arama motoru",
+        "category": "Search Engine",
+        "usage": "Darkweb, leak, pastebins arama",
+        "features": ["Darkweb arama", "Leak database", "Pastebin arama"]
+    },
+    "wappalyzer": {
+        "name": "Wappalyzer - Technology profiler",
+        "desc": "Web sitesi teknoloji analizi",
+        "category": "Technology Intelligence",
+        "usage": "Kullanılan teknolojileri tespit etme",
+        "detection": ["CMS", "Framework", "Analytics", "CDN", "Server"]
+    },
+    "shodan": {
+        "url": "https://www.shodan.io/",
+        "desc": "İnternet bağlantılı cihaz arama motoru",
+        "category": "Device Intelligence",
+        "usage": "IoT cihazları, sunucular, kameralar",
+        "note": "İnternet'in arama motoru",
+        "dorks": "VNC, webcam, router arama"
+    },
+    "osint_url_database": {
+        "desc": "Bilgi toplama ve dogrulama asamasinda yardimci olacak internet siteleri.",
+        "url": ["Fake Filler", "Hack Tools", "Netsparker", "Acunetix", "ipInfo", "dns-dumpster", "crt.sh (certificate check)", "Snav", "InstantReach?", "UsernameReach?", "RocketReach(ncie)", "Nuclei"],
+        "category": "OSINT URLS"
+    },
+    "waybackmachine": {
+        "url": "https://web.archive.org/",
+        "desc": "Internet uzerinde bulunan websitelerin gecmis goruntulerini saklar.",
+        "category": "Reverse Travel",
+        "usage": "General",
+        "note": "Internetin zaman makinesi"
+    }
+}

@@ -1,0 +1,175 @@
+{
+  "tutorial": {
+    "id": "007_rdp_enumeration",
+    "title": "007 Write-up - RDP Enumeration",
+    "category": "network_security",
+    "difficulty": "beginner",
+    "protocol": "RDP",
+    "description": "007 ısınma makinesi, Uzak Masaüstü Protokolü (RDP) ile ilgili ideal bir başlangıç noktasıdır. Bu makinede, RDP servislerinin yanlış yapılandırılmasından kaynaklanan güvenlik açıklarını belirlemeyi ve bunları nasıl kullanabileceğinizi öğreneceksiniz.",
+    "learning_objectives": [
+      "RDP servislerinin yanlış yapılandırılmasından kaynaklanan güvenlik açıklarını belirleme",
+      "RDP'nin temel işleyişini ve bağlantı kurma yöntemlerini öğrenme",
+      "RDP güvenlik açıklarını anlama ve siber güvenlik becerilerini güçlendirme"
+    ]
+  },
+  "protocol_info": {
+    "name": "Remote Desktop Protocol",
+    "abbreviation": "RDP",
+    "developer": "Microsoft",
+    "default_port": 3389,
+    "description": "Kullanıcıların bir ağ üzerinden başka bir bilgisayara uzaktan erişim sağlamasına olanak tanıyan protokol",
+    "features": [
+      "veri şifrelemesi",
+      "oturum yönetimi",
+      "cihaz yönlendirme"
+    ]
+  },
+  "reconnaissance": {
+    "phase": "Bilgi Toplama",
+    "techniques": [
+      {
+        "method": "port_scanning",
+        "description": "Hedef makinemize yönelik port taraması yaparak bilgi toplamaya başlayalım",
+        "results": {
+          "open_ports": 4,
+          "critical_port": {
+            "port": 3389,
+            "service": "RDP",
+            "description": "bilgisayara uzak masaüstü bağlantısı kurabileceğimiz RDP servisinin çalıştığını tespit ettik"
+          }
+        }
+      }
+    ]
+  },
+  "tasks": [
+    {
+      "task_id": 1,
+      "title": "NetBIOS Hostname Discovery",
+      "description": "Hedef makinenin NetBIOS servisi üzerinden hostname bilgisini öğrenebiliriz",
+      "tool": "nmblookup",
+      "command": "nmblookup",
+      "parameters": {
+        "-A": "Bir bilgisayarın IP adresinden NetBIOS adını öğrenmek için kullanılan parametredir",
+        "-B": "Bir bilgisayarın NetBIOS adından IP adresini öğrenmek için kullanılan parametredir"
+      }
+    },
+    {
+      "task_id": 2,
+      "title": "RDP Protocol Identification",
+      "description": "RDP'nin açılımı Remote Desktop Protocol'dür",
+      "answer": "Remote Desktop Protocol"
+    },
+    {
+      "task_id": 3,
+      "title": "Default Administrator Account",
+      "description": "Windows bilgisayarlarda genellikle varsayılan olarak yetkilil kullanıcı Administrator kullanıcısıdır",
+      "default_user": "Administrator"
+    },
+    {
+      "task_id": 4,
+      "title": "RDP Connection with Remmina",
+      "description": "Açık-kaynaklı bir proje olan Remmina ile RDP bağlantısı kurmayı deneyelim",
+      "tool": "Remmina",
+      "connection_details": {
+        "target_ip": "hedef_makinenin_IP_adresi",
+        "username": "Administrator",
+        "password": "boş",
+        "vulnerability": "parolasız bağlantıya izin verdiği için hatalı konfigüre edilmiş"
+      },
+      "post_connection": {
+        "command": "Get-ComputerInfo | Select-Object WindowsVersion",
+        "purpose": "Windows versiyonunu öğrenmek",
+        "shell": "PowerShell"
+      }
+    },
+    {
+      "task_id": 5,
+      "title": "File System Exploration",
+      "description": "C dizini altındaki dosya ve klasörleri kontrol edelim",
+      "suspicious_folder": "junk",
+      "location": "C:\\"
+    },
+    {
+      "task_id": 6,
+      "title": "Folder Owner Investigation",
+      "description": "Bu klasörün sahibi olan kullanıcıyı tespit etmek için Properties -> Security -> Advanced yolunu izliyoruz",
+      "navigation_path": "Properties -> Security -> Advanced",
+      "folder_owner": "spy7",
+      "result": "Şüpheli klasörün sahibi olan kullanıcıyı tespit ettik"
+    }
+  ],
+  "tools": [
+    {
+      "name": "nmblookup",
+      "purpose": "NetBIOS name resolution",
+      "category": "reconnaissance"
+    },
+    {
+      "name": "Remmina",
+      "purpose": "RDP client",
+      "category": "remote_access",
+      "type": "open_source"
+    },
+    {
+      "name": "Microsoft Remote Desktop",
+      "purpose": "RDP client",
+      "category": "remote_access"
+    },
+    {
+      "name": "FreeRDP",
+      "purpose": "RDP client",
+      "category": "remote_access"
+    },
+    {
+      "name": "rdesktop",
+      "purpose": "RDP client",
+      "category": "remote_access"
+    }
+  ],
+  "vulnerabilities": [
+    {
+      "type": "misconfiguration",
+      "description": "RDP servisi açık kalmış olan bu Windows bilgisayar, parolasız bağlantıya izin verdiği için hatalı konfigüre edilmiş",
+      "impact": "unauthorized_remote_access",
+      "severity": "high"
+    }
+  ],
+  "system_access": {
+    "method": "RDP",
+    "credentials": {
+      "username": "Administrator",
+      "password": "empty",
+      "authentication_bypass": true
+    },
+    "success": true,
+    "post_exploitation": [
+      {
+        "action": "system_enumeration",
+        "command": "Get-ComputerInfo | Select-Object WindowsVersion",
+        "purpose": "Windows version identification"
+      },
+      {
+        "action": "file_system_exploration",
+        "target": "C:\\",
+        "findings": ["junk folder - suspicious"]
+      },
+      {
+        "action": "ownership_investigation",
+        "target": "junk folder",
+        "method": "Properties -> Security -> Advanced",
+        "result": "spy7 user identified as owner"
+      }
+    ]
+  },
+  "completion": {
+    "status": "success",
+    "message": "Bu alıştırmadaki tüm görevleri başarıyla tamamladınız",
+    "emoji": "🎉✨"
+  },
+  "metadata": {
+    "language": "turkish",
+    "created_for": "cybersecurity_training",
+    "format": "hands_on_tutorial",
+    "platform": "HackerBox"
+  }
+}

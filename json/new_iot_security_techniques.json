@@ -1,0 +1,339 @@
+{
+  "default_credentials": {
+    "desc": "IoT cihazlarda yaygın olan varsayılan kullanıcı adı ve şifre kombinasyonları",
+    "category": "IoT Security",
+    "type": "Default Credentials",
+    "credentials": [
+      {
+        "vendor": "D-Link",
+        "username": "admin",
+        "password": "admin"
+      },
+      {
+        "vendor": "Linksys",
+        "username": "admin",
+        "password": "admin"
+      },
+      {
+        "vendor": "Netgear",
+        "username": "admin",
+        "password": "password"
+      },
+      {
+        "vendor": "TP-Link",
+        "username": "admin",
+        "password": ""
+      },
+      {
+        "vendor": "Huawei",
+        "username": "admin",
+        "password": "admin"
+      },
+      {
+        "vendor": "Ubiquiti",
+        "username": "ubnt",
+        "password": "ubnt"
+      },
+      {
+        "vendor": "Axis",
+        "username": "root",
+        "password": "pass"
+      },
+      {
+        "vendor": "Hikvision",
+        "username": "admin",
+        "password": "12345"
+      }
+    ],
+    "security": "high_risk",
+    "reference": "IoT Security Database"
+  },
+  "common_iot_ports": {
+    "desc": "IoT cihazlarda yaygın olarak kullanılan portlar ve hizmetler",
+    "category": "IoT Security",
+    "type": "Common Ports",
+    "ports": [
+      {
+        "port": 23,
+        "service": "Telnet",
+        "description": "Açık Telnet erişimi",
+        "risk": "Critical",
+        "exploitation": "Default credentials"
+      },
+      {
+        "port": 22,
+        "service": "SSH",
+        "description": "SSH erişimi",
+        "risk": "High",
+        "exploitation": "Default creds or weak keys"
+      },
+      {
+        "port": 80,
+        "service": "HTTP",
+        "description": "Web arayüzü",
+        "risk": "Medium-High",
+        "exploitation": "Web vulnerabilities"
+      },
+      {
+        "port": 443,
+        "service": "HTTPS",
+        "description": "Güvenli web arayüzü",
+        "risk": "Medium-High",
+        "exploitation": "Web vulnerabilities"
+      },
+      {
+        "port": 554,
+        "service": "RTSP",
+        "description": "Real Time Streaming Protocol",
+        "risk": "Medium",
+        "exploitation": "Stream capture"
+      },
+      {
+        "port": 5555,
+        "service": "ADB",
+        "description": "Android Debug Bridge",
+        "risk": "Critical",
+        "exploitation": "Full device access"
+      },
+      {
+        "port": 8080,
+        "service": "HTTP Alt",
+        "description": "Alternatif HTTP port",
+        "risk": "Medium-High",
+        "exploitation": "Web vulnerabilities"
+      }
+    ],
+    "security": "medium_risk",
+    "reference": "Shodan IoT Ports"
+  },
+  "firmware_analysis_techniques": {
+    "desc": "IoT cihaz firmware analizi teknikleri",
+    "category": "IoT Security",
+    "type": "Firmware Analysis",
+    "tools": [
+      {
+        "name": "binwalk",
+        "usage": "Firmware dosyasında dosya sistemi ve dosyaları tespit etme",
+        "command": "binwalk -e firmware.bin",
+        "purpose": "Firmware extraction"
+      },
+      {
+        "name": "firmware-mod-kit",
+        "usage": "Linux-based firmware extraction ve modification",
+        "command": "./extract-firmware.sh firmware.bin",
+        "purpose": "Firmware modification"
+      },
+      {
+        "name": "unsquashfs",
+        "usage": "SquashFS dosya sistemini çıkarma",
+        "command": "unsquashfs -f -d output/ filesystem.squashfs",
+        "purpose": "File system extraction"
+      },
+      {
+        "name": "dd",
+        "usage": "Firmware partition extraction",
+        "command": "dd if=firmware.bin of=partition.bin bs=1 skip=OFFSET count=SIZE",
+        "purpose": "Partition extraction"
+      },
+      {
+        "name": "hexdump",
+        "usage": "Firmware binary analysis",
+        "command": "hexdump -C firmware.bin | grep -i password",
+        "purpose": "Manual analysis"
+      }
+    ],
+    "techniques": [
+      {
+        "name": "String Analysis",
+        "description": "Firmware'de sabitlenmiş şifreler ve ayarlar",
+        "command": "strings firmware.bin | grep -i password",
+        "purpose": "Sensitive data discovery"
+      },
+      {
+        "name": "Configuration Files",
+        "description": "Ağ yapılandırmaları ve hizmet ayarları",
+        "location": "/etc/",
+        "purpose": "Configuration analysis"
+      },
+      {
+        "name": "SSH Keys",
+        "description": "Hardcoded SSH anahtarları",
+        "location": "/etc/ssh/", 
+        "purpose": "Authentication bypass"
+      },
+      {
+        "name": "Binary Analysis",
+        "description": "Reverse engineering of executables",
+        "tool": "Ghidra or IDA Pro",
+        "purpose": "Logic analysis"
+      }
+    ],
+    "security": "high_risk",
+    "reference": "IoT Security Framework"
+  },
+  "iot_protocol_exploitation": {
+    "desc": "IoT protokollerinde exploitation teknikleri",
+    "category": "IoT Security",
+    "type": "Protocol Exploitation",
+    "protocols": [
+      {
+        "name": "MQTT",
+        "port": 1883,
+        "description": "Message Queuing Telemetry Transport",
+        "exploitation": [
+          {
+            "type": "Authentication Bypass",
+            "desc": "Anonymous authentication",
+            "command": "mosquitto_sub -h target -t '#' -v",
+            "purpose": "Message interception"
+          },
+          {
+            "type": "Topic Manipulation",
+            "desc": "Incorrect topic ACLs",
+            "command": "mosquitto_pub -h target -t 'admin/config' -m 'new_config'",
+            "purpose": "Configuration change"
+          }
+        ]
+      },
+      {
+        "name": "CoAP",
+        "port": 5683,
+        "description": "Constrained Application Protocol",
+        "exploitation": [
+          {
+            "type": "Discovery",
+            "desc": "Resource discovery",
+            "command": "coap-client -m get coap://target/.well-known/core",
+            "purpose": "Resource enumeration"
+          },
+          {
+            "type": "Unauthorized Access",
+            "desc": "Missing authentication",
+            "command": "coap-client -m put coap://target/config",
+            "purpose": "Configuration change"
+          }
+        ]
+      },
+      {
+        "name": "Zigbee",
+        "port": null,
+        "description": "Wireless mesh networking",
+        "exploitation": [
+          {
+            "type": "Network Key",
+            "desc": "Zigbee network key discovery",
+            "tool": "zigbee2mqtt",
+            "purpose": "Network access"
+          },
+          {
+            "type": "Firmware Update",
+            "desc": "Overriding firmware updates",
+            "tool": "zigpy",
+            "purpose": "Device compromise"
+          }
+        ]
+      },
+      {
+        "name": "Z-Wave",
+        "port": null,
+        "description": "Wireless home automation",
+        "exploitation": [
+          {
+            "type": "Home ID",
+            "desc": "Z-Wave home ID discovery",
+            "tool": "Z-Force",
+            "purpose": "Network access"
+          },
+          {
+            "type": "Node Discovery",
+            "desc": "Z-Wave node enumeration",
+            "tool": "OpenZWave",
+            "purpose": "Topology mapping"
+          }
+        ]
+      }
+    ],
+    "security": "high_risk",
+    "reference": "IoT Protocol Security Research"
+  },
+  "iot_device_fingerprinting": {
+    "desc": "IoT cihazlarını tanımlama teknikleri",
+    "category": "IoT Security",
+    "type": "Device Fingerprinting",
+    "techniques": [
+      {
+        "name": "MAC Address OUI",
+        "description": "Vendor specific MAC address prefixes",
+        "tool": "nmap --script=mac-geolocation",
+        "command": "nmap --script=mac-geolocation target",
+        "purpose": "Vendor identification"
+      },
+      {
+        "name": "HTTP Headers",
+        "description": "Cihazın verdiği HTTP header bilgileri",
+        "fields": ["Server", "User-Agent", "X-Powered-By"],
+        "purpose": "Software identification"
+      },
+      {
+        "name": "Banner Grabbing",
+        "description": "Açık servislerin banner mesajları",
+        "ports": [23, 22, 80, 443],
+        "tool": "nc or nmap",
+        "purpose": "Service identification"
+      },
+      {
+        "name": "SSL/TLS Fingerprinting",
+        "description": "SSL/TLS handshake properties",
+        "tool": "sslscan or testssl.sh",
+        "purpose": "Implementation identification"
+      },
+      {
+        "name": "SNMP Queries",
+        "description": "SNMP destekleyen cihaz bilgileri",
+        "oids": ["1.3.6.1.2.1.1.1", "1.3.6.1.2.1.1.5"],
+        "purpose": "System information"
+      }
+    ],
+    "security": "medium_risk",
+    "reference": "Shodan Research"
+  },
+  "shodan_queries_iot": {
+    "desc": "IoT cihazlarını Shodan'da aramak için sorgular",
+    "category": "IoT Security",
+    "type": "Shodan Queries",
+    "queries": [
+      {
+        "query": "product:\"DVR\" country:US",
+        "description": "ABD'deki DVR cihazları",
+        "purpose": "Vulnerable devices"
+      },
+      {
+        "query": "product:\"webcam\" country:DE",
+        "description": "Almanya'daki IP kameralar",
+        "purpose": "Privacy research"
+      },
+      {
+        "query": "product:\"router\" port:8080",
+        "description": "8080 portunda çalışan router'lar",
+        "purpose": "Web interface access"
+      },
+      {
+        "query": "product:\"printer\" -authentication",
+        "description": "Kimlik doğrulamasız yazıcılar",
+        "purpose": "Unauthorized printing"
+      },
+      {
+        "query": "product:\"database\" tag:unauth",
+        "description": "Kimlik doğrulamasız veritabanları",
+        "purpose": "Data access"
+      },
+      {
+        "query": "product:\"camera\" org:\"Google LLC\"",
+        "description": "Google LLC ağındaki kameralar",
+        "purpose": "Infrastructure research"
+      }
+    ],
+    "security": "high_risk",
+    "reference": "Shodan API Documentation"
+  }
+}

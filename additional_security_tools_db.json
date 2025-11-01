@@ -1,0 +1,304 @@
+{
+    "waes": {
+        "desc": "Web Application Enumeration Scanner - comprehensive web application reconnaissance",
+        "category": "Web Application Scanning",
+        "usage": [
+            "waes -u http://target.com",
+            "waes -u http://target.com -w /usr/share/wordlists/dirb/common.txt",
+            "waes -u http://target.com --full-scan"
+        ],
+        "features": [
+            "Directory enumeration",
+            "Subdomain discovery",
+            "Technology detection",
+            "Vulnerability scanning",
+            "SSL/TLS analysis"
+        ],
+        "flags": {
+            "-u": "Target URL",
+            "-w": "Wordlist file",
+            "--threads": "Number of threads",
+            "--timeout": "Request timeout",
+            "--full-scan": "Comprehensive scanning",
+            "--output": "Output file format"
+        },
+        "examples": [
+            {
+                "desc": "Basic web enumeration",
+                "command": "waes -u http://target.com --threads 20"
+            }
+        ],
+        "notes": [
+            "Comprehensive web application analysis",
+            "Multiple scanning modules"
+        ],
+        "security_risk": "Medium - Active scanning",
+        "platform": ["Linux", "macOS"],
+        "required_permissions": "Network access"
+    },
+    "rapiscan": {
+        "desc": "Rapid API security scanner for REST API vulnerability assessment",
+        "category": "API Security Testing",
+        "usage": [
+            "rapiscan -u http://api.target.com",
+            "rapiscan --swagger http://api.target.com/swagger.json",
+            "rapiscan -u http://api.target.com --auth-token YOUR_TOKEN"
+        ],
+        "vulnerability_checks": [
+            "Authentication bypass",
+            "Authorization flaws",
+            "Input validation",
+            "Rate limiting",
+            "Information disclosure",
+            "OWASP API Top 10"
+        ],
+        "flags": {
+            "-u": "API base URL",
+            "--swagger": "Swagger/OpenAPI specification",
+            "--auth-token": "Authentication token",
+            "--rate-limit": "Requests per second",
+            "--output": "Output format (json, xml, html)"
+        },
+        "examples": [
+            {
+                "desc": "Basic API scan",
+                "command": "rapiscan -u https://api.example.com/v1"
+            },
+            {
+                "desc": "Swagger-based testing",
+                "command": "rapiscan --swagger https://api.example.com/swagger.json"
+            }
+        ],
+        "notes": [
+            "OWASP API Top 10 focused",
+            "Swagger/OpenAPI integration"
+        ],
+        "security_risk": "Medium - API vulnerability testing",
+        "platform": ["Linux", "Windows", "macOS"],
+        "required_permissions": "Network access"
+    },
+    "wapiti": {
+        "desc": "Web application vulnerability scanner - black-box security auditing",
+        "category": "Web Vulnerability Scanner",
+        "usage": [
+            "wapiti -u http://target.com",
+            "wapiti -u http://target.com -m all",
+            "wapiti -u http://target.com --scope domain"
+        ],
+        "flags": {
+            "-u": "Target URL",
+            "-m": "Modules to use (all, sql, xss, file, etc.)",
+            "--scope": "Scanning scope (page, folder, domain, punk)",
+            "-v": "Verbosity level",
+            "-f": "Output format (html, json, txt, xml)",
+            "-o": "Output file",
+            "--color": "Colorize output",
+            "--time-limit": "Maximum scan time",
+            "--max-depth": "Maximum link depth",
+            "--max-files-per-dir": "Files per directory limit",
+            "--max-scan-time": "Maximum time per URL",
+            "--timeout": "Request timeout",
+            "--verify-ssl": "Verify SSL certificates",
+            "--proxy": "Use proxy server",
+            "--auth-type": "Authentication type",
+            "--auth-user": "Authentication username",
+            "--auth-password": "Authentication password",
+            "--cookie": "Cookie string"
+        },
+        "vulnerability_modules": {
+            "sql": "SQL injection detection",
+            "xss": "Cross-site scripting",
+            "file": "File inclusion vulnerabilities",
+            "exec": "Command execution",
+            "crlf": "CRLF injection",
+            "xxe": "XML external entity",
+            "ssrf": "Server-side request forgery",
+            "redirect": "Open redirect",
+            "htaccess": ".htaccess bypass",
+            "backup": "Backup file detection",
+            "shellshock": "Shellshock vulnerability",
+            "nikto": "Nikto-based checks"
+        },
+        "examples": [
+            {
+                "desc": "Comprehensive scan",
+                "command": "wapiti -u http://target.com -m all --scope domain -f html -o report.html"
+            },
+            {
+                "desc": "Specific vulnerability testing",
+                "command": "wapiti -u http://target.com -m sql,xss,file --max-depth 3"
+            },
+            {
+                "desc": "Authenticated scanning",
+                "command": "wapiti -u http://target.com --cookie 'PHPSESSID=abc123' -m all"
+            }
+        ],
+        "output_formats": ["HTML", "JSON", "TXT", "XML"],
+        "notes": [
+            "Python dilinde yazılmış",
+            "Modüler yapı",
+            "Comprehensive vulnerability detection"
+        ],
+        "security_risk": "High - Active vulnerability testing",
+        "platform": ["Linux", "Windows", "macOS"],
+        "required_permissions": "Network access"
+    },
+    "uniscan_gui": {
+        "desc": "Comprehensive web vulnerability scanner with GUI interface",
+        "category": "Web Vulnerability Scanner",
+        "usage": [
+            "uniscan-gui (Launch GUI)",
+            "uniscan -u http://target.com -q",
+            "uniscan -u http://target.com -w -e"
+        ],
+        "scanning_modes": {
+            "directory": "Directory and file discovery",
+            "file": "Static file analysis",
+            "robots": "robots.txt analysis",
+            "dynamic": "Dynamic content testing",
+            "stress": "Stress testing",
+            "all": "Comprehensive scanning"
+        },
+        "vulnerability_checks": [
+            "LFI/RFI vulnerabilities",
+            "SQL injection",
+            "Cross-site scripting",
+            "Remote code execution",
+            "Server misconfigurations",
+            "Information disclosure"
+        ],
+        "flags": {
+            "-u": "Target URL",
+            "-q": "Directory check",
+            "-w": "File check",
+            "-e": "robots.txt check",
+            "-d": "Dynamic tests",
+            "-s": "Static tests",
+            "-r": "Stress tests",
+            "-i": "Server information",
+            "-o": "Enable plugins",
+            "-g": "Generate reports"
+        },
+        "examples": [
+            {
+                "desc": "Quick directory scan",
+                "command": "uniscan -u http://target.com -q"
+            },
+            {
+                "desc": "Comprehensive scan",
+                "command": "uniscan -u http://target.com -qweds"
+            }
+        ],
+        "notes": [
+            "Perl dilinde yazılmış",
+            "GUI ve command-line interface",
+            "Plugin sistemi"
+        ],
+        "security_risk": "High - Active vulnerability scanning",
+        "platform": ["Linux"],
+        "required_permissions": "Network access"
+    },
+    "vooki": {
+        "desc": "WebDAV security scanner and exploitation tool",
+        "category": "WebDAV Security Testing",
+        "usage": [
+            "vooki -h http://target.com",
+            "vooki -h http://target.com -m PUT",
+            "vooki -h http://target.com --upload test.txt"
+        ],
+        "webdav_methods": [
+            "PUT", "DELETE", "COPY", "MOVE", 
+            "MKCOL", "PROPFIND", "PROPPATCH", "LOCK", "UNLOCK"
+        ],
+        "vulnerability_checks": [
+            "WebDAV method testing",
+            "File upload capabilities",
+            "Directory creation",
+            "File manipulation",
+            "Authentication bypass"
+        ],
+        "flags": {
+            "-h": "Target host",
+            "-m": "HTTP method to test",
+            "--upload": "Upload file",
+            "--auth": "Authentication credentials",
+            "-v": "Verbose output"
+        },
+        "examples": [
+            {
+                "desc": "Test WebDAV methods",
+                "command": "vooki -h http://target.com/webdav/ -m PUT,DELETE,MKCOL"
+            },
+            {
+                "desc": "File upload test",
+                "command": "vooki -h http://target.com/webdav/ --upload shell.php"
+            }
+        ],
+        "notes": [
+            "WebDAV specific testing",
+            "File upload exploitation",
+            "Method enumeration"
+        ],
+        "security_risk": "High - Can upload malicious files",
+        "platform": ["Linux", "macOS"],
+        "required_permissions": "Network access"
+    },
+    "zaproxy": {
+        "desc": "OWASP ZAP (Zed Attack Proxy) - web application security scanner",
+        "category": "Web Application Security Testing",
+        "usage": [
+            "zaproxy",
+            "zap.sh -daemon -port 8080",
+            "zap-cli quick-scan http://target.com"
+        ],
+        "modes": {
+            "desktop": "Full GUI application",
+            "daemon": "Headless mode with API",
+            "cmd": "Command line interface"
+        },
+        "core_features": [
+            "Intercepting proxy",
+            "Active/passive scanning",
+            "Spider/crawler",
+            "Forced browsing",
+            "Fuzzer",
+            "WebSocket testing",
+            "Authentication testing"
+        ],
+        "api_usage": [
+            "RESTful API for automation",
+            "JSON/XML responses",
+            "Integration with CI/CD",
+            "Custom scripting"
+        ],
+        "examples": [
+            {
+                "desc": "Start GUI mode",
+                "command": "zaproxy"
+            },
+            {
+                "desc": "Daemon mode",
+                "command": "zap.sh -daemon -port 8080 -config api.disablekey=true"
+            },
+            {
+                "desc": "Quick scan via CLI",
+                "command": "zap-cli quick-scan --self-contained http://target.com"
+            }
+        ],
+        "plugins": [
+            "Active scan rules",
+            "Passive scan rules",
+            "Authentication methods",
+            "Session management",
+            "Script engines"
+        ],
+        "notes": [
+            "OWASP flagship project",
+            "Extensive plugin ecosystem",
+            "Industry standard tool"
+        ],
+        "security_risk": "High - Active security testing",
+        "platform": ["Linux", "Windows", "macOS"],
+        "required_permissions": "Network access"
+    }
+}

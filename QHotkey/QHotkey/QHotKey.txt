@@ -1,0 +1,7 @@
+# QHotkey include ve kaynak dosyaları
+INCLUDEPATH += $$PWD/QHotkey/QHotkey/include
+SOURCES += $$PWD/QHotkey/QHotkey/src/qhotkey.cpp
+HEADERS += $$PWD/QHotkey/QHotkey/include/qhotkey.h
+
+# Windows için gerekli olan user32 kütüphanesi
+win32: LIBS += -luser32

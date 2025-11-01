@@ -1,0 +1,9 @@
+{
+    "dir": {
+        "description": "Dizin içeriğini gösterir",
+        "syntax": "dir [sürücü:][yol][dosya adı]",
+        "options": ["/p (sayfa sayfa)", "/w (geniş format)", "/s (alt dizinler)"],
+        "target_os": "Windows",
+        "version": "Tüm Windows sürümleri"
+    }
+}

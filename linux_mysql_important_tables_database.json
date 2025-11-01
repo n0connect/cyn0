@@ -1,0 +1,17 @@
+{
+    "mysql_user": {
+        "desc": "MySQL kullanıcı bilgileri tablosu",
+        "path": "mysql.user",
+        "content": "Kullanıcı bilgileri ve izinler"
+    },
+    "mysql_db": {
+        "desc": "MySQL veritabanı erişim izinleri",
+        "path": "mysql.db",
+        "content": "Veritabanı erişim izinleri"
+    },
+    "information_schema": {
+        "desc": "MySQL sistem tabloları",
+        "path": "information_schema.tables",
+        "content": "Sistem tablolari bilgileri"
+    }
+}

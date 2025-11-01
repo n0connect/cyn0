@@ -1,0 +1,86 @@
+/* Genel Temel Stil */
+QWidget {
+    background-color: #1E1E1E; /* Arka plan rengi */
+    color: #E0E0E0; /* Yazı rengi */
+    font-family: "Segoe UI", "Roboto", "Helvetica Neue", sans-serif;
+    font-size: 14px;
+    border: none;
+}
+
+/* Ana Pencereye Gölgelendirme efekti (yalnızca özel pencere sınıfında geçerli olabilir) */
+QMainWindow {
+    border-radius: 16px;
+    background-color: #1E1E1E; /* Ana pencere arka plan rengi */
+}
+
+/* Arama Kutusu */
+QLineEdit {
+    background-color: #2A2A2A; /* Giriş alanı arka plan rengi */
+    border: 1px solid #4A4A4A; /* Giriş alanı kenar rengi */
+    padding: 8px 12px;
+    border-radius: 12px;
+    color: #FFFFFF; /* Giriş alanı yazı rengi */
+    selection-background-color: #4A90E2; /* Seçim arka plan rengi */
+}
+
+/* Liste Kutusu */
+QListWidget {
+    background-color: #2B2B2B; /* Liste kutusu arka plan rengi */
+    border: 1px solid #4A4A4A; /* Liste kutusu kenar rengi */
+    border-radius: 12px;
+    padding: 4px;
+}
+
+/* Liste Öğeleri */
+QListWidget::item {
+    padding: 10px 12px;
+    border-radius: 8px;
+    color: #DCDCDC; /* Liste öğeleri yazı rengi */
+}
+
+/* Hover ve Seçim Efektleri */
+QListWidget::item:hover {
+    background-color: #3A3A3A; /* Hover durumu arka plan rengi */
+    color: #FFFFFF; /* Hover durumu yazı rengi */
+}
+
+QListWidget::item:selected {
+    background-color: #4A90E2; /* Seçili öğe arka plan rengi */
+    color: #FFFFFF; /* Seçili öğe yazı rengi */
+}
+
+/* Butonlar */
+QPushButton {
+    background-color: #3A3A3A; /* Buton arka plan rengi */
+    color: #FFFFFF; /* Buton yazı rengi */
+    border-radius: 10px;
+    padding: 8px 16px;
+    border: 1px solid #555555; /* Buton kenar rengi */
+}
+
+QPushButton:hover {
+    background-color: #4A4A4A; /* Hover durumu arka plan rengi */
+}
+
+QPushButton:pressed {
+    background-color: #2A2A2A; /* Basılı buton arka plan rengi */
+}
+
+/* Scrollbar Stili */
+QScrollBar:vertical, QScrollBar:horizontal {
+    background: transparent; /* Scrollbar arka plan rengi */
+    width: 8px; /* Dikey scrollbar genişliği */
+    height: 8px; /* Yatay scrollbar yüksekliği */
+    margin: 2px;
+}
+
+QScrollBar::handle {
+    background: #4A90E2; /* Scrollbar tutamağı rengi */
+    border-radius: 4px; /* Scrollbar tutamağı kenar yuvarlama */
+}
+
+QScrollBar::add-line,
+QScrollBar::sub-line {
+    background: none; /* Scrollbar ekleme/çıkarma butonları arka plan rengi */
+    border: none; /* Scrollbar ekleme/çıkarma butonları kenar rengi */
+}

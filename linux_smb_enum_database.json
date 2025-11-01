@@ -1,0 +1,316 @@
+{
+    "smbclient": {
+        "desc": "SMB/CIFS protokolü üzerinden dosya paylaşımlarına erişim ve yönetim aracı",
+        "category": "Network Services",
+        "type": "Service Enumeration | Default Port: 445",
+        "usage": [
+            "smbclient [options] <netbios-name|ip-address>",
+            "smbclient -L //target_ip -N",
+            "smbclient //target_ip/share_name -U username",
+            "smbclient //target_ip/share_name -N",
+            "---------------------------",
+            "smbclient –no-pass \\\\\\\\<netbios-name|ip-address>\\\\<sharename>"
+        ],
+        "common_flags": {
+            "-L": "Mevcut SMB paylaşımlarını listeler",
+            "-N": "Parola sormadan (anonim giriş) deneme yapar",
+            "-U": "Kullanıcı adı belirtir",
+            "-p": "Port numarası belirtir",
+            "-W": "Workgroup/domain belirtir",
+            "-c": "Komut çalıştırır ve çıkar",
+            "-A": "Kimlik bilgilerini dosyadan okur",
+            "-k": "Kerberos authentication kullanır",
+            "-e": "Şifreleme seviyesi belirtir",
+            "--no-pass": "Parola gerektirmeyen bir kaynağa erişirken kullanılmalıdır. Bu parametre belirtilmezse istemci tarafından parola istenecektir."
+        },
+        "common_shares": {
+            "C$": "Windows işletim sistemlerinde bulunan ve sistem yöneticilerine ayrıcalıklı erişim sağlayan gizli bir ağ paylaşımıdır. C sürücüsünün kök dizinine erişim sağlar.",
+            "D$": "Windows'ta sistem yöneticilerine yönelik gizli bir paylaşımdır ve bu paylaşım D sürücüsünün kök dizinine erişim sağlar.",
+            "ADMIN$": "Windows işletim sistemlerinde, sistem yönetim amaçlı kullanılan bir gizli ağ paylaşımıdır. Genellikle, Windows'un kurulum dizini olan %WINDIR% (örneğin, C:\\Windows) dizinine erişimi sağlar.",
+            "IPC$": "\"Inter-Process Communication Share\" anlamına gelir ve Windows işletim sistemlerinde işlemler arası iletişim için kullanılır. Bu paylaşım, ağ üzerinden anonim oturum bilgileri ve diğer geçici ağ işlemleri için kullanılır, dosya veya dizin erişimi sağlamaz.",
+            "PRINT$": "Yazıcı sürücülerinin ve yazıcıların yapılandırma dosyalarının saklandığı ve yönetildiği özel bir ağ paylaşımıdır, bu sayede ağ üzerinden yazıcılara erişim ve onların yönetimi kolaylaştırılır."
+        },
+        "interactive_commands": {
+            "ls": "Dizin içeriğini listele",
+            "cd": "Dizin değiştir",
+            "get": "Dosya indir",
+            "put": "Dosya yükle",
+            "mget": "Çoklu dosya indir",
+            "mput": "Çoklu dosya yükle",
+            "mkdir": "Dizin oluştur",
+            "rmdir": "Dizin sil",
+            "del": "Dosya sil",
+            "help": "Komutları listele",
+            "exit": "Çıkış yap"
+        },
+        "examples": [
+            {
+                "desc": "Anonim olarak paylaşımları listele",
+                "command": "smbclient -L //172.20.2.14 -N",
+                "explanation": "Hedef sistemdeki tüm SMB paylaşımlarını anonim olarak listeler"
+            },
+            {
+                "desc": "Yetkili kullanıcı ile paylaşımları listele",
+                "command": "smbclient -L //172.20.2.14 -U kullanıcı_adı",
+                "explanation": "Belirtilen kullanıcı ile paylaşımları listeler"
+            },
+            {
+                "desc": "Anonim olarak paylaşıma bağlan",
+                "command": "smbclient //172.20.2.14/myshare -N",
+                "explanation": "Belirtilen paylaşıma anonim olarak bağlanır"
+            },
+            {
+                "desc": "Yetkili kullanıcı ile paylaşıma bağlan",
+                "command": "smbclient //172.20.2.14/myshare -U kullanıcı_adı",
+                "explanation": "Belirtilen kullanıcı ile paylaşıma bağlanır"
+            },
+            {
+                "desc": "Komut çalıştır ve çık",
+                "command": "smbclient //172.20.2.14/myshare -N -c 'ls'",
+                "explanation": "Paylaşıma bağlanıp ls komutunu çalıştırır ve çıkar"
+            }
+        ],
+        "security_risk": "Medium - Network service enumeration",
+        "platform": ["Linux", "Windows", "macOS"],
+        "required_permissions": "Network access"
+    },
+    "rpcclient": {
+        "desc": "Windows RPC (Remote Procedure Call) servisleri ile etkileşim aracı",
+        "category": "Network Services",
+        "type": "RPC Enumeration",
+        "usage": [
+            "rpcclient -U \"\" target_ip",
+            "rpcclient -U username target_ip",
+            "rpcclient -N target_ip"
+        ],
+        "common_flags": {
+            "-U": "Kullanıcı adı belirtir (\"\" boş kullanıcı için)",
+            "-N": "Parola sormaz",
+            "-W": "Workgroup/domain belirtir",
+            "-c": "Komut çalıştırır ve çıkar",
+            "-A": "Kimlik bilgilerini dosyadan okur",
+            "-I": "IP adresi belirtir",
+            "-p": "Port belirtir"
+        },
+        "rpc_commands": {
+            "enumdomusers": "Domain kullanıcılarını listeler",
+            "enumdomgroups": "Domain gruplarını listeler",
+            "querydominfo": "Domain bilgilerini alır",
+            "srvinfo": "Sunucu bilgilerini alır",
+            "netshareenum": "Açık SMB paylaşımlarını listeler",
+            "queryuser": "Belirli kullanıcı bilgilerini alır",
+            "enumprinters": "Yazıcıları listeler",
+            "enumdrivers": "Driver'ları listeler",
+            "lookupnames": "SID'den kullanıcı adı bulur",
+            "lookupsids": "Kullanıcı adından SID bulur",
+            "lsaenumsid": "LSA SID'lerini listeler",
+            "lsaquery": "LSA policy bilgilerini alır"
+        },
+        "examples": [
+            {
+                "desc": "Anonim RPC bağlantısı",
+                "command": "rpcclient -U \"\" 172.20.2.14",
+                "explanation": "Anonim olarak RPC servisine bağlanır"
+            },
+            {
+                "desc": "Kullanıcıları listele",
+                "command": "rpcclient -U \"\" 172.20.2.14 -c 'enumdomusers'",
+                "explanation": "Domain kullanıcılarını listeler"
+            },
+            {
+                "desc": "Paylaşımları listele",
+                "command": "rpcclient -U \"\" 172.20.2.14 -c 'netshareenum'",
+                "explanation": "Açık SMB paylaşımlarını listeler"
+            },
+            {
+                "desc": "Domain bilgilerini al",
+                "command": "rpcclient -U \"\" 172.20.2.14 -c 'querydominfo'",
+                "explanation": "Domain hakkında detaylı bilgi alır"
+            }
+        ],
+        "security_risk": "Medium - Information disclosure",
+        "platform": ["Linux", "Windows"],
+        "required_permissions": "Network access"
+    },
+    "nmblookup": {
+        "desc": "NetBIOS ad çözümleme ve bilgi toplama aracı",
+        "category": "Network Services",
+        "type": "NetBIOS Enumeration",
+        "usage": [
+            "nmblookup -A target_ip",
+            "nmblookup hostname",
+            "nmblookup -S hostname"
+        ],
+        "common_flags": {
+            "-A": "IP adresinden NetBIOS bilgilerini alır",
+            "-S": "NetBIOS servislerini listeler",
+            "-T": "Lookup timeout süresini belirtir",
+            "-U": "Unicast lookup yapar",
+            "-R": "Recursive lookup yapar",
+            "-M": "Master browser bulur",
+            "-d": "Debug level belirtir"
+        },
+        "examples": [
+            {
+                "desc": "IP'den NetBIOS bilgisi al",
+                "command": "nmblookup -A 172.20.2.14",
+                "explanation": "IP adresinden NetBIOS adlarını ve makine adını döndürür"
+            },
+            {
+                "desc": "Hostname'i çözümle",
+                "command": "nmblookup hostname",
+                "explanation": "NetBIOS hostname'ini IP adresine çevirir"
+            },
+            {
+                "desc": "Master browser bul",
+                "command": "nmblookup -M workgroup",
+                "explanation": "Belirtilen workgroup'un master browser'ını bulur"
+            }
+        ],
+        "security_risk": "Low - Information gathering",
+        "platform": ["Linux", "Windows"],
+        "required_permissions": "Network access"
+    },
+    "nmap_smb_scripts": {
+        "desc": "Nmap ile SMB servis keşfi ve güvenlik testleri",
+        "category": "Network Scanning",
+        "type": "Service Discovery",
+        "usage": [
+            "nmap -p 139,445 --script=smb-os-discovery target_ip",
+            "nmap -p 445 --script=smb-enum-shares target_ip",
+            "nmap -p 445 --script=smb-vuln-* target_ip"
+        ],
+        "smb_scripts": {
+            "smb-os-discovery": "İşletim sistemi bilgilerini tespit eder",
+            "smb-protocols": "Desteklenen SMB protokol versiyonlarını listeler",
+            "smb-enum-shares": "SMB paylaşımlarını listeler",
+            "smb-enum-users": "SMB kullanıcılarını listeler",
+            "smb-enum-domains": "SMB domain'lerini listeler",
+            "smb-enum-groups": "SMB gruplarını listeler",
+            "smb-enum-sessions": "Aktif SMB oturumlarını listeler",
+            "smb-enum-processes": "Çalışan süreçleri listeler",
+            "smb-enum-services": "Windows servislerini listeler",
+            "smb-vuln-ms17-010": "EternalBlue zafiyetini kontrol eder",
+            "smb-vuln-ms08-067": "MS08-067 zafiyetini kontrol eder",
+            "smb-vuln-conficker": "Conficker solucanını kontrol eder"
+        },
+        "examples": [
+            {
+                "desc": "SMB servisi keşfi",
+                "command": "nmap -p 139,445 --script=smb-os-discovery,smb-protocols,smb-enum-shares 172.20.2.14",
+                "explanation": "Temel SMB bilgilerini ve paylaşımları tespit eder"
+            },
+            {
+                "desc": "SMB zafiyeti taraması",
+                "command": "nmap -p 445 --script=smb-vuln-* 172.20.2.14",
+                "explanation": "Bilinen SMB zafiyetlerini kontrol eder"
+            },
+            {
+                "desc": "SMB kullanıcı enumerasyonu",
+                "command": "nmap -p 445 --script=smb-enum-users 172.20.2.14",
+                "explanation": "SMB üzerinden kullanıcıları listeler"
+            }
+        ],
+        "security_risk": "Medium-High - Vulnerability scanning",
+        "platform": ["Linux", "Windows", "macOS"],
+        "required_permissions": "Network access"
+    },
+    "smb_pentest_methodology": {
+        "desc": "SMB servisleri için sistematik penetrasyon testi adımları",
+        "category": "Penetration Testing",
+        "type": "Methodology",
+        "steps": [
+            {
+                "step": 1,
+                "desc": "SMB servisi keşfi",
+                "commands": [
+                    "nmap -p 139,445 --script=smb-os-discovery,smb-protocols,smb-enum-shares target_ip",
+                    "nmap -p 445 --script=smb-security-mode target_ip"
+                ]
+            },
+            {
+                "step": 2,
+                "desc": "SMB paylaşım enumerasyonu",
+                "commands": [
+                    "smbclient -L //target_ip -N",
+                    "smbmap -H target_ip",
+                    "enum4linux target_ip"
+                ]
+            },
+            {
+                "step": 3,
+                "desc": "Anonim erişim kontrolü",
+                "commands": [
+                    "smbclient //target_ip/share_name -N",
+                    "rpcclient -U \"\" target_ip"
+                ]
+            },
+            {
+                "step": 4,
+                "desc": "RPC ile bilgi toplama",
+                "commands": [
+                    "rpcclient -U \"\" target_ip -c 'enumdomusers'",
+                    "rpcclient -U \"\" target_ip -c 'enumdomgroups'",
+                    "rpcclient -U \"\" target_ip -c 'querydominfo'"
+                ]
+            },
+            {
+                "step": 5,
+                "desc": "NetBIOS bilgi toplama",
+                "commands": [
+                    "nmblookup -A target_ip",
+                    "nbtscan target_ip"
+                ]
+            },
+            {
+                "step": 6,
+                "desc": "Zafiyet tespiti",
+                "commands": [
+                    "nmap -p 445 --script=smb-vuln-ms17-010 target_ip",
+                    "nmap -p 445 --script=smb-vuln-ms08-067 target_ip"
+                ]
+            }
+        ],
+        "common_vulnerabilities": [
+            {
+                "name": "EternalBlue (MS17-010)",
+                "cve": "CVE-2017-0144",
+                "description": "SMBv1 protokolündeki kritik zafiyet"
+            },
+            {
+                "name": "MS08-067",
+                "cve": "CVE-2008-4250",
+                "description": "Windows Server servisindeki zafiyet"
+            },
+            {
+                "name": "SMB Relay",
+                "description": "NTLM authentication relay saldırısı"
+            }
+        ],
+        "security_risk": "High - Active exploitation techniques",
+        "required_permissions": "Network access, potential system access"
+    },
+    "additional_smb_tools": {
+        "desc": "SMB enumeration için ek araçlar",
+        "category": "Network Services",
+        "type": "Additional Tools",
+        "tools": {
+            "enum4linux": {
+                "desc": "Linux/Unix sistemlerde SMB enumeration aracı",
+                "command": "enum4linux target_ip"
+            },
+            "smbmap": {
+                "desc": "SMB paylaşım haritası ve izin kontrolü",
+                "command": "smbmap -H target_ip"
+            },
+            "nbtscan": {
+                "desc": "NetBIOS bilgi tarama aracı",
+                "command": "nbtscan target_ip"
+            },
+            "crackmapexec": {
+                "desc": "SMB/WinRM/LDAP için çoklu protokol aracı",
+                "command": "crackmapexec smb target_ip"
+            }
+        }
+    }
+}

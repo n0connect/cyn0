@@ -1,0 +1,28 @@
+{
+    "nfs_info": {
+        "desc": "Network File System (NFS), kullanıcıların farklı sistemlerdeki dosyalara sanki yerel disklerindeymiş gibi erişmelerini sağlayan, dosya tabanlı bir ağ protokolüdür. 1984 yılında Sun Microsystems tarafından geliştirilen NFS, Unix tabanlı sistemlerde yaygın olarak kullanılmakla birlikte, Windows ve diğer işletim sistemleri tarafından da desteklenmektedir. NFS, ağ üzerindeki dosya paylaşımını kolaylaştırarak, farklı bilgisayarlar arasında veri alışverişini basitleştirir.",
+        "port": "Default Port is 2049"
+    },
+    "nfs_connect": {
+        "desc": "Paylasilan bir sisteme baglanti kurmak icin yapilmasi gerekenler",
+        "command": "showmount -e <target-ip>",
+        "flag": [
+            "-a: Hem client bilgisayar adını veya IP adresini hem de bağlanan dizini bilgisayar:dizin biçiminde listeleyin.",
+            "-d: Sadece bağlanan dizinleri listeleyin.",
+            "-e: NFS sunucusunun dışa aktarma listesini gösterir.",
+            "-h: Yardım menüsü."
+        ]
+    },
+    "nfs_mount_to_client": {
+        "desc": "NFS dışa aktarımlarını kendi bilgisayarımıza bağlamak için mount komutunu kullanabiliriz",
+        "command": [
+            "mkdir /mnt/nfs_mount",
+            "mount -t nfs <target-ip>:/root /mnt/nfs_mount/"
+        ],
+        "flag": [
+            "-t : Dosya sistemi türleri kümesini sınırlar.",
+            "-o : Virgülle ayrılmış bağlama seçenekleri listesini belirtmek için kullanilir.",
+            "-l : Dosya sistemi etiketlerini de gösterir."
+        ]
+    }
+}

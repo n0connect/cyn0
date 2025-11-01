@@ -1,0 +1,112 @@
+{
+  "Get-ComputerInfo": {
+    "desc": "Bilgisayar hakkında detaylı sistem bilgilerini getirir",
+    "category": "System Information",
+    "usage": "Get-ComputerInfo",
+    "examples": ["Get-ComputerInfo"],
+    "target_os": "Windows",
+    "requires_admin": false,
+    "output": "Sistem donanımı, işletim sistemi, ağ yapılandırması gibi kapsamlı bilgiler",
+    "type": "PowerShell Cmdlet"
+  },
+  "Get-NetIpAddress": {
+    "desc": "Ağ adaptörlerinin IP adres yapılandırmalarını listeler",
+    "category": "Network Information",
+    "usage": "Get-NetIpAddress",
+    "examples": ["Get-NetIpAddress", "Get-NetIpAddress -AddressFamily IPv4"],
+    "target_os": "Windows",
+    "requires_admin": false,
+    "output": "IP adresleri, subnet maskeleri, ağ adaptörü bilgileri",
+    "type": "PowerShell Cmdlet"
+  },
+  "arp": {
+    "desc": "ARP (Address Resolution Protocol) tablosunu görüntüler",
+    "category": "Network Information",
+    "usage": "arp -a",
+    "examples": ["arp -a", "arp -a <IP_ADDRESS>"],
+    "target_os": "Windows/Linux",
+    "requires_admin": false,
+    "output": "IP adresi ve MAC adresi eşleştirmeleri",
+    "type": "Command Line Tool"
+  },
+  "Get-LocalUser": {
+    "desc": "Yerel kullanıcı hesaplarını listeler",
+    "category": "User Management",
+    "usage": "Get-LocalUser",
+    "examples": ["Get-LocalUser", "Get-LocalUser -Name 'Administrator'"],
+    "target_os": "Windows",
+    "requires_admin": false,
+    "output": "Kullanıcı adları, durum bilgileri, son giriş tarihleri",
+    "type": "PowerShell Cmdlet"
+  },
+  "Get-LocalGroup": {
+    "desc": "Yerel grupları listeler",
+    "category": "User Management", 
+    "usage": "Get-LocalGroup",
+    "examples": ["Get-LocalGroup", "Get-LocalGroup -Name 'Administrators'"],
+    "target_os": "Windows",
+    "requires_admin": false,
+    "output": "Grup adları ve açıklamaları",
+    "type": "PowerShell Cmdlet"
+  },
+  "Get-PSReadlineOption-HistorySavePath": {
+    "desc": "PowerShell komut geçmişi dosyasının yolunu gösterir ve içeriğini okur",
+    "category": "System Information",
+    "usage": "cat (Get-PSReadlineOption).HistorySavePath",
+    "examples": ["cat (Get-PSReadlineOption).HistorySavePath"],
+    "target_os": "Windows",
+    "requires_admin": false,
+    "output": "Daha önce çalıştırılan PowerShell komutları",
+    "type": "PowerShell Cmdlet",
+    "security": "Hassas bilgi içerebilir"
+  },
+  "Get-WinEvent": {
+    "desc": "Windows olay günlüklerini okur",
+    "category": "Event Logs",
+    "usage": "Get-WinEvent -LogName 'LogName'",
+    "examples": ["Get-WinEvent -LogName 'windows Powershell'", "Get-WinEvent -LogName 'Security'"],
+    "target_os": "Windows",
+    "requires_admin": true,
+    "output": "Olay günlüğü kayıtları",
+    "type": "PowerShell Cmdlet"
+  },
+  "Get-Clipboard": {
+    "desc": "Panodaki (clipboard) metni alır",
+    "category": "System Information",
+    "usage": "Get-Clipboard",
+    "examples": ["Get-Clipboard"],
+    "target_os": "Windows",
+    "requires_admin": false,
+    "output": "Panoda bulunan metin içeriği",
+    "type": "PowerShell Cmdlet",
+    "security": "Hassas bilgi içerebilir"
+  },
+  "Get-Service": {
+    "desc": "Windows servislerini listeler ve servis bilgilerini getirir",
+    "category": "Service Management",
+    "usage": "Get-Service [-Name ServiceName]",
+    "examples": [
+      "Get-Service",
+      "Get-Service -Name 'LanmanServer' -DependentServices",
+      "Get-Service -Name 'Tcpip' -RequiredServices",
+      "Get-Service -Name 'svcregistry' | Select-Object -ExpandProperty ServiceType"
+    ],
+    "target_os": "Windows",
+    "requires_admin": false,
+    "output": "Servis adları, durumları, bağımlılıkları",
+    "type": "PowerShell Cmdlet"
+  },
+  "Get-ScheduledTask": {
+    "desc": "Zamanlanmış görevleri listeler",
+    "category": "Task Management",
+    "usage": "Get-ScheduledTask",
+    "examples": [
+      "Get-ScheduledTask | where {$_.TaskPath -notlike '\\Microsoft*'} | select *",
+      "Get-ScheduledTask | where {$_.TaskPath -notlike '\\Microsoft*'} | foreach Actions"
+    ],
+    "target_os": "Windows",
+    "requires_admin": false,
+    "output": "Görev adları, yolları, eylem bilgileri",
+    "type": "PowerShell Cmdlet"
+  }
+}

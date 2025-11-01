@@ -1,0 +1,14 @@
+{
+    "Linux Isletim Sistemi": {
+        "desc": "Linux ile ilgili komutlar ve zafiyet istismarları",
+        "file": "linux/index.json"
+    },
+    "Windows Isletim Sistemi": {
+        "desc": "Windows ile ilgili komutlar ve zafiyet istismarları",
+        "file": "windows/index.json"
+    },
+    "Web Application Security": {
+        "desc": "Web uygulama güvenliği, penetrasyon testi ve exploitation teknikleri",
+        "file": "web_new/web_index.json"
+    }
+}

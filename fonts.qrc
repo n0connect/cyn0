@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/fonts">
+        <file>resources/AppleFonts/OneDir/SF-Pro-Rounded-Black.otf</file>
+        <file>resources/Segoe Fluent Icons.ttf</file>
+    </qresource>
+</RCC>

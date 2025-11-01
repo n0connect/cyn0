@@ -1,0 +1,354 @@
+{
+  "powershell_installation": {
+    "desc": "PowerShell kurulum komutları",
+    "category": "Installation",
+    "usage": "winget veya snap ile kurulum",
+    "examples": [
+      "winget search Microsoft.PowerShell",
+      "winget install --id Microsoft.Powershell --source winget",
+      "sudo snap install powershell --classic"
+    ],
+    "target_os": "Windows/Linux",
+    "requires_admin": true,
+    "output": "PowerShell kurulumu",
+    "type": "Package Manager",
+    "platforms": {
+      "windows": "winget",
+      "linux": "snap"
+    }
+  },
+  "version_check": {
+    "desc": "PowerShell sürüm bilgisini kontrol eder",
+    "category": "System Information",
+    "usage": "$PsVersionTable",
+    "examples": ["$PsVersionTable"],
+    "target_os": "Windows/Linux",
+    "requires_admin": false,
+    "output": "PowerShell sürüm detayları",
+    "type": "Built-in Variable"
+  },
+  "get_help": {
+    "desc": "PowerShell yardım sistemini kullanır",
+    "category": "Help System",
+    "usage": "Get-Help -Name <cmdlet> [-Detailed]",
+    "examples": ["Get-Help -Name Get-Command -Detailed"],
+    "target_os": "Windows/Linux",
+    "requires_admin": false,
+    "output": "Komut yardım bilgileri",
+    "type": "PowerShell Cmdlet"
+  },
+  "alias_management": {
+    "desc": "PowerShell takma adlarını yönetir",
+    "category": "Alias Management",
+    "usage": "alias [alias_name]",
+    "examples": [
+      "alias",
+      "alias | Get-Member",
+      "alias | Where DisplayName -like '*HoldenManeuver*'",
+      "alias | Select-String -Pattern 'HoldenManeuver'",
+      "alias | Where Definition -like '*HoldenManeuver*'"
+    ],
+    "target_os": "Windows/Linux",
+    "requires_admin": false,
+    "output": "Takma ad listesi ve tanımları",
+    "type": "PowerShell Command",
+    "note": "Get-Member ile nesne özelliklerini inceleyebilirsiniz"
+  },
+  "new_item": {
+    "desc": "Yeni dosya veya klasör oluşturur",
+    "category": "File Management",
+    "usage": "New-Item -ItemType <type> <name>",
+    "examples": ["New-Item -ItemType Directory logs"],
+    "target_os": "Windows/Linux",
+    "requires_admin": false,
+    "output": "Yeni oluşturulan öğe",
+    "type": "PowerShell Cmdlet",
+    "item_types": ["File", "Directory", "SymbolicLink", "Junction", "HardLink"]
+  },
+  "comparison_operators": {
+    "desc": "PowerShell karşılaştırma operatörleri",
+    "category": "Operators",
+    "operators": {
+      "-eq": "Eşittir",
+      "-ne": "Eşit değil", 
+      "-gt": "Büyüktür",
+      "-ge": "Büyük veya eşittir",
+      "-lt": "Küçüktür",
+      "-le": "Küçük veya eşittir"
+    },
+    "examples": [
+      "Get-Service | Where-Object Status -eq 'Running'",
+      "Get-Service | Where-Object DisplayName -like '*MCRN*'"
+    ],
+    "target_os": "Windows/Linux",
+    "type": "Language Feature"
+  },
+  "select_string": {
+    "desc": "Metin dosyalarında pattern arama yapar",
+    "category": "Text Processing", 
+    "usage": "Select-String -Pattern <pattern> <file>",
+    "examples": ["Select-String -Pattern 'today' .\\file.txt"],
+    "target_os": "Windows/Linux",
+    "requires_admin": false,
+    "output": "Eşleşen satırlar",
+    "type": "PowerShell Cmdlet"
+  },
+  "local_user_management": {
+    "desc": "Yerel kullanıcı hesap yönetimi",
+    "category": "User Management",
+    "commands": {
+      "Get-LocalUser": "Kullanıcıları listeler",
+      "New-LocalUser": "Yeni kullanıcı oluşturur",
+      "Set-LocalUser": "Kullanıcı özelliklerini değiştirir",
+      "Disable-LocalUser": "Kullanıcıyı devre dışı bırakır",
+      "Enable-LocalUser": "Kullanıcıyı etkinleştirir",
+      "Remove-LocalUser": "Kullanıcıyı siler"
+    },
+    "examples": [
+      "Get-LocalUser",
+      "New-LocalUser -Name 'j.doe' -Password (ConvertTo-SecureString -String 'password123' -AsPlainText -Force)",
+      "Set-LocalUser -Name 'j.doe' -Description 'This is a test user.'",
+      "Disable-LocalUser -Name 'j.doe'",
+      "Enable-LocalUser -Name 'j.doe'",
+      "Remove-LocalUser -Name 'j.doe'"
+    ],
+    "target_os": "Windows",
+    "requires_admin": true,
+    "type": "PowerShell Cmdlet"
+  },
+  "local_group_management": {
+    "desc": "Yerel grup yönetimi",
+    "category": "Group Management",
+    "commands": {
+      "Get-LocalGroup": "Grupları listeler",
+      "New-LocalGroup": "Yeni grup oluşturur",
+      "Set-LocalGroup": "Grup özelliklerini değiştirir",
+      "Add-LocalGroupMember": "Gruba üye ekler",
+      "Remove-LocalGroupMember": "Gruptan üye çıkarır",
+      "Remove-LocalGroup": "Grubu siler"
+    },
+    "examples": [
+      "Get-LocalGroup",
+      "New-LocalGroup -Name 'Students'",
+      "Set-LocalGroup -Name 'Students' -Description 'Improvise. Adapt. Overcome.'",
+      "Add-LocalGroupMember -Group 'Students' -Member 'j.doe'",
+      "Remove-LocalGroupMember -Group 'Students' -Member 'j.doe'",
+      "Remove-LocalGroup -Name 'Students'"
+    ],
+    "target_os": "Windows",
+    "requires_admin": true,
+    "type": "PowerShell Cmdlet"
+  },
+  "active_directory_users": {
+    "desc": "Active Directory kullanıcı yönetimi",
+    "category": "AD Management",
+    "commands": {
+      "Get-ADUser": "AD kullanıcılarını getirir",
+      "New-ADUser": "Yeni AD kullanıcısı oluşturur",
+      "Set-ADUser": "AD kullanıcı özelliklerini değiştirir",
+      "Remove-ADUser": "AD kullanıcısını siler"
+    },
+    "examples": [
+      "Get-ADuser -Filter \"Enabled -eq 'True'\" | Measure-Object",
+      "Get-ADUser 'j.doe'",
+      "Get-ADUser -Filter *",
+      "New-ADUser -Name 'j.doe' -SamAccountName j.doe -AccountPassword (ConvertTo-SecureString 'sifre123!' -AsPlainText -Force)",
+      "Set-ADUser -Identity 'j.doe' -Surname 'doe'",
+      "Remove-ADUser 'j.doe'"
+    ],
+    "target_os": "Windows Server",
+    "requires_admin": true,
+    "type": "AD Cmdlet",
+    "module": "ActiveDirectory"
+  },
+  "active_directory_groups": {
+    "desc": "Active Directory grup yönetimi",
+    "category": "AD Management",
+    "commands": {
+      "Get-ADGroup": "AD gruplarını getirir",
+      "New-ADGroup": "Yeni AD grubu oluşturur",
+      "Set-ADGroup": "AD grup özelliklerini değiştirir",
+      "Get-ADGroupMember": "Grup üyelerini listeler",
+      "Add-ADGroupMember": "Gruba üye ekler",
+      "Remove-ADGroupMember": "Gruptan üye çıkarır",
+      "Remove-ADGroup": "AD grubunu siler"
+    },
+    "examples": [
+      "Get-ADGroup 'Students'",
+      "Get-ADGroup -Filter *",
+      "New-ADGroup -Name 'Students' -GroupScope Universal",
+      "Set-ADGroup -Identity 'Students' -Description 'Learn as if you were to live forever'",
+      "Get-ADGroupMember -Identity 'Students'",
+      "Add-ADGroupMember -Identity 'Students' -Members j.doe",
+      "Remove-ADGroupMember -Identity 'Students' -Member 'j.doe'",
+      "Remove-ADGroup 'Students'"
+    ],
+    "target_os": "Windows Server",
+    "requires_admin": true,
+    "type": "AD Cmdlet",
+    "module": "ActiveDirectory"
+  },
+  "variables": {
+    "desc": "PowerShell değişken tanımlama ve kullanımı",
+    "category": "Programming Basics",
+    "usage": "$variableName = value",
+    "examples": [
+      "$name = 'John Doe'",
+      "$age = 30",
+      "$name",
+      "$firstName, $lastName = 'John', 'Doe'"
+    ],
+    "target_os": "Windows/Linux",
+    "type": "Language Feature",
+    "note": "PowerShell'de değişkenler $ işareti ile başlar"
+  },
+  "conditional_statements": {
+    "desc": "PowerShell koşullu ifadeler",
+    "category": "Programming Basics",
+    "usage": "if ($condition) { } else { }",
+    "examples": [
+      "if ($age -gt 18) {\n  Write-Host 'Adult'\n} else {\n  Write-Host 'Kid'\n}"
+    ],
+    "target_os": "Windows/Linux",
+    "type": "Language Feature",
+    "syntax": "if-else, switch"
+  },
+  "switch_statement": {
+    "desc": "PowerShell switch kontrolü",
+    "category": "Programming Basics",
+    "usage": "switch ($variable) { 'value' { action } }",
+    "examples": [
+      "$dayOfWeek = Get-Date -Format dddd",
+      "switch ($dayOfWeek) {\n    'Monday' { Write-Host 'Today is Monday. Time to start the week!' }\n    'Tuesday' { Write-Host 'Tuesday! Still a long way to go!' }\n    Default { Write-Host 'Invalid day of the week.' }\n}"
+    ],
+    "target_os": "Windows/Linux",
+    "type": "Language Feature"
+  },
+  "loops": {
+    "desc": "PowerShell döngü yapıları",
+    "category": "Programming Basics",
+    "loop_types": {
+      "for": "Sayaç tabanlı döngü",
+      "while": "Koşul tabanlı döngü",
+      "do-while": "En az bir kez çalışan döngü"
+    },
+    "examples": [
+      "for ($i = 1; $i -le 10; $i++) {\n  Write-Host $i\n}",
+      "$i = 1\nwhile ($i -le 10) {\n  Write-Host $i\n  $i++\n}",
+      "$i = 1\ndo {\n  Write-Host $i\n  $i++\n} while ($i -le 10)"
+    ],
+    "target_os": "Windows/Linux",
+    "type": "Language Feature"
+  },
+  "module_management": {
+    "desc": "PowerShell modül yönetimi",
+    "category": "Module Management",
+    "commands": {
+      "Find-Module": "Modül arar",
+      "Install-Module": "Modül yükler"
+    },
+    "examples": [
+      "Find-Module -Name 'sysinternals'",
+      "Install-Module -name SysInternals"
+    ],
+    "target_os": "Windows/Linux",
+    "requires_admin": true,
+    "type": "PowerShell Cmdlet"
+  },
+  "file_counting": {
+    "desc": "PowerShell'de nesneler (dosyalar, klasörler, metin satırları vb.) üzerinde çeşitli istatistiksel ölçümler yapar. Özellikle sayma, toplama, ortalama alma, minimum ve maksimum değerleri bulma gibi işlemlerde kullanılır.",
+    "category": "Data Analysis & Object Management",
+    "usage": "Command_Output | Measure-Object [-Property <PropertyName>] [-Minimum] [-Maximum] [-Average] [-Sum] [-Count] [-Word] [-Line] [-Character]",
+    "examples": [
+      {
+        "name": "Klasördeki Dosya Sayısı",
+        "description": "Belirtilen klasördeki (alt klasörler dahil değil) sadece dosyaların sayısını bulur.",
+        "command": "Get-ChildItem -Path 'C:\\TestKlasoru' -File | Measure-Object"
+      },
+      {
+        "name": "Klasördeki Dosyaların Toplam Boyutu",
+        "description": "Belirtilen klasördeki (alt klasörler dahil değil) dosyaların toplam boyutunu (byte cinsinden) hesaplar.",
+        "command": "Get-ChildItem -Path 'C:\\TestKlasoru' -File | Measure-Object -Property Length -Sum"
+      },
+      {
+        "name": "Klasördeki Dosyaların Min/Max/Ortalama Boyutu",
+        "description": "Belirtilen klasördeki (alt klasörler dahil değil) dosyaların minimum, maksimum ve ortalama boyutunu (byte cinsinden) bulur.",
+        "command": "Get-ChildItem -Path 'C:\\TestKlasoru' -File | Measure-Object -Property Length -Minimum -Maximum -Average"
+      },
+      {
+        "name": "Metin Dosyasındaki Kelime, Satır ve Karakter Sayısı",
+        "description": "Bir metin dosyasının içeriğindeki kelime, satır ve karakter sayılarını sayar.",
+        "command": "Get-Content 'C:\\TestKlasoru\\metin.txt' | Measure-Object -Word -Line -Character"
+      }
+    ],
+    "parameters": [
+      {
+        "name": "-Property",
+        "description": "Üzerinde ölçüm yapılacak özelliğin adını belirtir (örn. Length, CreationTime). Bu, genellikle sayısal değerler için kullanılır.",
+        "type": "string"
+      },
+      {
+        "name": "-Count",
+        "description": "Nesnelerin toplam sayısını döndürür. Bu, varsayılan olarak zaten gelir ancak açıkça belirtebilirsin.",
+        "type": "switch"
+      },
+      {
+        "name": "-Minimum",
+        "description": "Belirtilen 'Property' için en küçük değeri döndürür.",
+        "type": "switch"
+      },
+      {
+        "name": "-Maximum",
+        "description": "Belirtilen 'Property' için en büyük değeri döndürür.",
+        "type": "switch"
+      },
+      {
+        "name": "-Average",
+        "description": "Belirtilen 'Property' için ortalama değeri döndürür.",
+        "type": "switch"
+      },
+      {
+        "name": "-Sum",
+        "description": "Belirtilen 'Property' için tüm değerlerin toplamını döndürür.",
+        "type": "switch"
+      },
+      {
+        "name": "-Word",
+        "description": "Gelen metin girdisindeki kelime sayısını sayar.",
+        "type": "switch"
+      },
+      {
+        "name": "-Line",
+        "description": "Gelen metin girdisindeki satır sayısını sayar.",
+        "type": "switch"
+      },
+      {
+        "name": "-Character",
+        "description": "Gelen metin girdisindeki karakter sayısını sayar.",
+        "type": "switch"
+      }
+    ],
+    "target_os": "Windows/Linux/macOS (PowerShell Core)",
+    "requires_admin": false,
+    "output_format": {
+        "Count": "integer",
+        "Average": "double",
+        "Sum": "double",
+        "Minimum": "object",
+        "Maximum": "object",
+        "Property": "string"
+    },
+    "type": "PowerShell Cmdlet",
+    "notes": "Çoğu zaman `.Count` özelliği hızlı sayma için yeterliyken, `Measure-Object` daha detaylı istatistikler ve büyük veri kümeleri üzerinde daha verimli çalışmak için tercih edilir."
+  },
+  "advanced_search": {
+    "desc": "Dosya içeriğinde gelişmiş arama",
+    "category": "File Search",
+    "usage": "Get-ChildItem -Recurse *.* | Select-String -Pattern 'SEARCH_STR'",
+    "examples": ["Get-ChildItem -Recurse *.* | Select-String -Pattern 'SEARCH_STR'"],
+    "target_os": "Windows/Linux",
+    "requires_admin": false,
+    "output": "Arama sonuçları",
+    "type": "PowerShell Command"
+  }
+}

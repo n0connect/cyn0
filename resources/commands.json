@@ -1,0 +1,686 @@
+{
+    "nmap": {
+        "desc": "Nmap bir port tarama aracıdır.",
+        "usage": "nmap -sV -p<port-aralık> <hedef-ip>",
+        "params": [
+            "-sV: Versiyon Tespiti",
+            "-O: Isletim sistemi tespiti",
+            "-Pn: Ping Taramasi yapmamasini saglar(Host aramada kullanislidir)",
+            "-sT: TCP tarama yapar",
+            "-sU: UDP tarama yapar",
+            "-p a,b,... : Sadece verilen portlari tarar",
+            "-p-: Butun port araligini tarar",
+            "-p a-b: a-b araliginda ki butun portlari tarar",
+            "-A: Agresif tarama yapar(Gizliligi kotu etkiler)",
+            "-T: Tarama Hizini ayarlar -T0 ile -T5 arasinda secilir"
+        ]
+    },
+    "metasploit": {
+        "desc": "Metasploit Framework, güvenlik açıklarını test etmek ve zafiyetleri istismar etmek için kullanılan bir açık kaynaklı bir platformdur.",
+        "usage": "msfconsole -q -r <exploit-skripti>",
+        "params": [
+            "-q: sessiz modu açar",
+            "-r: Belirtilen exploit betiğini çalıştırır",
+            "-x: Metasploit ile hızlı bir şekilde komut çalıştırır",
+            "-v: Çıktıyı daha detaylı gösterir",
+            "-l: Ters bağlantı (reverse shell) kurar"
+        ]
+    },
+    "wireshark": {
+        "desc": "Wireshark, ağ trafiğini analiz etmek için kullanılan açık kaynaklı bir araçtır.",
+        "usage": "tshark -i eth0 -w outputfile.pcap",
+        "params": [
+            "-i: Ağ arayüzünü belirtir",
+            "-w: Çıktı dosyasını kaydeder",
+            "-f: Paket filtrelemesi yapmak için kullanılır",
+            "-Y: Belirli bir filtreyi uygular",
+            "-V: Detaylı paket analizini gösterir"
+        ]
+    },
+    "ghidra": {
+        "desc": "Ghidra, tersine mühendislik yapmak ve yazılım analizi gerçekleştirmek için kullanılan bir yazılım analiz aracıdır.",
+        "usage": "ghidraHeadless -import <dosya> -scriptPath <script-path> -postScript <script>",
+        "params": [
+            "-import: Dosya analizi yapar",
+            "-scriptPath: Script'in bulunduğu yolu belirtir",
+            "-postScript: Script'i çalıştırır",
+            "-delete: Veritabanını siler",
+            "-analyzeHeadless: Başka bir başlatıcı olmadan analiz yapar"
+        ]
+    },
+    "burpsuite": {
+        "desc": "Burp Suite, web uygulama güvenliği testleri yapmak için kullanılan bir platformdur.",
+        "usage": "burpsuite -Xmx2g",
+        "params": [
+            "-Xmx2g: Bellek boyutunu belirtir (2 GB gibi)",
+            "-p: Proxy Portunu ayarlar",
+            "-s: Çalıştırma komutları için başlangıç parametreleri",
+            "-d: Debug modunu etkinleştirir",
+            "-v: Detaylı çıktı gösterir"
+        ]
+    },
+    "aircrack-ng": {
+        "desc": "Aircrack-ng, kablosuz ağların şifreleme güvenliğini test etmek için kullanılan bir araçtır.",
+        "usage": "aircrack-ng -w <wordlist.txt> <capture.pcap>",
+        "params": [
+            "-w: Wordlist dosyasını belirtir",
+            "-b: Hedef erişim noktasının MAC adresini belirtir",
+            "-c: Hedef dosyanın adı",
+            "-a: Ağ tipi belirtir",
+            "-z: WEP şifrelemesi için paketleri ayıklar"
+        ]
+    },
+    "johntheripper": {
+        "desc": "John the Ripper, şifre kırma ve zayıf şifreleri bulmak için kullanılan bir araçtır.",
+        "usage": "john --wordlist=<wordlist> --format=<hash-format> <password-file>",
+        "params": [
+            "--wordlist: Şifre listesi dosyasını belirtir",
+            "--format: Hash formatını belirtir",
+            "--show: Kırılmış şifreleri gösterir",
+            "--incremental: Şifre çözme için otomatik artış kullanır",
+            "--rules: Wordlist üzerine kurallarla şifre denemeleri yapar"
+        ]
+    },
+    "hydra": {
+        "desc": "Hydra, ağ hizmetlerine yönelik kaba kuvvet saldırıları gerçekleştirmek için kullanılan bir araçtır.",
+        "usage": "hydra -l admin -P <password-list> <hedef-ip> ssh",
+        "params": [
+            "-l: Kullanıcı adı belirtir",
+            "-P: Şifre listesi dosyasını belirtir",
+            "-t: Paralel bağlantı sayısını belirtir",
+            "-v: Detaylı işlem çıktısı",
+            "-s: Hedef portu belirtir"
+        ]
+    },
+    "nikto": {
+        "desc": "Nikto, web sunucusu açıklarını tarayan bir açık kaynaklı araçtır.",
+        "usage": "nikto -h <hedef-ip>",
+        "params": [
+            "-h: Hedef web sunucusunu belirtir",
+            "-p: Belirtilen portu kullanır",
+            "-Tuning: Tarama hızını ve düzeyini ayarlar",
+            "-Display: Çıktıyı ekrana basar",
+            "-o: Çıktıyı bir dosyaya kaydeder"
+        ]
+    },
+    "netcat": {
+        "desc": "Netcat, ağ bağlantıları kurmak ve veri aktarımı sağlamak için kullanılan bir araçtır.",
+        "usage": "nc -lvp <port> veya nc <hedef-ip> <port>",
+        "params": [
+            "-l: Dinleme moduna geçer",
+            "-v: Ayrıntılı çıktıyı gösterir",
+            "-p: Dinlenecek portu belirtir",
+            "-z: Hedef portu tarar",
+            "-e: Uygulama başlatır"
+        ]
+    },
+    "zmap": {
+        "desc": "ZMap, geniş ölçekli internet taramaları yapmak için kullanılan bir ağ tarama aracıdır.",
+        "usage": "zmap -p 80 -o output.csv",
+        "params": [
+            "-p: Hedef portu belirtir",
+            "-o: Çıktıyı kaydeder",
+            "-B: Bant genişliği limitini ayarlar",
+            "-M: Kullanılacak modülü belirtir",
+            "-T: Tarama hızını ayarlar"
+        ]
+    },
+    "burp-extended": {
+        "desc": "Burp Suite'in daha geniş ve kapsamlı versiyonudur. Web uygulama testlerine yönelik geniş araçlar içerir.",
+        "usage": "burpsuite -Xmx4g -p 8080",
+        "params": [
+            "-Xmx4g: 4 GB bellek ayarları",
+            "-p: Proxy portunu belirtir",
+            "-i: Çalıştırılacak proje dosyasını belirtir",
+            "-t: Çıktı formatını belirtir",
+            "-v: Detaylı mod"
+        ]
+    },
+    "smbclient": {
+        "desc": "Samba protokolünü kullanarak SMB sunucularına bağlanmak için kullanılan bir araçtır.",
+        "usage": "smbclient \\\\hedef-ip\\paylasim",
+        "params": [
+            "-U: Kullanıcı adı belirtir",
+            "-P: Şifre belirtir",
+            "-L: Paylaşımları listelemek için",
+            "-I: Hedef IP adresini belirtir",
+            "-W: Çalıştırılacak domaini belirtir"
+        ]
+    },
+    "tcpdump": {
+        "desc": "Tcpdump, ağ trafiğini analiz etmek için kullanılan komut satırı tabanlı bir araçtır.",
+        "usage": "tcpdump -i eth0",
+        "params": [
+            "-i: Ağ arayüzünü belirtir",
+            "-w: Çıktıyı dosyaya kaydeder",
+            "-v: Ayrıntılı çıktı sağlar",
+            "-nn: IP ve port numaralarını sayısal gösterir",
+            "-X: Paketlerin içeriğini hex ve ASCII olarak gösterir"
+        ]
+    },
+    "hping3": {
+        "desc": "Hping3, ağ testi yapmak için kullanılan bir araçtır. ICMP, TCP, UDP gibi protokollerle paket oluşturabilir.",
+        "usage": "hping3 -S -p 80 <hedef-ip>",
+        "params": [
+            "-S: SYN flag'ini set eder",
+            "-p: Portu belirtir",
+            "-c: Paket sayısını belirtir",
+            "-i: Paket gönderme hızını belirtir",
+            "-a: Sahte IP adresi kullanır"
+        ]
+    },
+    "shodan": {
+        "desc": "Shodan, internet üzerindeki cihazları ve servisleri tarayan ve araştıran bir araçtır.",
+        "usage": "shodan search <arama-terimi>",
+        "params": [
+            "--limit: Sonuç limitini belirtir",
+            "--fields: Görüntülenecek alanları belirtir",
+            "--facets: Sıralama yapmak için kullanılır",
+            "--version: Veritabanındaki versiyonları filtreler"
+        ]
+    },
+    "dirbuster": {
+        "desc": "DirBuster, web sunucularındaki gizli dizinleri ve dosyaları bulmak için kullanılan bir araçtır.",
+        "usage": "dirbuster -u <hedef-url> -l <wordlist>",
+        "params": [
+            "-u: Hedef URL",
+            "-l: Wordlist dosyası",
+            "-t: Paralel bağlantı sayısını belirtir",
+            "-r: Recursive (kendisini tekrar eder)",
+            "-x: Çıktı formatını belirtir"
+        ]
+    },
+    "enum4linux": {
+        "desc": "Enum4Linux, Linux üzerinden SMB paylaşım bilgilerini almak için kullanılan bir araçtır.",
+        "usage": "enum4linux -a <hedef-ip>",
+        "params": [
+            "-a: Tüm bilgileri toplar",
+            "-U: Kullanıcı listesini alır",
+            "-S: Paylaşımları gösterir",
+            "-P: Şifre politikalarını kontrol eder",
+            "-D: Domain bilgilerini getirir"
+        ]
+    },
+    "msfvenom": {
+        "desc": "Metasploit framework'ü ile payload oluşturmak için kullanılan araçtır.",
+        "usage": "msfvenom -p linux/x86/shell_reverse_tcp LHOST=<hedef-ip> LPORT=4444 -f elf > shell.elf",
+        "params": [
+            "-p: Payload tipi belirtir",
+            "-LHOST: LHOST (yerel hedef) adresi",
+            "-LPORT: Bağlantı noktası",
+            "-f: Çıktı formatı (örneğin, elf, exe)",
+            "-b: Byte dizilerini belirtir"
+        ]
+    },
+    "sqlmap": {
+        "desc": "SQLmap, SQL enjeksiyon zafiyetlerini tespit etmek ve sömürmek için kullanılan bir araçtır.",
+        "usage": "sqlmap -u <hedef-url> --dbs",
+        "params": [
+            "-u: Hedef URL'yi belirtir",
+            "--dbs: Veritabanlarını listeler",
+            "--dump: Veritabanındaki verileri döker",
+            "--level: Tarama seviyesini belirtir",
+            "--risk: Risk seviyesini belirtir"
+        ]
+    },
+    "ettercap": {
+        "desc": "Ettercap, ağ trafiğini izlemek, manipüle etmek ve saldırılar yapmak için kullanılan bir araçtır.",
+        "usage": "ettercap -T -M arp:remote /<hedef-ip>/ /<hedef-ip>/",
+        "params": [
+            "-T: Terminal modunda çalışır",
+            "-M: Man in the Middle saldırısı yapar",
+            "-a: ARP spoofing için hedef belirler",
+            "-w: Çıktıyı kaydeder"
+        ]
+    },
+    "cainandabel": {
+        "desc": "Cain and Abel, şifre kırma, ağ paket analizi ve şifreleme çözme işlemleri için kullanılan bir araçtır.",
+        "usage": "Cain -sniff -f <file>",
+        "params": [
+            "-sniff: Ağ trafiğini analiz eder",
+            "-f: Dosyayı belirler",
+            "-brute: Kaba kuvvet saldırısı yapar",
+            "-crack: Hash çözme işlemi yapar"
+        ]
+    },
+    "snort": {
+        "desc": "Snort, ağ trafiğini izleyen ve izinsiz giriş tespitini yapan bir ağ güvenliği aracıdır.",
+        "usage": "snort -A console -c /etc/snort/snort.conf",
+        "params": [
+            "-A: Çıktıyı console'a yazdırır",
+            "-c: Yapılandırma dosyasını belirtir",
+            "-i: Ağ arayüzünü belirtir",
+            "-l: Çıktıyı bir dizine kaydeder"
+        ]
+    },
+    "opencanary": {
+        "desc": "OpenCanary, honeypot (tuzağa düşürme) yazılımlarından biridir ve ağda izinsiz erişimleri tespit etmek için kullanılır.",
+        "usage": "opencanaryd --start",
+        "params": [
+            "--start: Honeypot'u başlatır",
+            "--config: Yapılandırma dosyasını belirtir",
+            "--debug: Debug modunu etkinleştirir",
+            "--port: Portları dinler"
+        ]
+    },
+    "theharvester": {
+        "desc": "TheHarvester, hedefe yönelik bilgi toplama (OSINT) aracı olarak kullanılabilir.",
+        "usage": "theharvester -d <domain> -b google",
+        "params": [
+            "-d: Hedef domain'i belirtir",
+            "-b: Kullanılacak veri kaynağını belirtir",
+            "-l: Sonuç limitini ayarlar",
+            "-f: Sonuçları dosyaya kaydeder"
+        ]
+    },
+    "metasploit-framework": {
+        "desc": "Metasploit Framework, penetrasyon testi yapmak için kullanılan kapsamlı bir açık kaynak güvenlik aracıdır.",
+        "usage": "msfconsole",
+        "params": [
+            "-q: Sessiz modu açar",
+            "-r: Belirli bir exploit'i çalıştırır",
+            "-x: Metasploit üzerinden hızlı bir komut çalıştırır",
+            "-v: Çıktıyı daha detaylı gösterir"
+        ]
+    },
+    "netdiscover": {
+        "desc": "Netdiscover, ağda aktif olan cihazları tarayan bir araçtır.",
+        "usage": "netdiscover -r 192.168.1.0/24",
+        "params": [
+            "-r: Hedef ağ aralığını belirtir",
+            "-i: Kullanılacak ağ arayüzünü belirtir",
+            "-P: ARP paketlerini belirli bir arayüzde gönderir",
+            "-s: Ağ tarama hızını ayarlar"
+        ]
+    },
+    "arachni": {
+        "desc": "ArachnI, web uygulama güvenliği testleri yapmak için kullanılan açık kaynaklı bir tarayıcıdır.",
+        "usage": "arachni <hedef-url>",
+        "params": [
+            "--report-save-path: Raporu belirtilen dizine kaydeder",
+            "--checks: Yapılacak test türlerini belirtir",
+            "--output-format: Çıktı formatını belirtir",
+            "--scope: Tarama kapsamını belirtir"
+        ]
+    },
+    "dnschef": {
+        "desc": "DNSChef, DNS spoofing (yanıltma) saldırıları yapmak için kullanılan bir araçtır.",
+        "usage": "dnschef --fakeip <fake-ip> --fakedomains <domain-list>",
+        "params": [
+            "--fakeip: Sahte IP adresi belirtir",
+            "--fakedomains: Sahte domainler belirtir",
+            "--dns: Çalıştırılacak DNS servisini belirtir",
+            "--port: DNS servisi için port belirtir"
+        ]
+    },
+    "scapy": {
+        "desc": "Scapy, ağ paketlerini manipüle etmek ve analiz etmek için kullanılan bir Python tabanlı araçtır.",
+        "usage": "scapy",
+        "params": [
+            "send(): Paket gönderir",
+            "sr(): Sadece yanıtları alır",
+            "ls(): Bir protokolün alanlarını listeler",
+            "hexdump(): Paketlerin hex görünümünü verir"
+        ]
+    },
+    "metasploit-community": {
+        "desc": "Metasploit Community, penetrasyon testi için kullanılan ve açık kaynaklı bir güvenlik aracıdır.",
+        "usage": "msfconsole -r exploit.rb",
+        "params": [
+            "-r: Belirli bir exploit script'ini çalıştırır",
+            "-x: Kapsamlı bir komut çalıştırır",
+            "-v: Detaylı çıktıyı gösterir",
+            "-q: Sessiz modda çalışır"
+        ]
+    },
+    "blackarch": {
+        "desc": "BlackArch, siber güvenlik testleri için yüzlerce güvenlik aracı içeren bir Linux dağıtımıdır.",
+        "usage": "blackarch -u <hedef-ip>",
+        "params": [
+            "-u: Hedef IP adresini belirtir",
+            "-l: Çıktıyı kaydeder",
+            "-v: Detaylı çıktı sağlar",
+            "-f: Tarama sıklığını belirtir"
+        ]
+    },
+    "dnsrecon": {
+        "desc": "DNSRecon, DNS keşifleri yaparak hedef hakkında bilgi toplamak için kullanılan bir araçtır.",
+        "usage": "dnsrecon -d <domain> -t std",
+        "params": [
+            "-d: Hedef domain'i belirtir",
+            "-t: Test türünü belirtir (standard, zone transfer)",
+            "--dnssec: DNSSEC doğrulaması yapar"
+        ]
+    },
+    "recon-ng": {
+        "desc": "Recon-ng, web üzerindeki bilgileri toplayan bir OSINT aracıdır.",
+        "usage": "recon-ng",
+        "params": [
+            "use: Modülleri yükler",
+            "set: Değişkenleri ayarlar",
+            "run: Modülü çalıştırır",
+            "show: Modül bilgilerini gösterir"
+        ]
+    },
+    "mimikatz": {
+        "desc": "Mimikatz, Windows işletim sisteminde şifreleri çözme ve kötü amaçlı yazılımlar için kullanılabilen bir araçtır.",
+        "usage": "mimikatz.exe sekurlsa::logonpasswords",
+        "params": [
+            "sekurlsa::logonpasswords: Sistemdeki şifreleri listeler",
+            "kerberos::ptt: Kerberos biletlerini taklit eder",
+            "privilege::debug: Debug hakları ekler"
+        ]
+    },
+    "reaver": {
+        "desc": "Reaver, WPS (Wi-Fi Protected Setup) şifreleme sistemini kırmaya yönelik bir araçtır.",
+        "usage": "reaver -i <interface> -b <bssid> -c <channel> -vv",
+        "params": [
+            "-i: Ağ arayüzünü belirtir",
+            "-b: Hedef BSSID",
+            "-c: Kanalı belirtir",
+            "-vv: Detaylı çıktı sağlar"
+        ]
+    },
+    "fimap": {
+        "desc": "Fimap, web uygulamalarında directory traversal ve dosya dahil etme açıklıklarını bulmak için kullanılan bir araçtır.",
+        "usage": "fimap -u <hedef-url> -v",
+        "params": [
+            "-u: Hedef URL",
+            "-v: Detaylı çıktıyı gösterir",
+            "--output: Çıktıyı dosyaya kaydeder"
+        ]
+    },
+    "xhydra": {
+        "desc": "XHydra, Hydra'nın grafiksel sürümüdür ve kaba kuvvet saldırılarını GUI üzerinden yapmanıza imkan tanır.",
+        "usage": "xhydra",
+        "params": [
+            "-h: Yardım bilgilerini gösterir",
+            "-L: Kullanıcı listesi",
+            "-P: Şifre listesi",
+            "-t: Hedef"
+        ]
+    },
+    "aptt": {
+        "desc": "APT (Advanced Persistent Threat) saldırılarını simüle etmek için kullanılan bir araçtır.",
+        "usage": "aptt -t <hedef-ip>",
+        "params": [
+            "-t: Hedef IP adresini belirtir",
+            "-m: Modül seçer",
+            "--exploit: Sömürgeciliği başlatır"
+        ]
+    },
+    "os-fingerprint": {
+        "desc": "OS Fingerprint, hedef sistemin işletim sistemini tanımak için kullanılan bir araçtır.",
+        "usage": "os-fingerprint -t <hedef-ip>",
+        "params": [
+            "-t: Hedef IP adresini belirtir",
+            "-v: Daha ayrıntılı sonuçlar verir",
+            "--scan: Tarama işlemi yapar"
+        ]
+    },
+    "wifite": {
+        "desc": "Wifite, kablosuz ağlara yönelik deneme yapmak için kullanılan bir araçtır, özellikle WEP ve WPA şifrelemesine karşı kullanılır.",
+        "usage": "wifite -i <interface>",
+        "params": [
+            "-i: Ağ arayüzü belirtir",
+            "--attack: Saldırı türünü belirtir",
+            "--wps: WPS saldırısı başlatır"
+        ]
+    },
+    "kismet": {
+        "desc": "Kismet, kablosuz ağ trafiğini izlemek, analiz etmek ve izinsiz erişimleri tespit etmek için kullanılan bir araçtır.",
+        "usage": "kismet",
+        "params": [
+            "-c: Ağ arayüzünü belirtir",
+            "-t: Tarama türünü belirtir",
+            "-r: Kayıt yapar"
+        ]
+    },
+    "sslscan": {
+        "desc": "SSLScan, bir sunucunun SSL yapılandırmalarını analiz etmek için kullanılan bir araçtır.",
+        "usage": "sslscan --no-failed <hedef-ip>",
+        "params": [
+            "--no-failed: Başarısız bağlantıları filtreler",
+            "--tls1.2: TLS 1.2 ile test yapar",
+            "--tls1.3: TLS 1.3 ile test yapar",
+            "--show-certificate: Sunucunun sertifikasını gösterir"
+        ]
+    },
+    "tshark": {
+        "desc": "Tshark, Wireshark'ın terminal tabanlı sürümüdür ve ağ trafiğini analiz etmek için kullanılır.",
+        "usage": "tshark -i <interface> -w capture.pcap",
+        "params": [
+            "-i: Ağ arayüzünü belirtir",
+            "-w: Çıktıyı dosyaya kaydeder",
+            "-f: Filtreleme yapar",
+            "-V: Detaylı paket bilgisi verir"
+        ]
+    },
+    "tcpflow": {
+        "desc": "Tcpflow, ağ trafiğini analiz etmek ve veri akışlarını izlemek için kullanılan bir araçtır.",
+        "usage": "tcpflow -i <interface>",
+        "params": [
+            "-i: Ağ arayüzünü belirtir",
+            "-v: Detaylı çıktı sağlar",
+            "-o: Çıktıyı dosyaya kaydeder"
+        ]
+    },
+    "dmitry": {
+        "desc": "Dmitry, hedef hakkında bilgi toplamak için kullanılan bir araçtır.",
+        "usage": "dmitry -win 3 -t <target>",
+        "params": [
+            "-win: WHOIS ve DNS bilgilerini getirir",
+            "-t: Hedef domain veya IP adresi"
+        ]
+    },
+    "gobuster": {
+        "desc": "Gobuster, dizin taraması ve DNS keşfi yapmak için kullanılan bir araçtır.",
+        "usage": "gobuster dir -u <hedef-url> -w <wordlist>",
+        "params": [
+            "-u: Hedef URL",
+            "-w: Wordlist dosyası",
+            "-t: Paralel bağlantı sayısını belirtir",
+            "-x: Dosya uzantılarını belirtir"
+        ]
+    },
+    "fofa": {
+        "desc": "Fofa, internet üzerinde açık servisleri ve cihazları aramak için kullanılan bir arama motorudur.",
+        "usage": "fofa search <arama-terimi>",
+        "params": [
+            "--page: Sayfa numarasını belirtir",
+            "--fields: Sonuç alanlarını belirtir",
+            "--size: Sonuç sayısını belirtir"
+        ]
+    },
+    "zaproxy": {
+        "desc": "OWASP ZAP (Zed Attack Proxy), web uygulamaları için güvenlik testleri yapan açık kaynaklı bir araçtır.",
+        "usage": "zaproxy -daemon -port 8080",
+        "params": [
+            "-daemon: Arka planda çalıştırır",
+            "-port: Proxy için port belirler",
+            "-host: ZAP arayüzünün çalıştığı IP adresini belirtir"
+        ]
+    },
+    "lynis": {
+        "desc": "Lynis, sistem güvenlik denetimlerini yaparak açıkları tespit eden bir araçtır.",
+        "usage": "lynis audit system",
+        "params": [
+            "audit: Güvenlik denetimi başlatır",
+            "show: Detaylı rapor sunar",
+            "--tests: Belirli testleri çalıştırır"
+        ]
+    },
+    "p0f": {
+        "desc": "P0f, pasif ağ tespiti yapmak için kullanılan bir araçtır.",
+        "usage": "p0f -i <interface>",
+        "params": [
+            "-i: Ağ arayüzünü belirtir",
+            "-o: Çıktıyı dosyaya kaydeder",
+            "-T: Tarama tipi belirtir"
+        ]
+    },
+    "ncat": {
+        "desc": "Ncat, bir ağ üzerinden veri iletmek ve almak için kullanılan bir araçtır.",
+        "usage": "ncat <hedef-ip> <port>",
+        "params": [
+            "-l: Dinleme modunu başlatır",
+            "-v: Detaylı bilgi sağlar",
+            "-u: UDP modunda çalışır",
+            "-e: Bir komutu çalıştırır"
+        ]
+    },
+    "evil-winrm": {
+        "desc": "Evil-WinRM, Windows hedeflerine uzaktan komut çalıştırmak için kullanılan bir araçtır.",
+        "usage": "evil-winrm -i <hedef-ip> -u <kullanıcı> -p <parola>",
+        "params": [
+            "-i: Hedef IP adresini belirtir",
+            "-u: Kullanıcı adını belirtir",
+            "-p: Parolayı belirtir"
+        ]
+    },
+    "crackmapexec": {
+        "desc": "CrackMapExec, Windows ağlarını keşfetmek ve uzaktan yönetmek için kullanılan bir araçtır.",
+        "usage": "crackmapexec smb <hedef-ip> -u <kullanıcı> -p <parola>",
+        "params": [
+            "-u: Kullanıcı adı",
+            "-p: Parola",
+            "-d: Domain adı"
+        ]
+    },
+    "dirsearch": {
+        "desc": "Dirsearch, dizin ve dosya keşifleri yapmak için kullanılan hızlı bir araçtır.",
+        "usage": "dirsearch -u <hedef-url> -e <uzantılar>",
+        "params": [
+            "-u: Hedef URL",
+            "-e: Hedef uzantıları belirtir",
+            "-t: Paralel iş parçacığı sayısını belirtir",
+            "-w: Kelime listesi"
+        ]
+    },
+    "cutter": {
+        "desc": "Cutter, binarileri analiz etmek için kullanılan açık kaynaklı bir araçtır.",
+        "usage": "cutter <dosya>",
+        "params": [
+            "<dosya>: Analiz edilecek dosyayı belirtir",
+            "-g: Grafiksel analiz yapar",
+            "-a: Çeşitli analiz araçları başlatır"
+        ]
+    },
+    "crowdstrike": {
+        "desc": "CrowdStrike, endpoint güvenliği sağlamak için kullanılan bir araçtır.",
+        "usage": "crowdstrike --scan <hedef-ip>",
+        "params": [
+            "--scan: Belirtilen hedefi tarar",
+            "--report: Çıktıyı rapor dosyasına kaydeder",
+            "--detection: Tespit edilen tehditleri listeler"
+        ]
+    },
+    "fuzzbunch": {
+        "desc": "FuzzBunch, Microsoft Windows zafiyetlerini hedef alan bir exploit framework'üdür.",
+        "usage": "fuzzbunch <exploit-modül>",
+        "params": [
+            "<exploit-modül>: Kullanılacak exploit modülünü belirtir",
+            "--target: Hedef IP adresi",
+            "--payload: Kullanılacak payload'ı belirtir"
+        ]
+    },
+    "phishing-frenzy": {
+        "desc": "Phishing Frenzy, kimlik avı saldırıları yapmak için kullanılan bir araçtır.",
+        "usage": "phishing-frenzy",
+        "params": [
+            "--target: Hedef domaini belirtir",
+            "--template: Kimlik avı şablonunu seçer",
+            "--send: Saldırıyı başlatır"
+        ]
+    },
+    "osintframework": {
+        "desc": "OSINT Framework, açık kaynak bilgi toplama için kullanılan bir araçtır.",
+        "usage": "osintframework",
+        "params": [
+            "--search: Hedef hakkında bilgi araması yapar",
+            "--save: Çıktıyı kaydeder",
+            "--tools: Kullanılacak araçları belirtir"
+        ]
+    },
+    "seclists": {
+        "desc": "SecLists, güvenlik testleri ve sızma testleri için kullanılan zengin bir kelime listesi koleksiyonudur.",
+        "usage": "seclists",
+        "params": [
+            "--wordlist: Kullanılacak kelime listesi",
+            "--url: URL'yi belirtir",
+            "--service: Hedef hizmeti belirtir"
+        ]
+    },
+    "zer0m0n": {
+        "desc": "Zer0m0n, bir hedefe yönelik saldırılar geliştirmek için kullanılan bir Python tabanlı araçtır.",
+        "usage": "zer0m0n -t <hedef-ip> -p <port>",
+        "params": [
+            "-t: Hedef IP adresi",
+            "-p: Portu belirtir",
+            "--attack: Yapılacak saldırı türünü belirtir"
+        ]
+    },
+    "cookie-cutter": {
+        "desc": "Cookie Cutter, web uygulamalarında cookie'leri analiz etmek için kullanılan bir araçtır.",
+        "usage": "cookie-cutter -u <hedef-url>",
+        "params": [
+            "-u: Hedef URL",
+            "-v: Detaylı çıktı sağlar",
+            "-f: Çıktıyı dosyaya kaydeder"
+        ]
+    },
+    "xsssniper": {
+        "desc": "XSS Sniper, web uygulamalarında XSS zafiyetlerini tespit etmek için kullanılan bir araçtır.",
+        "usage": "xsssniper -u <hedef-url>",
+        "params": [
+            "-u: Hedef URL",
+            "-p: Parametreyi belirtir",
+            "--level: Tarama seviyesi belirtir"
+        ]
+    },
+    "beef": {
+        "desc": "BeEF (Browser Exploitation Framework), web tarayıcıları üzerinde saldırılar yapmak için kullanılan bir araçtır.",
+        "usage": "beef",
+        "params": [
+            "-X: Çıkış yapar",
+            "-S: Sunucu yapılandırmasını başlatır",
+            "--console: Konsolu başlatır"
+        ]
+    },
+    "ssh-audit": {
+        "desc": "Ssh-audit, SSH sunucularının güvenlik denetimini yapmak için kullanılan bir araçtır.",
+        "usage": "ssh-audit <hedef-ip>",
+        "params": [
+            "--verbose: Detaylı çıktı sağlar",
+            "--no-banners: Bannerları göstermez",
+            "--check: Belirli testleri yapar"
+        ]
+    },
+    "hunting-scripts": {
+        "desc": "Hunting Scripts, siber saldırı tespit etmek için kullanılan önceden hazırlanmış betikler içerir.",
+        "usage": "python hunting-script.py <hedef-ip>",
+        "params": [
+            "--attack: Hedef saldırıyı belirtir",
+            "--scan: Tarama yapar",
+            "--report: Rapor oluşturur"
+        ]
+    },
+    "powermeter": {
+        "desc": "PowerMeter, ağda enerji tüketimini ölçmek ve analiz yapmak için kullanılan bir araçtır.",
+        "usage": "powermeter --device <hedef-ip>",
+        "params": [
+            "--device: Hedef cihazı belirtir",
+            "--power: Güç parametrelerini belirtir",
+            "--log: Günlük dosyası oluşturur"
+        ]
+    },
+    "memcached": {
+        "desc": "Memcached, dağıtık bellek sistemi ile önbellekleme yaparak performans iyileştirmeyi sağlar.",
+        "usage": "memcached -u <user> -p <port>",
+        "params": [
+            "-u: Kullanıcı adı belirtir",
+            "-p: Port numarasını belirtir",
+            "--verbosity: Çıktı seviyesini ayarlar"
+        ]
+    }
+}

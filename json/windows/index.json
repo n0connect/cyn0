@@ -1,0 +1,14 @@
+{
+    "Windows PowerShell Commands": {
+        "desc": "Temel PowerShell komutları",
+        "file": "windows/terminal_commands.json"
+    },
+    "Windows Privilege Escalation": {
+        "desc": "Yetki yükseltme teknikleri",
+        "file": "windows/privilege_escalation.json"
+    },
+    "Windows Extras": {
+        "desc": "Ek notlar, araçlar, vb.",
+        "file": "windows/extras.json"
+    }
+}

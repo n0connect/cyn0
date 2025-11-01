@@ -1,0 +1,778 @@
+{
+    "display_name": "Google Dork Database",
+    "description": "Google dorking techniques and search operators for OSINT and security testing",
+
+    "Basic Operators": {
+        "desc": "Essential Google search operators",
+        "commands": [
+            {
+                "desc": "Search exact phrase",
+                "command": "\"exact phrase here\"",
+                "example": "\"admin login\" - finds exact match"
+            },
+            {
+                "desc": "Search within specific site",
+                "command": "site:domain.com keyword",
+                "example": "site:example.com admin - searches only example.com"
+            },
+            {
+                "desc": "Search specific file type",
+                "command": "filetype:ext keyword",
+                "example": "filetype:pdf confidential - finds PDF files"
+            },
+            {
+                "desc": "Search in URL",
+                "command": "inurl:keyword",
+                "example": "inurl:admin - finds admin in URL"
+            },
+            {
+                "desc": "Search in page title",
+                "command": "intitle:keyword",
+                "example": "intitle:\"index of\" - finds directory listings"
+            },
+            {
+                "desc": "Search in page text",
+                "command": "intext:keyword",
+                "example": "intext:password - finds password in page content"
+            },
+            {
+                "desc": "Find related websites",
+                "command": "related:domain.com",
+                "example": "related:github.com - finds similar sites"
+            },
+            {
+                "desc": "View cached version",
+                "command": "cache:domain.com",
+                "example": "cache:example.com - shows Google's cached page"
+            }
+        ]
+    },
+
+    "Exposed Files & Documents": {
+        "desc": "Finding sensitive documents and configuration files",
+        "commands": [
+            {
+                "desc": "Find exposed SQL dumps",
+                "command": "filetype:sql intext:password",
+                "example": "site:target.com filetype:sql \"INSERT INTO\" password"
+            },
+            {
+                "desc": "Find database backup files",
+                "command": "ext:sql | ext:bak | ext:backup intext:\"database\"",
+                "example": "site:example.com (ext:sql | ext:bak) intext:password"
+            },
+            {
+                "desc": "Find exposed environment files",
+                "command": "inurl:.env | inurl:env.txt | inurl:config.env",
+                "example": "site:target.com inurl:.env DB_PASSWORD"
+            },
+            {
+                "desc": "Find exposed Git repositories",
+                "command": "inurl:/.git intitle:index.of",
+                "example": "site:company.com inurl:/.git intitle:\"index of\""
+            },
+            {
+                "desc": "Find AWS credentials",
+                "command": "filetype:env \"AWS_ACCESS_KEY_ID\"",
+                "example": "site:target.com filetype:env AWS_SECRET"
+            },
+            {
+                "desc": "Find SSH private keys",
+                "command": "intitle:\"index of\" id_rsa -id_rsa.pub",
+                "example": "site:company.com intitle:\"index of\" id_rsa"
+            },
+            {
+                "desc": "Find config files",
+                "command": "ext:conf | ext:config | ext:cfg intext:password",
+                "example": "site:target.com ext:conf password"
+            },
+            {
+                "desc": "Find log files with credentials",
+                "command": "ext:log intext:password | intext:username",
+                "example": "site:company.com ext:log \"password:\" | \"user:\""
+            }
+        ]
+    },
+
+    "Login Panels & Admin Portals": {
+        "desc": "Discovering authentication interfaces",
+        "commands": [
+            {
+                "desc": "Find admin login pages",
+                "command": "inurl:admin | inurl:login | inurl:portal",
+                "example": "site:target.com (inurl:admin | inurl:login) intitle:\"admin\""
+            },
+            {
+                "desc": "Find phpMyAdmin panels",
+                "command": "inurl:phpMyAdmin | inurl:phpmyadmin",
+                "example": "site:company.com inurl:phpMyAdmin intitle:\"phpMyAdmin\""
+            },
+            {
+                "desc": "Find WordPress login pages",
+                "command": "inurl:wp-admin | inurl:wp-login",
+                "example": "site:target.com inurl:wp-login.php"
+            },
+            {
+                "desc": "Find cPanel login",
+                "command": "inurl:cpanel | intitle:\"cpanel\"",
+                "example": "site:target.com intitle:\"cpanel\" inurl:2083"
+            },
+            {
+                "desc": "Find Cisco router logins",
+                "command": "intitle:\"Login - Cisco\" | inurl:login.cgi",
+                "example": "intitle:\"Cisco Router and Security Device Manager\""
+            },
+            {
+                "desc": "Find database admin panels",
+                "command": "inurl:db_admin | inurl:dbadmin",
+                "example": "site:company.com (inurl:db_admin | inurl:dbadmin)"
+            },
+            {
+                "desc": "Find Jenkins login",
+                "command": "intitle:\"Dashboard [Jenkins]\"",
+                "example": "intitle:\"Dashboard [Jenkins]\" inurl:8080"
+            },
+            {
+                "desc": "Find Grafana dashboards",
+                "command": "intitle:\"Grafana\" inurl:3000",
+                "example": "site:target.com intitle:\"Grafana\" inurl:login"
+            }
+        ]
+    },
+
+    "Exposed Databases & APIs": {
+        "desc": "Finding publicly accessible databases and API endpoints",
+        "commands": [
+            {
+                "desc": "Find MongoDB databases",
+                "command": "intitle:\"MongoDB\" | inurl:27017",
+                "example": "site:company.com intitle:\"MongoDB Server\" port:27017"
+            },
+            {
+                "desc": "Find ElasticSearch instances",
+                "command": "intitle:\"elastic\" | inurl:9200/_cat",
+                "example": "site:target.com inurl:9200/_cat/indices"
+            },
+            {
+                "desc": "Find API documentation",
+                "command": "intitle:\"API Documentation\" | inurl:/api/docs",
+                "example": "site:company.com (inurl:api/docs | inurl:swagger)"
+            },
+            {
+                "desc": "Find Swagger API docs",
+                "command": "inurl:swagger | inurl:api-docs",
+                "example": "site:target.com inurl:/swagger-ui.html"
+            },
+            {
+                "desc": "Find exposed Redis",
+                "command": "intitle:\"Redis\" port:6379",
+                "example": "site:company.com intitle:\"Redis Commander\""
+            },
+            {
+                "desc": "Find GraphQL endpoints",
+                "command": "inurl:graphql | inurl:graphiql",
+                "example": "site:target.com (inurl:/graphql | inurl:/graphiql)"
+            },
+            {
+                "desc": "Find exposed Kibana",
+                "command": "intitle:\"Kibana\" inurl:5601",
+                "example": "site:company.com intitle:\"Kibana\" app/kibana"
+            },
+            {
+                "desc": "Find API keys in public repos",
+                "command": "site:github.com \"api_key\" | \"API_KEY\"",
+                "example": "site:github.com \"companyname\" \"api_key\""
+            }
+        ]
+    },
+
+    "Directory Listings & File Indexes": {
+        "desc": "Finding open directories with sensitive files",
+        "commands": [
+            {
+                "desc": "Find directory listings",
+                "command": "intitle:\"index of\" | intitle:\"directory listing\"",
+                "example": "site:target.com intitle:\"index of\" backup"
+            },
+            {
+                "desc": "Find backup directories",
+                "command": "intitle:\"index of\" backup | backups",
+                "example": "site:company.com intitle:\"index of\" inurl:backup"
+            },
+            {
+                "desc": "Find database dumps",
+                "command": "intitle:\"index of\" db_backup | database",
+                "example": "intitle:\"index of\" (db_backup | dump | sql)"
+            },
+            {
+                "desc": "Find password files",
+                "command": "intitle:\"index of\" password.txt | passwords.txt",
+                "example": "intitle:\"index of\" (password | passwd) ext:txt"
+            },
+            {
+                "desc": "Find upload directories",
+                "command": "intitle:\"index of\" /uploads | /files",
+                "example": "site:target.com intitle:\"index of\" inurl:uploads"
+            },
+            {
+                "desc": "Find private SSH keys",
+                "command": "intitle:\"index of\" .ssh | id_rsa",
+                "example": "intitle:\"index of\" inurl:.ssh id_rsa"
+            },
+            {
+                "desc": "Find server logs",
+                "command": "intitle:\"index of\" log | logs ext:log",
+                "example": "site:company.com intitle:\"index of\" inurl:logs"
+            },
+            {
+                "desc": "Find source code repositories",
+                "command": "intitle:\"index of\" .git | .svn",
+                "example": "site:target.com intitle:\"index of\" (inurl:.git | inurl:.svn)"
+            }
+        ]
+    },
+
+    "Error Messages & Debug Info": {
+        "desc": "Finding pages that leak technical information",
+        "commands": [
+            {
+                "desc": "Find SQL error messages",
+                "command": "intext:\"SQL syntax\" | \"mysql_fetch\"",
+                "example": "site:target.com intext:\"You have an error in your SQL syntax\""
+            },
+            {
+                "desc": "Find PHP errors",
+                "command": "intext:\"Warning: mysql\" | \"Fatal error:\"",
+                "example": "site:company.com \"Fatal error:\" intext:\"on line\""
+            },
+            {
+                "desc": "Find stack traces",
+                "command": "intext:\"Stack trace:\" | \"Debug trace\"",
+                "example": "site:target.com intext:\"Stack trace\" Exception"
+            },
+            {
+                "desc": "Find ASP.NET errors",
+                "command": "intext:\"Server Error in '/' Application\"",
+                "example": "site:company.com \"Server Error\" \"Version Information\""
+            },
+            {
+                "desc": "Find Java exceptions",
+                "command": "intext:\"java.lang.Exception\" | \"stackTrace\"",
+                "example": "site:target.com intext:\"java.lang.NullPointerException\""
+            },
+            {
+                "desc": "Find Python tracebacks",
+                "command": "intext:\"Traceback (most recent call last)\"",
+                "example": "site:company.com \"Traceback\" \"File\""
+            },
+            {
+                "desc": "Find debug mode enabled",
+                "command": "intext:\"DEBUG = True\" | \"debug mode\"",
+                "example": "site:target.com intext:\"DEBUG = True\" inurl:settings"
+            },
+            {
+                "desc": "Find Laravel debug pages",
+                "command": "intitle:\"Laravel\" intext:\"Whoops\"",
+                "example": "site:company.com intitle:\"Whoops\" \"Laravel\""
+            }
+        ]
+    },
+
+    "Cloud Storage & Buckets": {
+        "desc": "Finding exposed cloud storage",
+        "commands": [
+            {
+                "desc": "Find AWS S3 buckets",
+                "command": "site:s3.amazonaws.com \"companyname\"",
+                "example": "site:s3.amazonaws.com \"target-company\""
+            },
+            {
+                "desc": "Find Azure blob storage",
+                "command": "site:blob.core.windows.net \"companyname\"",
+                "example": "site:blob.core.windows.net intitle:\"index of\""
+            },
+            {
+                "desc": "Find Google Cloud Storage",
+                "command": "site:storage.googleapis.com \"companyname\"",
+                "example": "site:storage.googleapis.com intitle:\"index of\""
+            },
+            {
+                "desc": "Find DigitalOcean Spaces",
+                "command": "site:digitaloceanspaces.com intitle:\"index\"",
+                "example": "site:digitaloceanspaces.com \"companyname\""
+            },
+            {
+                "desc": "Find exposed S3 buckets (generic)",
+                "command": "inurl:s3.amazonaws.com intitle:\"index of\"",
+                "example": "inurl:s3.amazonaws.com intitle:\"Bucket listing\""
+            },
+            {
+                "desc": "Find files in S3 buckets",
+                "command": "site:s3.amazonaws.com filetype:pdf | filetype:xls",
+                "example": "site:s3.amazonaws.com \"company\" filetype:pdf"
+            },
+            {
+                "desc": "Find Firebase databases",
+                "command": "site:firebaseio.com \"companyname\"",
+                "example": "site:firebaseio.com inurl:.json"
+            },
+            {
+                "desc": "Find exposed Docker registries",
+                "command": "intitle:\"Docker Registry\" | inurl:5000/v2",
+                "example": "site:company.com intitle:\"Docker Registry API\""
+            }
+        ]
+    },
+
+    "IoT & Network Devices": {
+        "desc": "Finding Internet-connected devices and cameras",
+        "commands": [
+            {
+                "desc": "Find webcams",
+                "command": "inurl:/view/view.shtml | intitle:\"Live View\"",
+                "example": "inurl:view.shtml intitle:\"Network Camera\""
+            },
+            {
+                "desc": "Find IP cameras",
+                "command": "intitle:\"Network Camera\" | inurl:CgiStart",
+                "example": "intitle:\"AXIS\" | intitle:\"Network Camera\""
+            },
+            {
+                "desc": "Find printers",
+                "command": "intitle:\"Printer\" | inurl:hp/device",
+                "example": "intitle:\"HP LaserJet\" inurl:SSI/Auth"
+            },
+            {
+                "desc": "Find routers",
+                "command": "intitle:\"Router\" login | admin",
+                "example": "intitle:\"DD-WRT\" | intitle:\"OpenWrt\""
+            },
+            {
+                "desc": "Find SCADA systems",
+                "command": "intitle:\"SCADA\" | intitle:\"Human Machine\"",
+                "example": "intitle:\"Supervisory Control\" SCADA"
+            },
+            {
+                "desc": "Find smart home hubs",
+                "command": "intitle:\"SmartThings\" | intitle:\"Home Assistant\"",
+                "example": "intitle:\"Home Assistant\" inurl:8123"
+            },
+            {
+                "desc": "Find VNC servers",
+                "command": "intitle:\"VNC viewer\" | inurl:5900",
+                "example": "intitle:\"VNC viewer for Java\""
+            },
+            {
+                "desc": "Find Ubiquiti devices",
+                "command": "intitle:\"UniFi\" | intitle:\"EdgeRouter\"",
+                "example": "intitle:\"UniFi Network\" login"
+            }
+        ]
+    },
+
+    "Social Media & OSINT": {
+        "desc": "Finding information on social platforms",
+        "commands": [
+            {
+                "desc": "Search LinkedIn profiles",
+                "command": "site:linkedin.com \"Company Name\" \"Job Title\"",
+                "example": "site:linkedin.com \"Target Corp\" \"Security Engineer\""
+            },
+            {
+                "desc": "Search GitHub repositories",
+                "command": "site:github.com \"companyname\" password",
+                "example": "site:github.com \"acme-corp\" api_key"
+            },
+            {
+                "desc": "Search Pastebin leaks",
+                "command": "site:pastebin.com \"companyname\" password",
+                "example": "site:pastebin.com \"target.com\" credentials"
+            },
+            {
+                "desc": "Search Twitter mentions",
+                "command": "site:twitter.com \"@companyname\" security",
+                "example": "site:twitter.com \"@targetcorp\" vulnerability"
+            },
+            {
+                "desc": "Find employee emails",
+                "command": "site:linkedin.com \"@companyname.com\"",
+                "example": "site:linkedin.com \"@target.com\" email"
+            },
+            {
+                "desc": "Search code repositories",
+                "command": "site:gitlab.com | site:bitbucket.org \"company\"",
+                "example": "site:gitlab.com \"acme\" password | api_key"
+            },
+            {
+                "desc": "Find breach data",
+                "command": "site:pastebin.com | site:ghostbin.com leak",
+                "example": "site:pastebin.com \"company.com\" database leak"
+            },
+            {
+                "desc": "Search archived pages",
+                "command": "site:archive.org \"companyname.com\"",
+                "example": "site:archive.org \"target.com/admin\""
+            }
+        ]
+    },
+
+    "Advanced Combinations": {
+        "desc": "Powerful multi-operator searches",
+        "commands": [
+            {
+                "desc": "Find credentials in config files",
+                "command": "site:target.com ext:xml | ext:conf intext:password",
+                "example": "site:company.com (ext:xml | ext:conf | ext:cnf) (intext:password | intext:passwd)"
+            },
+            {
+                "desc": "Find API keys and secrets",
+                "command": "site:github.com \"company\" (api_key | api_secret | access_token)",
+                "example": "site:github.com \"acme\" (\"api_key\" | \"API_SECRET\")"
+            },
+            {
+                "desc": "Find vulnerable WordPress sites",
+                "command": "site:target.com inurl:wp-content | wp-includes -inurl:https",
+                "example": "site:target.com inurl:wp-content intitle:\"index of\""
+            },
+            {
+                "desc": "Find email addresses",
+                "command": "site:target.com intext:\"@companyname.com\" -www",
+                "example": "site:linkedin.com | site:twitter.com \"@target.com\""
+            },
+            {
+                "desc": "Find subdomains",
+                "command": "site:*.target.com -www",
+                "example": "site:*.example.com -www -ftp"
+            },
+            {
+                "desc": "Find juicy files (combined)",
+                "command": "(ext:sql | ext:bak | ext:old | ext:backup) password",
+                "example": "site:target.com (ext:sql | ext:dbf | ext:mdb) password"
+            },
+            {
+                "desc": "Find exposed admin areas",
+                "command": "site:target.com (inurl:admin | inurl:administrator | inurl:moderator)",
+                "example": "site:company.com (inurl:admin | inurl:cpanel) (intext:login | intext:password)"
+            },
+            {
+                "desc": "Find test/dev servers",
+                "command": "site:target.com (inurl:test | inurl:dev | inurl:staging)",
+                "example": "site:company.com (subdomain:dev | subdomain:test | subdomain:staging)"
+            }
+        ]
+    },
+
+    "Exclusion Operators": {
+        "desc": "Refining searches by excluding unwanted results",
+        "commands": [
+            {
+                "desc": "Exclude specific term",
+                "command": "-keyword",
+                "example": "site:company.com admin -www - excludes www subdomain"
+            },
+            {
+                "desc": "Exclude file types",
+                "command": "-filetype:pdf",
+                "example": "site:target.com documents -filetype:pdf - exclude PDFs"
+            },
+            {
+                "desc": "Exclude multiple terms",
+                "command": "-word1 -word2",
+                "example": "site:company.com -blog -news - exclude blog and news"
+            },
+            {
+                "desc": "Exclude subdomains",
+                "command": "site:*.target.com -www -mail",
+                "example": "site:*.example.com -www -ftp -mail"
+            }
+        ]
+    },
+
+    "Google Dork Cheat Sheet": {
+        "desc": "Quick reference for common operators",
+        "commands": [
+            {
+                "desc": "Combine multiple operators",
+                "command": "site: + inurl: + filetype: + intext:",
+                "example": "site:target.com inurl:admin filetype:php intext:login"
+            },
+            {
+                "desc": "Use OR operator",
+                "command": "keyword1 | keyword2",
+                "example": "(admin | administrator | root) login"
+            },
+            {
+                "desc": "Use wildcard",
+                "command": "keyword * keyword",
+                "example": "admin * password - matches any words between"
+            },
+            {
+                "desc": "Number ranges",
+                "command": "keyword 2020..2024",
+                "example": "site:company.com report 2020..2024"
+            },
+            {
+                "desc": "Search within URL path",
+                "command": "allinurl:keyword1 keyword2",
+                "example": "allinurl:admin panel login"
+            },
+            {
+                "desc": "Search all text in page",
+                "command": "allintext:keyword1 keyword2",
+                "example": "allintext:username password database"
+            },
+            {
+                "desc": "Search all words in title",
+                "command": "allintitle:keyword1 keyword2",
+                "example": "allintitle:index of backup"
+            }
+        ]
+    },
+
+    "🔴 CRITICAL - AUTHORIZED USE ONLY": {
+        "desc": "⚠️ EXTREMELY SENSITIVE DORKS - AUTHORIZED TESTING ONLY - LEGAL CONSEQUENCES FOR MISUSE ⚠️",
+        "commands": [
+            {
+                "desc": "🔴 CRITICAL: Database credentials in plain text",
+                "command": "intext:\"mysql_connect\" | \"mysqli_connect\" intext:\"localhost\" password",
+                "example": "site:target.com filetype:php intext:\"mysql_connect(\" intext:\"password\" - EXTREMELY DANGEROUS"
+            },
+            {
+                "desc": "🔴 CRITICAL: Full AWS credentials exposed",
+                "command": "\"AKIA\" \"aws_secret_access_key\" | \"aws_access_key_id\"",
+                "example": "site:github.com | site:pastebin.com \"AKIA\" \"aws_secret_access_key\" - FULL CLOUD ACCESS"
+            },
+            {
+                "desc": "🔴 CRITICAL: Private SSH keys with passphrases",
+                "command": "filetype:pem | filetype:key intext:\"BEGIN RSA PRIVATE KEY\"",
+                "example": "site:target.com (ext:pem | ext:key) \"BEGIN PRIVATE KEY\" - ROOT SERVER ACCESS"
+            },
+            {
+                "desc": "🔴 CRITICAL: Production database dumps with user data",
+                "command": "filetype:sql intext:\"INSERT INTO users\" (password | email | credit_card)",
+                "example": "site:company.com ext:sql \"INSERT INTO\" \"users\" \"password\" - PII BREACH"
+            },
+            {
+                "desc": "🔴 CRITICAL: Elasticsearch with no authentication",
+                "command": "inurl:9200/_cat/indices | inurl:9200/_cluster/health",
+                "example": "site:target.com inurl:9200 \"cluster_name\" - FULL DATABASE ACCESS"
+            },
+            {
+                "desc": "🔴 CRITICAL: Jenkins without authentication",
+                "command": "intitle:\"Dashboard [Jenkins]\" inurl:script",
+                "example": "intitle:\"Dashboard [Jenkins]\" \"Manage Jenkins\" -login - RCE POSSIBLE"
+            },
+            {
+                "desc": "🔴 CRITICAL: Exposed .git config with credentials",
+                "command": "inurl:/.git/config intext:\"[remote\" | intext:\"url =\"",
+                "example": "site:company.com inurl:/.git/config - SOURCE CODE + CREDENTIALS"
+            },
+            {
+                "desc": "🔴 CRITICAL: Live credit card data in logs",
+                "command": "filetype:log intext:\"card_number\" | \"cvv\" | \"expiry\"",
+                "example": "site:target.com ext:log (\"4\" | \"5\") 16 digits \"cvv\" - FINANCIAL FRAUD RISK"
+            },
+            {
+                "desc": "🔴 CRITICAL: Admin credentials in config files",
+                "command": "filetype:ini | filetype:config \"admin_password\" | \"admin_user\"",
+                "example": "site:company.com (ext:ini | ext:cfg) \"admin\" \"password\" = - FULL ADMIN ACCESS"
+            },
+            {
+                "desc": "🔴 CRITICAL: OAuth client secrets exposed",
+                "command": "\"client_secret\" \"client_id\" (google | facebook | github)",
+                "example": "site:github.com \"client_secret\" \"client_id\" - ACCOUNT TAKEOVER RISK"
+            },
+            {
+                "desc": "🔴 CRITICAL: Stripe/Payment API keys",
+                "command": "\"sk_live_\" | \"pk_live_\" | \"rk_live_\" stripe",
+                "example": "site:github.com | site:pastebin.com \"sk_live_\" - PAYMENT PROCESSING ACCESS"
+            },
+            {
+                "desc": "🔴 CRITICAL: JWT secret keys",
+                "command": "\"JWT_SECRET\" | \"jwt_secret\" | \"JWT_KEY\" -example -tutorial",
+                "example": "site:github.com \"companyname\" \"JWT_SECRET\" - SESSION HIJACKING"
+            },
+            {
+                "desc": "🔴 CRITICAL: Redis without authentication (6379)",
+                "command": "intitle:\"Redis Commander\" | inurl:6379/info",
+                "example": "site:target.com intitle:\"Redis Commander\" - FULL CACHE ACCESS + RCE"
+            },
+            {
+                "desc": "🔴 CRITICAL: MongoDB without auth (27017)",
+                "command": "intitle:\"MongoDB Server Information\" port:27017",
+                "example": "site:company.com inurl:27017 - FULL DATABASE DUMP POSSIBLE"
+            },
+            {
+                "desc": "🔴 CRITICAL: SMTP credentials in plain text",
+                "command": "filetype:env \"MAIL_PASSWORD\" | \"SMTP_PASSWORD\"",
+                "example": "site:target.com ext:env \"MAIL_\" \"PASSWORD\" - EMAIL SYSTEM ACCESS"
+            },
+            {
+                "desc": "🔴 CRITICAL: Kubernetes config with cluster creds",
+                "command": "filetype:yaml | filetype:yml \"apiVersion: v1\" \"kind: Secret\"",
+                "example": "site:github.com ext:yaml \"kind: Secret\" \"namespace\" - K8S CLUSTER ACCESS"
+            },
+            {
+                "desc": "🔴 CRITICAL: Docker .env files with secrets",
+                "command": "site:github.com filename:.env DB_PASSWORD",
+                "example": "site:github.com \"companyname\" filename:.env - FULL STACK CREDENTIALS"
+            },
+            {
+                "desc": "🔴 CRITICAL: Backup files with all credentials",
+                "command": "intitle:\"index of\" (database.sql | dump.sql | backup.sql) -git",
+                "example": "intitle:\"index of\" \"backup.sql\" size:>1000000 - MASSIVE DATA LEAK"
+            },
+            {
+                "desc": "🔴 CRITICAL: API documentation with live keys",
+                "command": "inurl:swagger-ui.html | inurl:api-docs \"api_key\" \"authorization\"",
+                "example": "site:target.com inurl:/api-docs \"Bearer\" - LIVE API EXPLOITATION"
+            },
+            {
+                "desc": "🔴 CRITICAL: Grafana with default credentials",
+                "command": "intitle:\"Grafana\" \"Sign in\" -login -secure",
+                "example": "intitle:\"Grafana\" inurl:3000 \"admin:admin\" - METRICS + POTENTIAL RCE"
+            },
+            {
+                "desc": "🔴 CRITICAL: phpMyAdmin with root access",
+                "command": "intitle:\"phpMyAdmin\" \"Welcome to phpMyAdmin\" inurl:index.php",
+                "example": "intitle:\"phpMyAdmin\" \"root@localhost\" - DATABASE ROOT ACCESS"
+            },
+            {
+                "desc": "🔴 CRITICAL: Exposed Kubernetes dashboard",
+                "command": "intitle:\"Kubernetes Dashboard\" inurl:#!/login",
+                "example": "intitle:\"Kubernetes Dashboard\" -\"Sign in\" - FULL CLUSTER CONTROL"
+            },
+            {
+                "desc": "🔴 CRITICAL: Confluence spaces with credentials",
+                "command": "site:confluence.company.com intext:\"password\" | \"credentials\"",
+                "example": "site:*.atlassian.net intext:\"prod password\" - INTERNAL CREDENTIALS"
+            },
+            {
+                "desc": "🔴 CRITICAL: Jira tickets with secrets",
+                "command": "site:jira.company.com | site:*.atlassian.net (api_key | password | secret)",
+                "example": "site:company.atlassian.net \"API_KEY\" \"production\" - LIVE SECRETS"
+            },
+            {
+                "desc": "🔴 CRITICAL: Slack tokens and webhooks",
+                "command": "\"xoxb-\" | \"xoxp-\" | \"T00000000\" slack",
+                "example": "site:github.com | site:pastebin.com \"xoxb-\" - SLACK WORKSPACE ACCESS"
+            },
+            {
+                "desc": "🔴 CRITICAL: Twilio API credentials",
+                "command": "\"SK\" twilio | \"AC\" \"auth_token\" twilio",
+                "example": "site:github.com \"SK\" \"AC\" \"twilio\" - SMS/CALL SYSTEM ACCESS"
+            },
+            {
+                "desc": "🔴 CRITICAL: Private API endpoints (no auth)",
+                "command": "inurl:/api/v1/users | inurl:/api/admin -login -auth",
+                "example": "site:target.com inurl:/api/ (users | admin | config) - BROKEN AUTH"
+            },
+            {
+                "desc": "🔴 CRITICAL: Leaked .p12 / .pfx certificates",
+                "command": "filetype:p12 | filetype:pfx certificate",
+                "example": "site:company.com (ext:p12 | ext:pfx) - CODE SIGNING / SSL CERTS"
+            },
+            {
+                "desc": "🔴 CRITICAL: Telerik Web UI RCE vulnerable",
+                "command": "inurl:Telerik.Web.UI.WebResource.axd",
+                "example": "site:target.com inurl:Telerik.Web.UI.WebResource.axd - KNOWN RCE VULN"
+            },
+            {
+                "desc": "🔴 CRITICAL: Exposed .DS_Store files (macOS)",
+                "command": "intitle:\"Index of\" .DS_Store",
+                "example": "site:company.com intitle:\"index of\" .DS_Store - DIRECTORY STRUCTURE LEAK"
+            },
+            {
+                "desc": "🔴 CRITICAL: WordPress debug.log with credentials",
+                "command": "inurl:wp-content/debug.log | inurl:wp-errors.log",
+                "example": "site:target.com inurl:wp-content/debug.log - DB CREDENTIALS POSSIBLE"
+            },
+            {
+                "desc": "🔴 CRITICAL: Laravel .env with APP_KEY",
+                "command": "site:target.com inurl:.env \"APP_KEY\" \"DB_PASSWORD\"",
+                "example": "site:company.com \".env\" \"APP_KEY\" \"base64:\" - FULL FRAMEWORK ACCESS"
+            },
+            {
+                "desc": "🔴 CRITICAL: Firebase database with .json access",
+                "command": "site:firebaseio.com inurl:.json -rules",
+                "example": "site:company.firebaseio.com \"users.json\" - ENTIRE DATABASE READABLE"
+            },
+            {
+                "desc": "🔴 CRITICAL: Prometheus metrics with secrets",
+                "command": "inurl:9090/metrics | inurl:9090/graph",
+                "example": "site:target.com inurl:9090/metrics - INTERNAL METRICS + POSSIBLE SECRETS"
+            },
+            {
+                "desc": "🔴 CRITICAL: Exposed Docker daemon (2375/2376)",
+                "command": "intitle:\"Docker Remote API\" | inurl:2375/info",
+                "example": "site:company.com inurl:2375 - CONTAINER TAKEOVER + HOST ACCESS"
+            },
+            {
+                "desc": "🔴 CRITICAL: Jupyter Notebook without password",
+                "command": "intitle:\"Jupyter Notebook\" inurl:tree?",
+                "example": "intitle:\"Home Page - Select or create a notebook\" - CODE EXECUTION"
+            },
+            {
+                "desc": "🔴 CRITICAL: Sonarqube with default credentials",
+                "command": "intitle:\"SonarQube\" \"Projects\"",
+                "example": "intitle:\"SonarQube\" -login - SOURCE CODE ANALYSIS ACCESS"
+            },
+            {
+                "desc": "🔴 CRITICAL: Exposed internal wikis/docs",
+                "command": "site:docs.company.com | site:wiki.company.com (password | api_key | secret)",
+                "example": "site:wiki.target.com \"production credentials\" - INTERNAL SECRETS"
+            },
+            {
+                "desc": "🔴 CRITICAL: Backup archive files",
+                "command": "filetype:bak | filetype:old | filetype:backup intext:password",
+                "example": "site:company.com (ext:bak | ext:old) \"password\" - OLD CREDENTIALS STILL VALID"
+            },
+            {
+                "desc": "🔴 CRITICAL: FTP credentials in logs",
+                "command": "filetype:log intext:\"USER\" intext:\"PASS\" ftp",
+                "example": "site:target.com ext:log \"230 User logged in\" - FTP ACCESS"
+            }
+        ]
+    },
+
+    "Safety & Legal Notes": {
+        "desc": "Important reminders for responsible use",
+        "commands": [
+            {
+                "desc": "⚠️ Authorization Required",
+                "command": "ONLY use on systems you own or have written permission to test",
+                "example": "Unauthorized reconnaissance is illegal in most jurisdictions"
+            },
+            {
+                "desc": "⚠️ Responsible Disclosure",
+                "command": "If you find vulnerabilities, report them responsibly",
+                "example": "Use bug bounty platforms or contact security@company.com"
+            },
+            {
+                "desc": "⚠️ Privacy Considerations",
+                "command": "Respect privacy - don't abuse public information",
+                "example": "Finding public data ≠ right to exploit it"
+            },
+            {
+                "desc": "⚠️ Rate Limiting",
+                "command": "Don't overwhelm Google with automated queries",
+                "example": "Use delays between searches, respect robots.txt"
+            },
+            {
+                "desc": "🔴 CRITICAL DORKS WARNING",
+                "command": "The CRITICAL section contains EXTREMELY dangerous dorks",
+                "example": "Misuse can lead to: Criminal charges, Lawsuits, Imprisonment, Career destruction"
+            },
+            {
+                "desc": "⚖️ Legal Consequences",
+                "command": "Computer Fraud and Abuse Act (CFAA) - US Federal Crime",
+                "example": "Penalties: Up to 20 years imprisonment + $250,000 fine per violation"
+            },
+            {
+                "desc": "✅ When to use CRITICAL dorks",
+                "command": "ONLY during authorized bug bounty programs or penetration tests",
+                "example": "Always get written permission BEFORE reconnaissance"
+            }
+        ]
+    }
+}

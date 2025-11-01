@@ -1,0 +1,131 @@
+{
+    "theharvester": {
+        "desc": "E-mail, subdomain ve host bilgilerini toplamak için OSINT aracı - pasif bilgi toplama",
+        "category": "OSINT",
+        "usage": [
+            "theHarvester -d example.com -l 500 -b google",
+            "theHarvester -d target.com -b all -l 100 -f results.html",
+            "theHarvester -d company.com -b linkedin,google,bing -l 200"
+        ],
+        "flags": {
+            "-d": "Domain to search",
+            "-l": "Limit of results to work with",
+            "-b": "Data source (google, bing, linkedin, twitter, etc.)",
+            "-s": "Start in result number X",
+            "-v": "Verify host name via DNS resolution",
+            "-f": "Save results to HTML or XML file",
+            "-n": "Perform a DNS reverse query on all ranges discovered",
+            "-c": "Perform a DNS brute force for the domain name",
+            "-t": "Perform a DNS TLD expansion discovery",
+            "-e": "Use DNS server",
+            "-p": "Port scan the hosts found",
+            "-g": "Use Google dorking"
+        },
+        "data_sources": [
+            "google", "bing", "yahoo", "duckduckgo", "linkedin", "twitter",
+            "facebook", "instagram", "github", "shodan", "censys", "virustotal",
+            "dnsdumpster", "netcraft", "threatcrowd", "crtsh", "passivetotal",
+            "securitytrails", "all"
+        ],
+        "examples": [
+            {
+                "desc": "Basic domain reconnaissance",
+                "command": "theHarvester -d example.com -l 500 -b google,bing,yahoo"
+            },
+            {
+                "desc": "Comprehensive scan with all sources",
+                "command": "theHarvester -d target.com -b all -l 100 -f comprehensive_scan.html"
+            },
+            {
+                "desc": "LinkedIn employee enumeration",
+                "command": "theHarvester -d company.com -b linkedin -l 200"
+            },
+            {
+                "desc": "Subdomain discovery with DNS verification",
+                "command": "theHarvester -d target.com -b google,bing -l 100 -v"
+            }
+        ],
+        "output_formats": ["HTML", "XML", "JSON", "console"],
+        "notes": [
+            "Pasif reconnaissance için mükemmel",
+            "Rate limiting dikkat edilmeli",
+            "API key gereken kaynaklar var"
+        ],
+        "security_risk": "Low - Passive reconnaissance",
+        "platform": ["Linux", "Windows", "macOS"],
+        "required_permissions": "Network access"
+    },
+    "urlscan_io": {
+        "desc": "URL analizi ve website tarama servisi - şüpheli URL'leri analiz etme",
+        "category": "URL Analysis",
+        "usage": [
+            "curl -X POST \"https://urlscan.io/api/v1/scan/\" -H \"API-Key: YOUR-API-KEY\" -H \"Content-Type: application/json\" -d '{\"url\": \"http://example.com\"}'",
+            "Web interface: https://urlscan.io"
+        ],
+        "features": [
+            "Website screenshot",
+            "DOM analysis",
+            "Network connections",
+            "Resource loading analysis",
+            "Security indicators",
+            "Malware detection",
+            "Phishing detection"
+        ],
+        "api_endpoints": {
+            "scan": "https://urlscan.io/api/v1/scan/",
+            "result": "https://urlscan.io/api/v1/result/{uuid}/",
+            "search": "https://urlscan.io/api/v1/search/"
+        },
+        "examples": [
+            {
+                "desc": "URL scan with API",
+                "command": "curl -X POST \"https://urlscan.io/api/v1/scan/\" -H \"API-Key: YOUR-KEY\" -d '{\"url\": \"http://suspicious-site.com\"}'"
+            },
+            {
+                "desc": "Search for domain",
+                "command": "curl \"https://urlscan.io/api/v1/search/?q=domain:example.com\""
+            }
+        ],
+        "notes": [
+            "API key gerekli",
+            "Rate limiting var",
+            "Public ve private scan seçenekleri"
+        ],
+        "security_risk": "Low - Analysis service",
+        "platform": ["Web-based", "API"],
+        "required_permissions": "API key"
+    },
+    "abuse_ch": {
+        "desc": "Malware ve threat intelligence platformu - zararlı yazılım analizi",
+        "category": "Threat Intelligence",
+        "services": {
+            "malware_bazaar": "https://bazaar.abuse.ch",
+            "feodo_tracker": "https://feodotracker.abuse.ch",
+            "ssl_blacklist": "https://sslbl.abuse.ch",
+            "url_haus": "https://urlhaus.abuse.ch"
+        },
+        "usage": [
+            "Web interface üzerinden malware hash arama",
+            "API üzerinden otomatik sorgulama",
+            "Feed'ler üzerinden threat intelligence"
+        ],
+        "api_examples": [
+            {
+                "desc": "Hash lookup in MalwareBazaar",
+                "command": "curl -X POST https://mb-api.abuse.ch/api/v1/ -d 'query=get_info&hash=HASH_VALUE'"
+            },
+            {
+                "desc": "URLhaus lookup",
+                "command": "curl -X POST https://urlhaus-api.abuse.ch/v1/url/ -d 'url=http://example.com/malware.exe'"
+            }
+        ],
+        "notes": [
+            "Free threat intelligence",
+            "Malware sample sharing",
+            "API rate limiting var"
+        ],
+        "security_risk": "Low - Intelligence service",
+        "platform": ["Web-based", "API"],
+        "required_permissions": "None for basic usage"
+    }
+}

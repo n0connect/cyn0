@@ -1,0 +1,353 @@
+{
+    "ffuf": {
+        "desc": "Fast web fuzzer written in Go - HTTP parametreler, dizinler ve dosyalar için fuzzing aracı",
+        "category": "Web Fuzzing",
+        "usage": [
+            "ffuf -u \"http://example.site/login.php\" -X POST -d \"username=admin&password=FUZZ\" -w /usr/share/wordlists/rockyou.txt -H \"Content-Type: application/x-www-form-urlencoded\"",
+            "ffuf -u http://target.com/FUZZ -w /usr/share/wordlists/dirb/common.txt",
+            "ffuf -u http://target.com/?FUZZ=test -w /usr/share/wordlists/parameters.txt",
+            "ffuf -u https://example.com -H \"Host: FUZZ.example.com\" -w /path/to/wordlist.txt",
+            "ffuf -u https://FUZZ.example.com -H \"Host: FUZZ.example.com\" -w /path/to/wordlist.txt"
+        ],
+        "flags": {
+            "-u": "Target URL (FUZZ keyword ile fuzzing yapılacak yer belirtilir)",
+            "-w": "Wordlist dosyası yolu",
+            "-X": "HTTP method (GET, POST, PUT, DELETE)",
+            "-d": "POST data (FUZZ keyword kullanılabilir)",
+            "-H": "HTTP header ekler",
+            "-t": "Thread sayısı (varsayılan: 40)",
+            "-p": "Delay between requests (saniye)",
+            "-mc": "Match HTTP status codes",
+            "-ms": "Match response size",
+            "-mw": "Match word count",
+            "-fc": "Filter HTTP status codes",
+            "-fs": "Filter response size",
+            "-fw": "Filter word count",
+            "-o": "Output format (json, ejson, html, md, csv, ecsv)",
+            "-of": "Output file",
+            "-s": "Silent mode",
+            "-v": "Verbose output",
+            "-maxtime": "Maximum running time",
+            "-maxtime-job": "Maximum time per job",
+            "-recursion": "Enable recursion",
+            "-recursion-depth": "Recursion depth",
+            "-e": "File extensions to fuzz"
+        },
+        "examples": [
+            {
+                "desc": "Dizin fuzzing",
+                "command": "ffuf -u http://target.com/FUZZ -w /usr/share/wordlists/dirb/common.txt -mc 200,301,302,403"
+            },
+            {
+                "desc": "POST parameter fuzzing",
+                "command": "ffuf -u http://target.com/login -X POST -d \"username=admin&password=FUZZ\" -w passwords.txt -H \"Content-Type: application/x-www-form-urlencoded\""
+            },
+            {
+                "desc": "Virtual host discovery",
+                "command": "ffuf -u http://target.com -H \"Host: FUZZ.target.com\" -w subdomains.txt -fs 1234"
+            },
+            {
+                "desc": "File extension fuzzing",
+                "command": "ffuf -u http://target.com/indexFUZZ -w /usr/share/wordlists/dirb/extensions_common.txt"
+            },
+            {
+                "desc": "Subdomain enumeration",
+                "command": "ffuf -u https://FUZZ.target.com -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt -mc 200"
+            }
+        ],
+        "wordlists": [
+            "/usr/share/wordlists/dirb/common.txt",
+            "/usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt",
+            "/usr/share/wordlists/rockyou.txt",
+            "/usr/share/seclists/Discovery/Web-Content/common.txt"
+        ],
+        "output_formats": ["json", "ejson", "html", "md", "csv", "ecsv"],
+        "notes": [
+            "FUZZ keyword her yerde kullanılabilir (URL, headers, POST data)",
+            "Multiple wordlist kullanımı için -w flag'i birden fazla kez kullanılabilir",
+            "Rate limiting için -p ve -t parametreleri önemli"
+        ],
+        "security_risk": "High - Aggressive scanning can cause DoS",
+        "platform": ["Linux", "Windows", "macOS"],
+        "required_permissions": "Network access"
+    },
+    "feroxbuster": {
+        "desc": "Fast, simple, recursive content discovery tool written in Rust - dizin ve dosya keşfi için",
+        "category": "Web Directory Scanning",
+        "usage": [
+            "feroxbuster -u http://impact.hv/uploads -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt",
+            "feroxbuster -u http://target.com -x php,html,js,txt",
+            "feroxbuster -u http://target.com -w wordlist.txt --depth 3"
+        ],
+        "flags": {
+            "-u": "Target URL",
+            "-w": "Wordlist file",
+            "-x": "File extensions to search for",
+            "-t": "Number of threads (default: 50)",
+            "-d": "Maximum recursion depth",
+            "--depth": "Maximum recursion depth",
+            "-s": "Status codes to include (default: 200 204 301 302 307 308 401 403 405)",
+            "-C": "Status codes to filter out",
+            "-k": "Disables TLS certificate validation",
+            "-r": "Follow redirects",
+            "-a": "User-Agent string",
+            "-H": "Add custom header",
+            "-b": "Add cookie",
+            "-o": "Output file",
+            "-q": "Quiet mode",
+            "-v": "Verbose output",
+            "--json": "Output as JSON",
+            "--extract-links": "Extract links from response bodies",
+            "--scan-limit": "Limit total number of requests",
+            "--time-limit": "Limit scan time",
+            "--filter-size": "Filter responses by size",
+            "--filter-words": "Filter responses by word count",
+            "--filter-lines": "Filter responses by line count"
+        },
+        "examples": [
+            {
+                "desc": "Basic directory scan",
+                "command": "feroxbuster -u http://target.com -w /usr/share/wordlists/dirb/common.txt"
+            },
+            {
+                "desc": "PHP file discovery with extensions",
+                "command": "feroxbuster -u http://target.com -x php,html,js,txt -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt"
+            },
+            {
+                "desc": "Recursive scan with depth limit",
+                "command": "feroxbuster -u http://target.com -w wordlist.txt --depth 3 -t 30"
+            },
+            {
+                "desc": "Scan with custom headers and cookies",
+                "command": "feroxbuster -u http://target.com -w wordlist.txt -H \"Authorization: Bearer token\" -b \"session=abc123\""
+            }
+        ],
+        "common_extensions": ["php", "html", "js", "txt", "xml", "json", "asp", "aspx", "jsp"],
+        "wordlists": [
+            "/usr/share/wordlists/dirb/common.txt",
+            "/usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt",
+            "/usr/share/seclists/Discovery/Web-Content/common.txt"
+        ],
+        "notes": [
+            "Rust ile yazıldığı için çok hızlı",
+            "Otomatik recursive tarama yapar",
+            "Response filtering çok gelişmiş"
+        ],
+        "security_risk": "Medium-High - Can generate high traffic",
+        "platform": ["Linux", "Windows", "macOS"],
+        "required_permissions": "Network access"
+    },
+    "gobuster": {
+        "desc": "Directory/File, DNS and VHost busting tool written in Go - çok hızlı web içerik keşif aracı",
+        "category": "Web Content Discovery",
+        "usage": [
+            "gobuster dir -u http://target.com -w /usr/share/wordlists/dirb/common.txt",
+            "gobuster dns -d target.com -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt",
+            "gobuster vhost -u http://target.com -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt"
+        ],
+        "modes": {
+            "dir": "Directory/file enumeration mode",
+            "dns": "DNS subdomain brute force mode",
+            "vhost": "Virtual host brute force mode",
+            "s3": "AWS S3 bucket enumeration",
+            "gcs": "Google Cloud Storage enumeration"
+        },
+        "flags": {
+            "dir_mode": {
+                "-u": "Target URL",
+                "-w": "Wordlist file",
+                "-x": "File extensions",
+                "-t": "Number of threads (default: 10)",
+                "-s": "Positive status codes (default: 200,204,301,302,307,401,403)",
+                "-b": "Negative status codes",
+                "-k": "Skip TLS certificate verification",
+                "-a": "User-Agent string",
+                "-H": "Specify HTTP header",
+                "-c": "Specify cookie",
+                "-r": "Follow redirects",
+                "-l": "Include the length of the body in the output",
+                "-q": "Don't print the banner and other noise",
+                "-n": "Don't print status codes",
+                "-e": "Expanded mode, print full URLs",
+                "-o": "Output file to write results to",
+                "--timeout": "HTTP Timeout",
+                "--wildcard": "Force continued operation when wildcard found"
+            },
+            "dns_mode": {
+                "-d": "Target domain",
+                "-w": "Wordlist file", 
+                "-t": "Number of threads (default: 10)",
+                "-c": "Show CNAME records",
+                "-i": "Show IP addresses",
+                "-r": "Use custom DNS server",
+                "-o": "Output file to write results to",
+                "--timeout": "DNS resolver timeout",
+                "--wildcard": "Force continued operation when wildcard found"
+            },
+            "vhost_mode": {
+                "-u": "Target URL",
+                "-w": "Wordlist file",
+                "-t": "Number of threads (default: 10)",
+                "-k": "Skip TLS certificate verification",
+                "-a": "User-Agent string",
+                "-H": "Specify HTTP header",
+                "-c": "Specify cookie",
+                "-r": "Follow redirects",
+                "--timeout": "HTTP Timeout",
+                "--append-domain": "Append main domain to words from wordlist"
+            }
+        },
+        "examples": [
+            {
+                "desc": "Basic directory enumeration",
+                "command": "gobuster dir -u http://target.com -w /usr/share/wordlists/dirb/common.txt"
+            },
+            {
+                "desc": "Directory scan with extensions",
+                "command": "gobuster dir -u http://target.com -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x php,html,txt,js"
+            },
+            {
+                "desc": "DNS subdomain brute force",
+                "command": "gobuster dns -d target.com -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt -i"
+            },
+            {
+                "desc": "Virtual host discovery",
+                "command": "gobuster vhost -u http://target.com -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt"
+            },
+            {
+                "desc": "Threaded scan with custom user agent",
+                "command": "gobuster dir -u http://target.com -w /usr/share/wordlists/dirb/common.txt -t 50 -a \"Mozilla/5.0 (compatible; Googlebot)\""
+            },
+            {
+                "desc": "S3 bucket enumeration",
+                "command": "gobuster s3 -w /usr/share/wordlists/dirb/common.txt"
+            }
+        ],
+        "wordlists": [
+            "/usr/share/wordlists/dirb/common.txt",
+            "/usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt",
+            "/usr/share/seclists/Discovery/Web-Content/common.txt",
+            "/usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt",
+            "/usr/share/seclists/Discovery/DNS/fierce-hostlist.txt"
+        ],
+        "common_extensions": ["php", "html", "js", "txt", "xml", "json", "asp", "aspx", "jsp", "pdf", "zip"],
+        "notes": [
+            "Go ile yazıldığı için çok hızlı ve hafif",
+            "Farklı modları ile çok yönlü kullanım",
+            "Wildcard detection özelliği var",
+            "Output formatları çeşitli"
+        ],
+        "security_risk": "Medium - Standard reconnaissance tool",
+        "platform": ["Linux", "Windows", "macOS"],
+        "required_permissions": "Network access"
+    },
+    "sublist3r": {
+        "desc": "Fast subdomains enumeration tool for penetration testers - OSINT tabanlı subdomain keşif aracı",
+        "category": "Subdomain Enumeration",
+        "usage": [
+            "sublist3r -d target.com",
+            "sublist3r -d target.com -b",
+            "sublist3r -d target.com -p 80,443,8080 -v",
+            "sublist3r -d target.com -o subdomains.txt"
+        ],
+        "flags": {
+            "-d": "Domain to enumerate subdomains",
+            "-b": "Enable the subbrute bruteforce module",
+            "-p": "Specify TCP ports to scan",
+            "-v": "Enable the verbose mode",
+            "-t": "Number of threads (default: 40)",
+            "-e": "Specify search engines (google,yahoo,bing,baidu,ask,netcraft,dnsdumpster,virustotal,ssl)",
+            "-o": "Save the results to text file",
+            "-h": "Show help message and exit"
+        },
+        "search_engines": [
+            "Google",
+            "Yahoo", 
+            "Bing",
+            "Baidu",
+            "Ask",
+            "Netcraft",
+            "DNSdumpster",
+            "VirusTotal",
+            "SSL Certificate logs",
+            "PassiveDNS"
+        ],
+        "examples": [
+            {
+                "desc": "Basic subdomain enumeration",
+                "command": "sublist3r -d target.com"
+            },
+            {
+                "desc": "Subdomain enum with bruteforce",
+                "command": "sublist3r -d target.com -b"
+            },
+            {
+                "desc": "Enumerate with port scanning",
+                "command": "sublist3r -d target.com -p 80,443,8080,8443 -v"
+            },
+            {
+                "desc": "Save results to file",
+                "command": "sublist3r -d target.com -o target_subdomains.txt"
+            },
+            {
+                "desc": "Use specific search engines",
+                "command": "sublist3r -d target.com -e google,bing,yahoo -v"
+            },
+            {
+                "desc": "Multi-threaded enumeration",
+                "command": "sublist3r -d target.com -t 100 -v"
+            }
+        ],
+        "features": [
+            "OSINT tabanlı pasif keşif",
+            "Çoklu arama motoru desteği",
+            "Brute force modülü",
+            "Port tarama özelliği",
+            "DNS çözümleme",
+            "SSL sertifika logları tarama"
+        ],
+        "output_formats": ["stdout", "text file"],
+        "notes": [
+            "Python ile yazılmış, kolay kurulum",
+            "Pasif reconnaissance için ideal",
+            "Birden fazla kaynak kullanarak kapsamlı sonuç",
+            "Rate limiting ile detection'dan kaçınma",
+            "Subbrute modülü ek wordlist gerektirir"
+        ],
+        "security_risk": "Low - Passive reconnaissance tool",
+        "platform": ["Linux", "Windows", "macOS"],
+        "required_permissions": "Network access",
+        "dependencies": ["Python", "requests", "dnspython", "argparse"],
+        "installation": {
+            "git": "git clone https://github.com/aboul3la/Sublist3r.git",
+            "pip": "pip install sublist3r"
+        }
+    },
+    "additional_subdomain_tools": {
+        "desc": "Diğer popüler subdomain enumeration araçları",
+        "category": "Subdomain Enumeration - Alternatives",
+        "tools": {
+            "amass": {
+                "desc": "OWASP Amass - En kapsamlı subdomain enum aracı",
+                "command": "amass enum -d target.com"
+            },
+            "assetfinder": {
+                "desc": "Tomnomnom'un hızlı subdomain finder'ı", 
+                "command": "assetfinder target.com"
+            },
+            "subfinder": {
+                "desc": "ProjectDiscovery'nin fast subdomain discovery aracı",
+                "command": "subfinder -d target.com"
+            },
+            "findomain": {
+                "desc": "Rust ile yazılmış hızlı subdomain finder",
+                "command": "findomain -t target.com"
+            }
+        },
+        "comparison": {
+            "speed": "assetfinder > subfinder > findomain > sublist3r > amass",
+            "accuracy": "amass > sublist3r > subfinder > findomain > assetfinder",
+            "features": "amass > sublist3r > subfinder > findomain > assetfinder"
+        }
+    }
+}

@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/arglist">
+        <file>commands.json</file>
+    </qresource>
+</RCC>

