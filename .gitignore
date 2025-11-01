@@ -46,6 +46,9 @@ personal_notes.json
 backups/
 *.backup
 
+# Claude Code settings
+.claude/
+
 # IDE
 .vscode/
 .idea/
