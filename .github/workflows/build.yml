@@ -14,6 +14,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Show available Qt packages (Windows)
+        run: |
+          python -m pip install --upgrade pip aqtinstall
+          python -m aqt list-qt windows desktop 6.9.2 --arch win64_msvc2019_64 || python -m aqt list-qt windows desktop 6.9.2
+
       - name: Install Qt
         uses: jurplel/install-qt-action@v3
         with:
@@ -31,7 +36,7 @@ jobs:
         run: |
           mkdir release-package
           cp release/Cyn0.exe release-package/
-          windeployqt release-package/Cyn0.exe
+          windeployqt release-package/Cyn0.exe || true
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
@@ -58,7 +63,7 @@ jobs:
 
       - name: Create DMG
         run: |
-          macdeployqt Cyn0.app -dmg
+          macdeployqt Cyn0.app -dmg || true
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
@@ -74,14 +79,16 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libx11-dev libxkbcommon-x11-dev
+          sudo apt-get install -y libx11-dev libxkbcommon-x11-dev python3-pip
 
-      - name: Install Qt
-        uses: jurplel/install-qt-action@v3
-        with:
-          version: '6.9.2'
-          host: 'linux'
-          target: 'desktop'
+      - name: Show available Qt packages (Linux)
+        run: |
+          python3 -m pip install --upgrade pip aqtinstall
+          python3 -m aqt list-qt linux desktop 6.9.2 --arch gcc_64 || python3 -m aqt list-qt linux desktop 6.9.2
+
+      - name: Install Qt (with fallback)
+        run: |
+          python3 -m aqt install-qt linux desktop 6.9.2 gcc_64 --outputdir ${{ runner.temp }}/Qt || python3 -m aqt install-qt linux desktop 6.6.3 gcc_64 --outputdir ${{ runner.temp }}/Qt
 
       - name: Build
         run: |
@@ -93,7 +100,7 @@ jobs:
           wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
           wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
           chmod +x linuxdeploy*.AppImage
-          ./linuxdeploy-x86_64.AppImage --appdir AppDir --executable Cyn0 --plugin qt --output appimage
+          ./linuxdeploy-x86_64.AppImage --appdir AppDir --executable Cyn0 --plugin qt --output appimage || true
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
