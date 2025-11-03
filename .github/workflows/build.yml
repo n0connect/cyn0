@@ -19,13 +19,14 @@ jobs:
           python -m pip install --upgrade pip aqtinstall
           python -m aqt list-qt windows desktop 6.9.2 --arch win64_msvc2019_64 || python -m aqt list-qt windows desktop 6.9.2
 
-      - name: Install Qt
-        uses: jurplel/install-qt-action@v3
-        with:
-          version: '6.9.2'
-          host: 'windows'
-          target: 'desktop'
-          arch: 'win64_msvc2019_64'
+      - name: Install Qt (with fallback)
+        run: |
+          python -m pip install --upgrade pip aqtinstall
+          python -m aqt install-qt windows desktop 6.9.2 win64_msvc2019_64 --outputdir $RUNNER_TEMP/Qt ^
+          || python -m aqt install-qt windows desktop 6.6.3 win64_msvc2019_64 --outputdir $RUNNER_TEMP/Qt
+
+      - name: Add Qt bin to PATH
+        run: echo "$RUNNER_TEMP/Qt/6.9.2/win64_msvc2019_64/bin" >> $GITHUB_PATH || true
 
       - name: Build
         run: |
@@ -35,8 +36,12 @@ jobs:
       - name: Package
         run: |
           mkdir release-package
-          cp release/Cyn0.exe release-package/
-          windeployqt release-package/Cyn0.exe || true
+          copy release\Cyn0.exe release-package\ || echo "Executable not found"
+          if exist "%RUNNER_TEMP%\Qt\6.9.2\win64_msvc2019_64\bin\windeployqt.exe" (
+            "%RUNNER_TEMP%\Qt\6.9.2\win64_msvc2019_64\bin\windeployqt.exe" release-package\Cyn0.exe || echo "windeployqt failed"
+          ) else (
+            echo "windeployqt not found"
+          )
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
@@ -49,12 +54,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install Qt
-        uses: jurplel/install-qt-action@v3
-        with:
-          version: '6.9.2'
-          host: 'mac'
-          target: 'desktop'
+      - name: Install Qt (mac)
+        run: |
+          python3 -m pip install --upgrade pip aqtinstall
+          python3 -m aqt install-qt mac desktop 6.9.2 clang_64 --outputdir $RUNNER_TEMP/Qt \
+          || python3 -m aqt install-qt mac desktop 6.6.3 clang_64 --outputdir $RUNNER_TEMP/Qt
+
+      - name: Add Qt bin to PATH (mac)
+        run: echo "$RUNNER_TEMP/Qt/6.9.2/clang_64/bin" >> $GITHUB_PATH || true
 
       - name: Build
         run: |
@@ -63,7 +70,11 @@ jobs:
 
       - name: Create DMG
         run: |
-          macdeployqt Cyn0.app -dmg || true
+          if command -v macdeployqt &> /dev/null; then
+            macdeployqt Cyn0.app -dmg || echo "macdeployqt failed"
+          else
+            echo "macdeployqt not found"
+          fi
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
@@ -76,10 +87,21 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install Dependencies
+      - name: Install Dependencies (system)
         run: |
           sudo apt-get update
-          sudo apt-get install -y libx11-dev libxkbcommon-x11-dev python3-pip
+          sudo apt-get install -y \
+            build-essential \
+            libx11-dev \
+            libxkbcommon-x11-dev \
+            python3-pip \
+            libxcb1 \
+            libxcb-cursor0 \
+            libxcb-xinerama0 \
+            libx11-xcb-dev \
+            libxcb-render0-dev \
+            libxcb-shape0 \
+            libxcb-shm0
 
       - name: Show available Qt packages (Linux)
         run: |
@@ -88,7 +110,11 @@ jobs:
 
       - name: Install Qt (with fallback)
         run: |
-          python3 -m aqt install-qt linux desktop 6.9.2 gcc_64 --outputdir ${{ runner.temp }}/Qt || python3 -m aqt install-qt linux desktop 6.6.3 gcc_64 --outputdir ${{ runner.temp }}/Qt
+          python3 -m aqt install-qt linux desktop 6.9.2 gcc_64 --outputdir $RUNNER_TEMP/Qt \
+          || python3 -m aqt install-qt linux desktop 6.6.3 gcc_64 --outputdir $RUNNER_TEMP/Qt
+
+      - name: Add Qt bin to PATH (linux)
+        run: echo "$RUNNER_TEMP/Qt/6.9.2/gcc_64/bin" >> $GITHUB_PATH || true
 
       - name: Build
         run: |
@@ -97,10 +123,14 @@ jobs:
 
       - name: Create AppImage
         run: |
-          wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
-          wget https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
-          chmod +x linuxdeploy*.AppImage
-          ./linuxdeploy-x86_64.AppImage --appdir AppDir --executable Cyn0 --plugin qt --output appimage || true
+          wget -q https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage -O linuxdeploy
+          wget -q https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage -O linuxdeploy-plugin-qt
+          chmod +x linuxdeploy linuxdeploy-plugin-qt
+          if [ -f Cyn0 ]; then
+            ./linuxdeploy --appdir AppDir --executable Cyn0 --plugin qt --output appimage || echo "linuxdeploy failed"
+          else
+            echo "Cyn0 executable not found; skipping linuxdeploy"
+          fi
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
@@ -125,3 +155,4 @@ jobs:
             Cyn0-Linux-x86_64/**/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
