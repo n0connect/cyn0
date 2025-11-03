@@ -69,4 +69,4 @@ qrc_*.cpp
 
 # Generated UI headers
 ui_*.h
-resources/AppleFonts/
+#resources/AppleFonts/
