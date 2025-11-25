@@ -331,30 +331,6 @@ This tool is intended for:
 ### Windows
 - **Antivirus False Positives** - Some AVs flag global hotkey usage (add exception)
 
-## Roadmap
-
-### v1.1 (Planned)
-- [ ] Syntax highlighting for payloads
-- [ ] Copy history (last 10 copied items)
-- [ ] Export notes to file
-- [ ] Light theme option
-
-### v2.0 (Future)
-- [ ] Payload templates with variables
-- [ ] Cloud sync (optional)
-- [ ] Plugin system
-- [ ] Multi-language support
-
-## Contributing
-
-Contributions welcome! Please:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
 ### Adding Payloads/Commands
 
 Edit JSON files in the project root or `json/` directory. Format:
@@ -405,3 +381,4 @@ MIT License - See [LICENSE](LICENSE) file for details.
 Special thanks to the security community for sharing knowledge and techniques. This tool stands on the shoulders of giants.
 
 **Stay ethical. Stay legal. Happy hacking! 🔒**
+
