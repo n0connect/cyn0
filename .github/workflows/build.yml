@@ -46,11 +46,16 @@ jobs:
           )
         shell: cmd
 
+      - name: Create ZIP
+        run: |
+          Compress-Archive -Path release-package\* -DestinationPath Cyn0-Windows-x64.zip
+        shell: pwsh
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: Cyn0-Windows-x64
-          path: release-package/
+          path: Cyn0-Windows-x64.zip
 
   build-macos:
     runs-on: macos-latest
@@ -190,11 +195,12 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            Cyn0-Windows-x64/*
-            Cyn0-macOS/*
-            Cyn0-Linux-x86_64/*
-          fail_on_unmatched_files: false
+            Cyn0-Windows-x64/Cyn0-Windows-x64.zip
+            Cyn0-macOS/Cyn0.dmg
+            Cyn0-Linux-x86_64/Cyn0-Linux-x86_64.AppImage
+          fail_on_unmatched_files: true
           generate_release_notes: true
+          draft: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
