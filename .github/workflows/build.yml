@@ -118,19 +118,20 @@ jobs:
 
       - name: Prepare AppImage
         run: |
-          # Create desktop file
+          # Create desktop file with icon
           cat > Cyn0.desktop <<EOF
           [Desktop Entry]
           Type=Application
           Name=Cyn0
           Exec=Cyn0
           Icon=Cyn0
-          Categories=Utility;
+          Categories=Utility;Security;
           Terminal=false
           EOF
           
-          # Create a simple icon (placeholder)
-          mkdir -p AppDir/usr/share/icons/hicolor/256x256/apps
+          # Copy icon to standard location
+          mkdir -p .icon-tmp
+          cp icons/devilSearch.png .icon-tmp/Cyn0.png
           
           # Make executable
           chmod +x Cyn0
@@ -147,8 +148,7 @@ jobs:
           
           if [ -f Cyn0 ]; then
             echo "QMAKE path: $QMAKE"
-            echo "Qt6_DIR: $Qt6_DIR"
-            ./linuxdeploy --appdir AppDir --executable Cyn0 --desktop-file Cyn0.desktop --plugin qt --output appimage
+            ./linuxdeploy --appdir AppDir --executable Cyn0 --desktop-file Cyn0.desktop --icon-file .icon-tmp/Cyn0.png --plugin qt --output appimage
           else
             echo "Cyn0 executable not found"
             ls -la
