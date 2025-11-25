@@ -2,10 +2,20 @@
 
 **Instant access to security testing payloads, commands, and techniques.**
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Version](https://img.shields.io/badge/version-1.1.0-blue)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)
-![Qt](https://img.shields.io/badge/Qt-6.9+-green)
+![Qt](https://img.shields.io/badge/Qt-6.5.3-green)
 ![License](https://img.shields.io/badge/license-MIT-orange)
+
+<div align="center">
+  
+![Cyn0 Demo](runtime.gif)
+
+*Lightning-fast access to security payloads with `Shift + Space`*
+
+</div>
+
+---
 
 Cyn0 is a cross-platform desktop application designed for penetration testers, security researchers, and bug bounty hunters. Access thousands of security payloads, exploitation techniques, and commands with lightning-fast search and intelligent payload copying.
 
