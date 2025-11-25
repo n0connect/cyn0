@@ -26,22 +26,30 @@ jobs:
           || python -m aqt install-qt windows desktop 6.6.3 win64_msvc2019_64 --outputdir $RUNNER_TEMP/Qt
 
       - name: Add Qt bin to PATH
-        run: echo "$RUNNER_TEMP/Qt/6.9.2/win64_msvc2019_64/bin" >> $GITHUB_PATH || true
+        run: |
+          echo "$env:RUNNER_TEMP\Qt\6.9.2\win64_msvc2019_64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        shell: pwsh
 
       - name: Build
         run: |
-          qmake Cyn0.pro
-          nmake
+          qmake Cyn0.pro "CONFIG+=release"
+          nmake release
+        shell: cmd
 
       - name: Package
         run: |
           mkdir release-package
-          copy release\Cyn0.exe release-package\ || echo "Executable not found"
-          if exist "%RUNNER_TEMP%\Qt\6.9.2\win64_msvc2019_64\bin\windeployqt.exe" (
-            "%RUNNER_TEMP%\Qt\6.9.2\win64_msvc2019_64\bin\windeployqt.exe" release-package\Cyn0.exe || echo "windeployqt failed"
+          if exist release\Cyn0.exe (
+            copy release\Cyn0.exe release-package\
+            "%RUNNER_TEMP%\Qt\6.9.2\win64_msvc2019_64\bin\windeployqt.exe" release-package\Cyn0.exe --release --no-translations || echo "windeployqt failed"
+          ) else if exist debug\Cyn0.exe (
+            copy debug\Cyn0.exe release-package\
+            "%RUNNER_TEMP%\Qt\6.9.2\win64_msvc2019_64\bin\windeployqt.exe" release-package\Cyn0.exe --debug --no-translations || echo "windeployqt failed"
           ) else (
-            echo "windeployqt not found"
+            echo "Executable not found in release or debug folder"
+            dir /s Cyn0.exe
           )
+        shell: cmd
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
@@ -65,15 +73,16 @@ jobs:
 
       - name: Build
         run: |
-          qmake Cyn0.pro
+          qmake Cyn0.pro "CONFIG+=release"
           make
 
       - name: Create DMG
         run: |
-          if command -v macdeployqt &> /dev/null; then
-            macdeployqt Cyn0.app -dmg || echo "macdeployqt failed"
+          if [ -f "$RUNNER_TEMP/Qt/6.9.2/clang_64/bin/macdeployqt" ]; then
+            "$RUNNER_TEMP/Qt/6.9.2/clang_64/bin/macdeployqt" Cyn0.app -dmg || echo "macdeployqt failed"
           else
-            echo "macdeployqt not found"
+            echo "macdeployqt not found, trying from PATH"
+            macdeployqt Cyn0.app -dmg || echo "macdeployqt failed"
           fi
 
       - name: Upload Artifact
@@ -94,14 +103,16 @@ jobs:
             build-essential \
             libx11-dev \
             libxkbcommon-x11-dev \
+            libxcb-keysyms1-dev \
+            libxcb-icccm4-dev \
             python3-pip \
-            libxcb1 \
+            libxcb1-dev \
             libxcb-cursor0 \
             libxcb-xinerama0 \
             libx11-xcb-dev \
             libxcb-render0-dev \
-            libxcb-shape0 \
-            libxcb-shm0
+            libxcb-shape0-dev \
+            libxcb-shm0-dev
 
       - name: Show available Qt packages (Linux)
         run: |
@@ -118,7 +129,7 @@ jobs:
 
       - name: Build
         run: |
-          qmake Cyn0.pro
+          qmake Cyn0.pro "CONFIG+=release"
           make
 
       - name: Create AppImage

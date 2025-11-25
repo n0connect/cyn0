@@ -42,6 +42,10 @@ unix:!macx {
     SOURCES += QHotkey/QHotkey/qhotkey_x11.cpp
     # Qt 6 doesn't have x11extras, use native X11
     LIBS += -lX11
+    # Qt 6.2+ için QNativeInterface::QX11Application kullanımı
+    greaterThan(QT_MAJOR_VERSION, 5) {
+        QT += gui-private
+    }
 }
 
 HEADERS += \
