@@ -9,7 +9,7 @@
 
 <div align="center">
   
-![Cyn0 Demo](.github/assets/runtime.gif)
+![Cyn0 Demo](.github/assets/runtime_cyn0.gif)
 
 *Lightning-fast access to security payloads with `Shift + Space`*
 
