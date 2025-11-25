@@ -122,17 +122,6 @@ nmake
 release\Cyn0.exe
 ```
 
-### Automated Builds (GitHub Actions)
-
-Every release is automatically built for all platforms via GitHub Actions. Simply push a tag:
-
-```bash
-git tag -a v1.0.0 -m "Release v1.0.0"
-git push origin v1.0.0
-```
-
-Binaries will be automatically generated and attached to the release.
-
 ## Quick Start Guide
 
 ### First Launch
@@ -381,4 +370,5 @@ MIT License - See [LICENSE](LICENSE) file for details.
 Special thanks to the security community for sharing knowledge and techniques. This tool stands on the shoulders of giants.
 
 **Stay ethical. Stay legal. Happy hacking! 🔒**
+
 
