@@ -304,7 +304,6 @@ This tool is intended for:
 
 - **100% Local** - All data stored locally, no cloud connections
 - **No Telemetry** - Zero tracking or analytics
-- **Encrypted Backups** - SHA256 hashing for backup integrity
 - **Open Source** - Full transparency, audit the code yourself
 
 ## Known Issues
@@ -370,5 +369,6 @@ MIT License - See [LICENSE](LICENSE) file for details.
 Special thanks to the security community for sharing knowledge and techniques. This tool stands on the shoulders of giants.
 
 **Stay ethical. Stay legal. Happy hacking! 🔒**
+
 
 
