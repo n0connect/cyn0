@@ -22,11 +22,15 @@ jobs:
           arch: 'win64_msvc2019_64'
           cache: true
 
+      - name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
       - name: Build
         run: |
           qmake Cyn0.pro CONFIG+=release
           nmake
-        shell: cmd
 
       - name: Package
         run: |

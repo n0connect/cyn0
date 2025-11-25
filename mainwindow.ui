@@ -703,7 +703,7 @@
      <font>
       <stylestrategy>PreferAntialias</stylestrategy>
       <hintingpreference>PreferDefaultHinting</hintingpreference>
-      <fontweight>DemiBold</fontweight>
+      <weight>63</weight>
      </font>
     </property>
     <property name="styleSheet">
@@ -726,7 +726,7 @@
      <font>
       <family>Segoe UI</family>
       <stylestrategy>PreferAntialias</stylestrategy>
-      <fontweight>DemiBold</fontweight>
+      <weight>63</weight>
      </font>
     </property>
     <property name="styleSheet">
