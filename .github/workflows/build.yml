@@ -14,20 +14,18 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Install Qt
-        run: |
-          python -m pip install --upgrade pip aqtinstall
-          python -m aqt install-qt windows desktop 6.7.3 win64_msvc2019_64 --outputdir $env:RUNNER_TEMP/Qt
-        shell: pwsh
-
-      - name: Add Qt bin to PATH
-        run: |
-          echo "$env:RUNNER_TEMP\Qt\6.7.3\win64_msvc2019_64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-        shell: pwsh
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.5.3'
+          host: 'windows'
+          target: 'desktop'
+          arch: 'win64_msvc2019_64'
+          cache: true
 
       - name: Build
         run: |
-          qmake Cyn0.pro "CONFIG+=release"
-          nmake release
+          qmake Cyn0.pro CONFIG+=release
+          nmake
         shell: cmd
 
       - name: Package
@@ -35,12 +33,9 @@ jobs:
           mkdir release-package
           if exist release\Cyn0.exe (
             copy release\Cyn0.exe release-package\
-            "%RUNNER_TEMP%\Qt\6.7.3\win64_msvc2019_64\bin\windeployqt.exe" release-package\Cyn0.exe --release --no-translations || echo "windeployqt failed"
-          ) else if exist debug\Cyn0.exe (
-            copy debug\Cyn0.exe release-package\
-            "%RUNNER_TEMP%\Qt\6.7.3\win64_msvc2019_64\bin\windeployqt.exe" release-package\Cyn0.exe --debug --no-translations || echo "windeployqt failed"
+            windeployqt release-package\Cyn0.exe --release --no-translations
           ) else (
-            echo "Executable not found in release or debug folder"
+            echo "Executable not found"
             dir /s Cyn0.exe
           )
         shell: cmd
@@ -56,27 +51,22 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install Qt (mac)
-        run: |
-          python3 -m pip install --upgrade pip aqtinstall
-          python3 -m aqt install-qt mac desktop 6.7.3 clang_64 --outputdir $RUNNER_TEMP/Qt
-
-      - name: Add Qt bin to PATH (mac)
-        run: echo "$RUNNER_TEMP/Qt/6.7.3/clang_64/bin" >> $GITHUB_PATH
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.5.3'
+          host: 'mac'
+          target: 'desktop'
+          cache: true
 
       - name: Build
         run: |
-          qmake Cyn0.pro "CONFIG+=release"
+          qmake Cyn0.pro CONFIG+=release
           make
 
       - name: Create DMG
         run: |
-          if [ -f "$RUNNER_TEMP/Qt/6.7.3/clang_64/bin/macdeployqt" ]; then
-            "$RUNNER_TEMP/Qt/6.7.3/clang_64/bin/macdeployqt" Cyn0.app -dmg || echo "macdeployqt failed"
-          else
-            echo "macdeployqt not found, trying from PATH"
-            macdeployqt Cyn0.app -dmg || echo "macdeployqt failed"
-          fi
+          macdeployqt Cyn0.app -dmg
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
@@ -98,7 +88,6 @@ jobs:
             libxkbcommon-x11-dev \
             libxcb-keysyms1-dev \
             libxcb-icccm4-dev \
-            python3-pip \
             libxcb1-dev \
             libxcb-cursor0 \
             libxcb-cursor-dev \
@@ -109,16 +98,16 @@ jobs:
             libxcb-shm0-dev
 
       - name: Install Qt
-        run: |
-          python3 -m pip install --upgrade pip aqtinstall
-          python3 -m aqt install-qt linux desktop 6.7.3 gcc_64 --outputdir $RUNNER_TEMP/Qt
-
-      - name: Add Qt bin to PATH (linux)
-        run: echo "$RUNNER_TEMP/Qt/6.7.3/gcc_64/bin" >> $GITHUB_PATH
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.5.3'
+          host: 'linux'
+          target: 'desktop'
+          cache: true
 
       - name: Build
         run: |
-          qmake Cyn0.pro "CONFIG+=release"
+          qmake Cyn0.pro CONFIG+=release
           make
 
       - name: Create AppImage
