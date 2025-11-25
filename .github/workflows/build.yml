@@ -129,9 +129,13 @@ jobs:
           Terminal=false
           EOF
           
-          # Copy icon to standard location
+          # Install ImageMagick for icon resize
+          sudo apt-get update -qq
+          sudo apt-get install -y imagemagick
+          
+          # Resize icon to 512x512 (max size for linuxdeploy)
           mkdir -p .icon-tmp
-          cp icons/devilSearch.png .icon-tmp/Cyn0.png
+          convert icons/devilSearch.png -resize 512x512 .icon-tmp/Cyn0.png
           
           # Make executable
           chmod +x Cyn0
