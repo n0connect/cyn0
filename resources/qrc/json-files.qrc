@@ -1,0 +1,58 @@
+<RCC>
+    <qresource prefix="/json">
+        <file alias="index.json">../../data/json/index.json</file>
+
+        <file alias="general/additional_security_tools_db.json">../../data/json/general/additional_security_tools_db.json</file>
+        <file alias="general/burp_suite_extensions.json">../../data/json/general/burp_suite_extensions.json</file>
+        <file alias="general/github_sources.json">../../data/json/general/github_sources.json</file>
+        <file alias="general/google_dork_database.json">../../data/json/general/google_dork_database.json</file>
+        <file alias="general/osint_recon_db.json">../../data/json/general/osint_recon_db.json</file>
+        <file alias="general/osint_tools_database.json">../../data/json/general/osint_tools_database.json</file>
+        <file alias="general/python_commands.json">../../data/json/general/python_commands.json</file>
+        <file alias="general/steganography_tools_db.json">../../data/json/general/steganography_tools_db.json</file>
+        <file alias="general/xss_tools_db.json">../../data/json/general/xss_tools_db.json</file>
+
+        <file alias="linux/linux_advanced_system_commands.json">../../data/json/linux/linux_advanced_system_commands.json</file>
+        <file alias="linux/linux_metasploit_modules_database.json">../../data/json/linux/linux_metasploit_modules_database.json</file>
+        <file alias="linux/linux_mysql_exploitation.json">../../data/json/linux/linux_mysql_exploitation.json</file>
+        <file alias="linux/linux_mysql_important_tables_database.json">../../data/json/linux/linux_mysql_important_tables_database.json</file>
+        <file alias="linux/linux_nfs_enumaration_database.json">../../data/json/linux/linux_nfs_enumaration_database.json</file>
+        <file alias="linux/linux_privilege_escalation_database.json">../../data/json/linux/linux_privilege_escalation_database.json</file>
+        <file alias="linux/linux_rdp_enumaration_database.json">../../data/json/linux/linux_rdp_enumaration_database.json</file>
+        <file alias="linux/linux_redis_exploitation.json">../../data/json/linux/linux_redis_exploitation.json</file>
+        <file alias="linux/linux_smb_enum_database.json">../../data/json/linux/linux_smb_enum_database.json</file>
+        <file alias="linux/linux_specialized_security_tools_database.json">../../data/json/linux/linux_specialized_security_tools_database.json</file>
+        <file alias="linux/linux_system_commands_database.json">../../data/json/linux/linux_system_commands_database.json</file>
+        <file alias="linux/linux_terminal_commands_database.json">../../data/json/linux/linux_terminal_commands_database.json</file>
+
+        <file alias="windows/windows_powershell_basics.json">../../data/json/windows/windows_powershell_basics.json</file>
+        <file alias="windows/windows_powershell_commands.json">../../data/json/windows/windows_powershell_commands.json</file>
+        <file alias="windows/windows_privilege_escalation.json">../../data/json/windows/windows_privilege_escalation.json</file>
+        <file alias="windows/windows_registry_commands.json">../../data/json/windows/windows_registry_commands.json</file>
+        <file alias="windows/windows_service_commands.json">../../data/json/windows/windows_service_commands.json</file>
+
+        <file alias="web/new_api_security_exploitation.json">../../data/json/web/new_api_security_exploitation.json</file>
+        <file alias="web/new_iot_security_techniques.json">../../data/json/web/new_iot_security_techniques.json</file>
+        <file alias="web/new_xss_payloads_and_bypasses.json">../../data/json/web/new_xss_payloads_and_bypasses.json</file>
+        <file alias="web/web_command_injection.json">../../data/json/web/web_command_injection.json</file>
+        <file alias="web/web_cors_misconfiguration.json">../../data/json/web/web_cors_misconfiguration.json</file>
+        <file alias="web/web_exploitation_techniques.json">../../data/json/web/web_exploitation_techniques.json</file>
+        <file alias="web/web_file_upload_bypass.json">../../data/json/web/web_file_upload_bypass.json</file>
+        <file alias="web/web_fuzzing_tools.json">../../data/json/web/web_fuzzing_tools.json</file>
+        <file alias="web/web_graphql_exploitation.json">../../data/json/web/web_graphql_exploitation.json</file>
+        <file alias="web/web_index.json">../../data/json/web/web_index.json</file>
+        <file alias="web/web_jwt_api_security.json">../../data/json/web/web_jwt_api_security.json</file>
+        <file alias="web/web_lfi_rfi_exploitation.json">../../data/json/web/web_lfi_rfi_exploitation.json</file>
+        <file alias="web/web_oauth_attacks.json">../../data/json/web/web_oauth_attacks.json</file>
+        <file alias="web/web_sql_injection_db.json">../../data/json/web/web_sql_injection_db.json</file>
+        <file alias="web/web_ssrf_exploitation.json">../../data/json/web/web_ssrf_exploitation.json</file>
+        <file alias="web/web_ssti_database.json">../../data/json/web/web_ssti_database.json</file>
+        <file alias="web/web_vulnerability_scanners_db.json">../../data/json/web/web_vulnerability_scanners_db.json</file>
+        <file alias="web/web_waf_bypass_techniques.json">../../data/json/web/web_waf_bypass_techniques.json</file>
+        <file alias="web/web_websocket_security.json">../../data/json/web/web_websocket_security.json</file>
+        <file alias="web/web_werkzeug_database.json">../../data/json/web/web_werkzeug_database.json</file>
+        <file alias="web/web_wordpress_database.json">../../data/json/web/web_wordpress_database.json</file>
+        <file alias="web/web_xxe_exploitation.json">../../data/json/web/web_xxe_exploitation.json</file>
+        <file alias="web/xss_tools.json">../../data/json/web/xss_tools.json</file>
+    </qresource>
+</RCC>

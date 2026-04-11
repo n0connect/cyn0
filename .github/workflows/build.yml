@@ -140,7 +140,7 @@ jobs:
           
           # Resize icon to 512x512 (max size for linuxdeploy)
           mkdir -p .icon-tmp
-          convert icons/devilSearch.png -resize 512x512 .icon-tmp/Cyn0.png
+          convert assets/icons/devilSearch.png -resize 512x512 .icon-tmp/Cyn0.png
           
           # Make executable
           chmod +x Cyn0
@@ -203,4 +203,3 @@ jobs:
           draft: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-

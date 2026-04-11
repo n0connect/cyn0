@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/arglist">
+        <file alias="commands.json">../../data/json/general/commands.json</file>
+    </qresource>
+</RCC>

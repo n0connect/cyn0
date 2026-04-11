@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/json/legacy">
+        <file alias="index.json">../../data/json/legacy/index.json</file>
+        <file alias="linux/index.json">../../data/json/legacy/linux/index.json</file>
+        <file alias="linux/terminal_commands.json">../../data/json/legacy/linux/terminal_commands.json</file>
+        <file alias="linux/privilege_escalation.json">../../data/json/legacy/linux/privilege_escalation.json</file>
+        <file alias="linux/extras.json">../../data/json/legacy/linux/extras.json</file>
+        <file alias="windows/index.json">../../data/json/legacy/windows/index.json</file>
+        <file alias="windows/terminal_commands.json">../../data/json/legacy/windows/terminal_commands.json</file>
+        <file alias="windows/privilege_escalation.json">../../data/json/legacy/windows/privilege_escalation.json</file>
+        <file alias="windows/privlige_escalation.json">../../data/json/legacy/windows/privlige_escalation.json</file>
+        <file alias="windows/extras.json">../../data/json/legacy/windows/extras.json</file>
+    </qresource>
+</RCC>

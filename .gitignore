@@ -14,9 +14,10 @@ Makefile*
 # Build directories
 build/
 build-*/
+bin/
 debug/
 release/
-*.app/Contents/MacOS/Cyn0
+/Cyn0.app/
 x64/
 
 # Qt Creator
@@ -60,6 +61,10 @@ backups/
 *.tmp
 *.temp
 *.log
+runtime_cyn0.gif
+
+# Local bulky font dumps. Keep committed app fonts under assets/fonts/.
+resources/AppleFonts/
 
 # Qt Meta Object Compiler
 moc_predefs.h
@@ -70,3 +75,4 @@ qrc_*.cpp
 # Generated UI headers
 ui_*.h
 #resources/AppleFonts/
+build_cmake/

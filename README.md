@@ -25,7 +25,7 @@ Cyn0 is a cross-platform desktop application designed for penetration testers, s
 - **Global Hotkey Access** - Press `Shift + Space` anywhere to instantly open Cyn0
 - **Fast Search** - Real-time search across 100+ security categories
 - **Intelligent Payload Copying** - Auto-detect and copy payloads with keyboard shortcuts
-- **Personal Notes** - Secure local notes with encryption, favorites, tags, and auto-backup
+- **Personal Notes** - Local notes with favorites, tags, and auto-backup
 - **Comprehensive Database** - Web exploits, Linux/Windows commands, OSINT tools, and more
 
 ### Keyboard-First Design
@@ -44,6 +44,8 @@ Cyn0 is a cross-platform desktop application designed for penetration testers, s
 - **System Tray** - Runs quietly in the background
 
 ## Installation
+
+Project layout notes are documented in [docs/PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md).
 
 ### Prerequisites
 
