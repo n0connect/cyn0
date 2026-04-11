@@ -29,12 +29,6 @@ public:
     bool saveSearchItem(const QString& keyword, const QString& description, bool isFolder, const QString& parentPath, bool showDirectContent);
     QStringList search(const QString& keyword); // Eski sistemin matches formatında dönüş (Icon|Keyword|Path|Key|Flag)
 
-    // Personal Notes İşlemleri (Encrypted)
-    bool savePersonalNote(const QString& id, const QString& encryptedBase64);
-    QString getPersonalNote(const QString& id);
-    QList<QPair<QString, QString>> getAllPersonalNotes(); // id, encryptedBase64 döner
-    bool deletePersonalNote(const QString& id);
-
 private:
     explicit DatabaseManager(QObject *parent = nullptr);
     ~DatabaseManager();

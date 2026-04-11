@@ -371,62 +371,6 @@ void MainWindow::on_listWidget_itemActivated(QListWidgetItem *item) {
 
     qDebug() << "[Debug] Seçilen item: " << key << " JSON: " << jsonPath << " DirectContent: " << showDirectContent << " IsSearchResult: " << isSearchResult;
 
-    // Personal Notes arama sonucundan geldiyse
-    if (jsonPath == "personal_notes") {
-        qDebug() << "[Debug] Personal note arama sonucundan geldi, Personal Notlar'a yönlendiriliyor";
-
-        // Arama kutusunu temizle
-        ui->lineEdit->clear();
-
-        // Personal Notlar menüsüne git
-        currentPath = "personal_notes";
-
-        // Personal Notlar içeriğini göster
-        commandData = QJsonObject();
-
-        QJsonObject createNewNote;
-        createNewNote["desc"] = "Yeni bir kişisel not oluşturun";
-        createNewNote["is_create_note_action"] = true;
-        commandData["➕ Yeni Not Oluştur"] = createNewNote;
-
-        QJsonObject personalNotes = personalNotesData["Personal Notlar"].toObject();
-        QJsonArray notesArray = personalNotes["notes"].toArray();
-
-        for (int i = 0; i < notesArray.size(); ++i) {
-            QJsonObject note = notesArray[i].toObject();
-            QString noteTitle = note["title"].toString();
-            bool isFavorite = note["favorite"].toBool();
-
-            // Favori ise ⭐ emoji ekle
-            QString displayTitle = isFavorite ? ("⭐ " + noteTitle) : noteTitle;
-
-            QJsonObject noteItem;
-            noteItem["desc"] = "📅 " + note["created"].toString().left(10);
-            noteItem["content"] = note["content"].toString();
-            noteItem["created"] = note["created"].toString();
-            noteItem["modified"] = note["modified"].toString();
-            noteItem["tags"] = note["tags"].toString();
-            noteItem["favorite"] = isFavorite;
-            noteItem["note_id"] = note["id"].toString();
-            noteItem["is_personal_note"] = true;
-
-            commandData[displayTitle] = noteItem;
-        }
-
-        showMainMenu();
-
-        // Aranan notu seç
-        for (int i = 0; i < ui->listWidget->count(); ++i) {
-            QListWidgetItem* listItem = ui->listWidget->item(i);
-            if (listItem->data(Qt::UserRole).toString() == key) {
-                ui->listWidget->setCurrentRow(i);
-                break;
-            }
-        }
-
-        return;
-    }
-
     // Eğer başka bir JSON'dan geliyorsa, önce o JSON'u yükle
     if (jsonPath != "current" && jsonPath != currentPath && !jsonPath.isEmpty()) {
         qDebug() << "[Debug] Başka JSON'dan gelen sonuç, JSON yükleniyor: " << jsonPath;
@@ -507,58 +451,6 @@ void MainWindow::on_listWidget_itemActivated(QListWidgetItem *item) {
     if (selected.contains("file") && selected["file"].isString()) {
         QString fileName = selected["file"].toString();
 
-        // ÖZEL: Personal Notlar klasörü kontrolü
-        if (fileName == "personal_notes_virtual.json") {
-            qDebug() << "[Debug] Personal Notlar klasörü açılıyor";
-
-            // İçerik flag'ini sıfırla
-            m_isShowingContent = false;
-
-            // Mevcut yolu geçmişe ekle
-            pathHistory.push(currentPath);
-            selectedIndexHistory.push(ui->listWidget->currentRow());
-
-            // Personal Notlar'ı commandData'ya yükle
-            currentPath = "personal_notes";  // Özel işaretleyici
-
-            // commandData'yı temizle ve notları ekle
-            commandData = QJsonObject();
-
-            // İLK OLARAK "Yeni Not Oluştur" seçeneğini ekle (sabit)
-            QJsonObject createNewNote;
-            createNewNote["desc"] = "Yeni bir kişisel not oluşturun";
-            createNewNote["is_create_note_action"] = true;  // Bu özel bir aksiyon işareti
-            commandData["➕ Yeni Not Oluştur"] = createNewNote;
-
-            QJsonObject personalNotes = personalNotesData["Personal Notlar"].toObject();
-            QJsonArray notesArray = personalNotes["notes"].toArray();
-
-            qDebug() << "[Debug] Personal Notlar yükleniyor, toplam not:" << notesArray.size();
-
-            // Her notu commandData'ya ekle
-            for (int i = 0; i < notesArray.size(); ++i) {
-                QJsonObject note = notesArray[i].toObject();
-                QString title = note["title"].toString();
-                QString noteKey = title;  // Başlık key olarak kullanılsın
-
-                // Not içeriğini düzenle - showCommandInfo için uygun format
-                QJsonObject noteItem;
-                noteItem["desc"] = "📅 " + note["created"].toString().left(10);
-                noteItem["content"] = note["content"].toString();
-                noteItem["created"] = note["created"].toString();
-                noteItem["modified"] = note["modified"].toString();
-                noteItem["is_personal_note"] = true;
-
-                commandData[noteKey] = noteItem;
-            }
-
-            // Menüyü göster
-            showMainMenu();
-            ui->lineEdit->clear();
-            ui->infoBrowser->hide();
-            return;
-        }
-
         QString nextFile = ":/json/" + fileName;
 
         qDebug() << "[Debug] Alt klasöre geçiliyor: " << nextFile;
@@ -599,66 +491,6 @@ void MainWindow::on_listWidget_itemActivated(QListWidgetItem *item) {
         ui->infoBrowser->hide();
     }
     else {
-        // ÖZEL: "Yeni Not Oluştur" aksiyonu kontrolü
-        if (selected.contains("is_create_note_action") && selected["is_create_note_action"].toBool()) {
-            qDebug() << "[Debug] Yeni Not Oluştur aksiyonu tetiklendi";
-
-            // PersonalNotesDialog'u aç
-            PersonalNotesDialog *dialog = new PersonalNotesDialog(this);
-
-            connect(dialog, &PersonalNotesDialog::noteSaved, this,
-                    [this](const QString &title, const QString &content, const QString &tags, bool isFavorite, const QString &) {
-                // Notu ekle
-                addPersonalNote(title, content, tags, isFavorite);
-
-                // Listeyi güncelle
-                if (currentPath == "personal_notes") {
-                    // commandData'yı yeniden oluştur
-                    commandData = QJsonObject();
-
-                    // "Yeni Not Oluştur" seçeneğini tekrar ekle
-                    QJsonObject createNewNote;
-                    createNewNote["desc"] = "Yeni bir kişisel not oluşturun";
-                    createNewNote["is_create_note_action"] = true;
-                    commandData["➕ Yeni Not Oluştur"] = createNewNote;
-
-                    // Notları yeniden yükle
-                    QJsonObject personalNotes = personalNotesData["Personal Notlar"].toObject();
-                    QJsonArray notesArray = personalNotes["notes"].toArray();
-
-                    for (int i = 0; i < notesArray.size(); ++i) {
-                        QJsonObject note = notesArray[i].toObject();
-                        QString noteTitle = note["title"].toString();
-                        bool isFavorite = note["favorite"].toBool();
-
-                        // Favori ise ⭐ emoji ekle
-                        QString displayTitle = isFavorite ? ("⭐ " + noteTitle) : noteTitle;
-
-                        QJsonObject noteItem;
-                        noteItem["desc"] = "📅 " + note["created"].toString().left(10);
-                        noteItem["content"] = note["content"].toString();
-                        noteItem["created"] = note["created"].toString();
-                        noteItem["modified"] = note["modified"].toString();
-                        noteItem["tags"] = note["tags"].toString();
-                        noteItem["favorite"] = isFavorite;
-                        noteItem["note_id"] = note["id"].toString();
-                        noteItem["is_personal_note"] = true;
-
-                        commandData[displayTitle] = noteItem;
-                    }
-
-                    // Listeyi yenile
-                    showMainMenu();
-                }
-            });
-
-            dialog->exec();
-            dialog->deleteLater();
-
-            ui->lineEdit->clear();
-            return;
-        }
-
         // Gerçek içerik - showCommandInfo çağır
         qDebug() << "[Debug] İçerik gösteriliyor: " << key;
 
@@ -704,28 +536,6 @@ void MainWindow::navigateBack() {
     qDebug() << "[Debug] navigateBack çağrıldı. Mevcut path: " << currentPath;
     qDebug() << "[Debug] PathHistory boyutu: " << pathHistory.size();
 
-    // ÖZEL: Personal Notlar içindeyse ana dizine dön
-    if (currentPath == "personal_notes") {
-        qDebug() << "[Debug] Personal Notlar içinden çıkılıyor";
-
-        // Geçmişi temizle
-        if (!pathHistory.isEmpty()) {
-            pathHistory.pop();
-        }
-        if (!selectedIndexHistory.isEmpty()) {
-            // Personal Notlar seçili kalsın (index 0)
-            selectedIndexHistory.top() = 0;
-        }
-
-        // Ana dizine dön
-        currentPath = ":/json/index.json";
-        commandData = QJsonObject();
-        loadCommandData(currentPath);
-        mergePersonalNotesIntoMenu();
-        showMainMenu();
-        return;
-    }
-
     // Ana dizindeyse (index.json) veya geçmiş yoksa geri gitme
     if (currentPath == ":/json/index.json" || pathHistory.isEmpty()) {
         qDebug() << "[Debug] Ana dizindeyiz veya geçmiş yok, geri gidemez";
@@ -754,12 +564,6 @@ void MainWindow::navigateBack() {
     if (commandData.isEmpty()) {
         qDebug() << "[Debug] Önceki JSON yüklenemedi!";
         return;
-    }
-
-    // Ana dizine dönüyorsak Personal Notlar'ı tekrar ekle
-    if (currentPath == ":/json/index.json") {
-        qDebug() << "[Debug] Ana dizine dönüldü, Personal Notlar ekleniyor";
-        mergePersonalNotesIntoMenu();
     }
 
     // Menüyü göster (seçim hafızası burada geri yüklenecek)

@@ -73,37 +73,4 @@ void MainWindow::recursiveSearchInAllJsons(const QString &keyword, QStringList &
         QStringList dbMatches = DatabaseManager::instance().search(keyword);
         matches.append(dbMatches);
     }
-
-    // PERSONAL NOTES ARAMASINI EKLE (sadece ilk çağrıda, yani index.json'da)
-    if (currentJsonPath.isEmpty() || currentJsonPath == ":/json/index.json") {
-        QJsonObject personalNotes = personalNotesData["Personal Notlar"].toObject();
-        QJsonArray notesArray = personalNotes["notes"].toArray();
-
-        for (int i = 0; i < notesArray.size(); ++i) {
-            QJsonObject note = notesArray[i].toObject();
-            QString noteTitle = note["title"].toString();
-            QString noteContent = note["content"].toString();
-            QString noteTags = note["tags"].toString();
-
-            bool titleMatch = noteTitle.contains(keyword, Qt::CaseInsensitive);
-            bool contentMatch = noteContent.contains(keyword, Qt::CaseInsensitive);
-            bool tagsMatch = noteTags.contains(keyword, Qt::CaseInsensitive);
-
-            if (titleMatch || contentMatch || tagsMatch) {
-                QString matchInfo;
-                if (titleMatch) {
-                    matchInfo = "Personal Notlar > " + noteTitle;
-                } else if (tagsMatch) {
-                    matchInfo = "Personal Notlar > " + noteTitle + " (etiket eşleşmesi)";
-                } else {
-                    matchInfo = "Personal Notlar > " + noteTitle + " (içerik eşleşmesi)";
-                }
-
-                // Personal note için özel format
-                matches.append("📝|" + matchInfo + "|personal_notes|" + noteTitle);
-
-                qDebug() << "[Search] Personal note bulundu:" << noteTitle;
-            }
-        }
-    }
 }

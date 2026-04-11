@@ -36,9 +36,6 @@ MainWindow::MainWindow(QWidget *parent)
     // Set Visual Things
     fixUiCenter();
 
-    // Personal Notes sistemini başlat --
-    initPersonalNotes();
-
     // Database Başlat
     if (DatabaseManager::instance().initDatabase()) {
         qDebug() << "[Database] Başarılı şekilde init edildi.";
@@ -71,11 +68,6 @@ MainWindow::MainWindow(QWidget *parent)
         toggleVisibility();
     });
 
-    connect(quickNoteAction, &QAction::triggered, this, [=]() {
-        qDebug() << "[Tray Menu] Clicked Quick Note button.";
-        showQuickNoteDialog();
-    });
-
     connect(quitAction, &QAction::triggered, this, [=]() {
         qDebug() << "[Tray Menu] Clicked Exit button.";
         if (isVisibleFlag) {
@@ -106,8 +98,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     if (isFirstRun) {
         loadCommandData(":/json/index.json");
-        // Personal Notlar'ı ana menüye ekle
-        mergePersonalNotesIntoMenu();
         showMainMenu();
         fadeInOnStart(this);
         isFirstRun = false;
@@ -117,10 +107,6 @@ MainWindow::MainWindow(QWidget *parent)
 // Destructor
 MainWindow::~MainWindow()
 {
-    // Program kapanırken yedekleme yap
-    qDebug() << "[MainWindow] Destructor - Yedekleme yapılıyor";
-    backupPersonalNotes();
-
     delete ui;
 }
 

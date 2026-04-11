@@ -17,7 +17,6 @@
 #include <QStack>
 #include <QStandardPaths>
 #include <QDir>
-#include "PersonalNotes.h"
 #include "DatabaseManager.h"
 
 QT_BEGIN_NAMESPACE
@@ -39,15 +38,6 @@ public slots:
     void on_lineEdit_textChanged(const QString &text);
     void on_listWidget_itemActivated(QListWidgetItem *item);
 
-public:
-    // Personal Notes verisi - PersonalNotesDialog erişimi için public
-    QJsonObject personalNotesData;
-
-    // Personal Notes yönetim fonksiyonları - PersonalNotesDialog erişimi için public
-    void updatePersonalNote(const QString &noteId, const QString &title, const QString &content, const QString &tags = "", bool isFavorite = false);
-    void deletePersonalNote(const QString &noteId);
-    void showEditNoteDialog(const QString &noteId);
-
 private:
     Ui::MainWindow *ui;
     QHotkey *hotkey;                                // QHotkey for all platforms
@@ -62,14 +52,11 @@ private:
     QSystemTrayIcon *trayIcon;
     QMenu *trayMenu;
     QAction *restoreAction;
-    QAction *quickNoteAction;
     QAction *quitAction;
 
-    // Personal Notes yönetimi
-    QString personalNotesPath;
-    QString m_masterPassword;
-
-    // Payload kopyalama sistemi
+    QStringList pathHistory;
+    QStack<int> selectedIndexHistory;               // Liste seçim hafızası
+    QJsonObject commandData;
     QStringList currentPayloads;
     int currentPayloadIndex;
 
@@ -85,15 +72,6 @@ private:
     QJsonObject loadJsonFile(const QString &filePath);
     void getAllJsonPaths(const QString &startPath, QStringList &jsonPaths, const QString &pathPrefix = "");
 
-    // Personal Notes fonksiyonları
-    void initPersonalNotes();
-    void loadPersonalNotes();
-    void savePersonalNotes();
-    void addPersonalNote(const QString &title, const QString &content, const QString &tags = "", bool isFavorite = false, const QString &noteId = "");
-    void showQuickNoteDialog();
-    void mergePersonalNotesIntoMenu();
-    void backupPersonalNotes();
-    void showBackupManager();
     void setupKeyboardShortcuts();
 
     // Payload kopyalama fonksiyonları

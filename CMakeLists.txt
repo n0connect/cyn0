@@ -18,7 +18,6 @@ find_package(Qt6 COMPONENTS Core Gui Widgets Sql REQUIRED)
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/third_party/QHotkey/QHotkey
-    ${CMAKE_CURRENT_SOURCE_DIR}/third_party/QAESEncryption
 )
 
 # Source files
@@ -31,14 +30,11 @@ set(SOURCES
     src/JsonParser.cpp
     src/KeyboardShortcuts.cpp
     src/PayloadCopySystem.cpp
-    src/PersonalNotes.cpp
-    src/PersonalNotesManager.cpp
     src/SearchInsideJson.cpp
     src/TrayIcon.cpp
     src/UiDesign.cpp
     src/DatabaseManager.cpp
     third_party/QHotkey/QHotkey/qhotkey.cpp
-    third_party/QAESEncryption/qaesencryption.cpp
 )
 
 # Header files
@@ -46,12 +42,10 @@ set(HEADERS
     include/mainwindow.h
     include/Animations.h
     include/JsonParser.h
-    include/PersonalNotes.h
     include/UiDesign.h
     include/DatabaseManager.h
     third_party/QHotkey/QHotkey/qhotkey.h
     third_party/QHotkey/QHotkey/qhotkey_p.h
-    third_party/QAESEncryption/qaesencryption.h
 )
 
 # Form files

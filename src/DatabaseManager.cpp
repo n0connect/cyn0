@@ -80,15 +80,6 @@ bool DatabaseManager::createTables()
         return false;
     }
 
-    // 3. Encrypted Personal Notes
-    QString createNotes = "CREATE TABLE IF NOT EXISTS personal_notes ("
-                          "id TEXT PRIMARY KEY, "
-                          "encrypted_data TEXT)";
-    if (!query.exec(createNotes)) {
-        qDebug() << "[DatabaseManager] personal_notes tablosu oluşturulamadı:" << query.lastError().text();
-        return false;
-    }
-
     return true;
 }
 
@@ -178,51 +169,4 @@ QStringList DatabaseManager::search(const QString& keyword)
     }
     
     return matches;
-}
-
-
-// ------ PERSONAL NOTES GÜVENLİ & ŞİFRELİ (BLOB) SORGULAR ------
-
-bool DatabaseManager::savePersonalNote(const QString& id, const QString& encryptedBase64)
-{
-    QSqlQuery query(m_db);
-    query.prepare("INSERT OR REPLACE INTO personal_notes (id, encrypted_data) VALUES (:id, :data)");
-    query.bindValue(":id", id);
-    query.bindValue(":data", encryptedBase64);
-    
-    return query.exec();
-}
-
-QString DatabaseManager::getPersonalNote(const QString& id)
-{
-    QSqlQuery query(m_db);
-    query.prepare("SELECT encrypted_data FROM personal_notes WHERE id = :id");
-    query.bindValue(":id", id);
-    
-    if (query.exec() && query.next()) {
-        return query.value(0).toString();
-    }
-    return QString();
-}
-
-QList<QPair<QString, QString>> DatabaseManager::getAllPersonalNotes()
-{
-    QList<QPair<QString, QString>> list;
-    QSqlQuery query(m_db);
-    
-    if (query.exec("SELECT id, encrypted_data FROM personal_notes")) {
-        while (query.next()) {
-            list.append(qMakePair(query.value(0).toString(), query.value(1).toString()));
-        }
-    }
-    return list;
-}
-
-bool DatabaseManager::deletePersonalNote(const QString& id)
-{
-    QSqlQuery query(m_db);
-    query.prepare("DELETE FROM personal_notes WHERE id = :id");
-    query.bindValue(":id", id);
-    
-    return query.exec();
 }
