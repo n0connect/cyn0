@@ -33,89 +33,12 @@ void MainWindow::showMainMenu() {
     QStringList keys = commandData.keys();
     qDebug() << "[Debug] Gösterilecek anahtarlar: " << keys;
 
-    // Özel öğeleri en başa taşı
-    QString createNoteKey;
-    QString personalNotesKey;
-    QStringList favoriteKeys;
-    QStringList regularKeys;
-
     for (const QString &key : keys) {
-        if (key.startsWith("➕ Yeni Not Oluştur") || key == "➕ Yeni Not Oluştur") {
-            createNoteKey = key;
-        }
-        else if (key.startsWith("📝 Personal Notlar") || key == "Personal Notlar") {
-            personalNotesKey = key;
-        }
-        else {
-            // Personal notları favorilere göre ayır
-            QJsonObject obj = commandData[key].toObject();
-            if (obj.contains("is_personal_note") && obj["is_personal_note"].toBool()) {
-                if (obj.contains("favorite") && obj["favorite"].toBool()) {
-                    favoriteKeys.append(key);
-                } else {
-                    regularKeys.append(key);
-                }
-            } else {
-                regularKeys.append(key);
-            }
-        }
-    }
-
-    QStringList sortedKeys;
-
-    // 1. "Yeni Not Oluştur" (eğer Personal Notes içindeysek)
-    if (!createNoteKey.isEmpty()) {
-        sortedKeys.append(createNoteKey);
-    }
-
-    // 2. Favori notlar (⭐ ile işaretle)
-    for (const QString &key : favoriteKeys) {
-        sortedKeys.append(key);
-    }
-
-    // 3. Normal notlar
-    for (const QString &key : regularKeys) {
-        sortedKeys.append(key);
-    }
-
-    // 4. Personal Notlar (ana menüdeyse)
-    if (!personalNotesKey.isEmpty()) {
-        // Ana menüdeyse en başta değil, normal sırada göster
-        if (createNoteKey.isEmpty()) {
-            sortedKeys.prepend(personalNotesKey);
-        }
-    }
-
-    for (const QString &key : sortedKeys) {
         QListWidgetItem* item = new QListWidgetItem();
 
         QJsonObject obj = commandData[key].toObject();
 
-        // Personal Notlar özel kontrolü
-        if (obj.contains("is_personal_notes") && obj["is_personal_notes"].toBool()) {
-            item->setText("📝 " + key);
-            item->setToolTip("Kişisel notlarınız: " + obj["desc"].toString());
-            qDebug() << "[Debug] Personal Notlar öğesi eklendi: " << key;
-        }
-        else if (obj.contains("is_personal_note") && obj["is_personal_note"].toBool()) {
-            // Personal note için favori kontrolü
-            bool isFavorite = obj.contains("favorite") && obj["favorite"].toBool();
-            QString displayText = (isFavorite ? "⭐ " : "📄 ") + key;
-
-            // Etiketleri göster
-            if (obj.contains("tags") && !obj["tags"].toString().isEmpty()) {
-                displayText += " 🏷️";
-            }
-
-            item->setText(displayText);
-            QString tooltip = obj["desc"].toString();
-            if (!obj["tags"].toString().isEmpty()) {
-                tooltip += "\n🏷️ " + obj["tags"].toString();
-            }
-            item->setToolTip(tooltip);
-            qDebug() << "[Debug] Personal note eklendi: " << key << (isFavorite ? "(Favori)" : "");
-        }
-        else if (obj.contains("file")) {
+        if (obj.contains("file")) {
             item->setText("📁 " + key);
             item->setToolTip("Alt kategori: " + obj["desc"].toString());
             qDebug() << "[Debug] Navigasyon öğesi eklendi: " << key;
@@ -164,77 +87,7 @@ void MainWindow::showCommandInfo(const QString &keyword)
 
     QJsonObject cmdObj = commandData[keyword].toObject();
 
-    // ========== ÖZEL: Personal Note Gösterimi ==========
-    if (cmdObj.contains("is_personal_note") && cmdObj["is_personal_note"].toBool()) {
-        QString html = "<div style='";
-        html += "font-family: \"" + m_customFontFamily + "\", -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; ";
-        html += "padding: 25px; ";
-        html += "background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); ";
-        html += "color: #fff; ";
-        html += "border-radius: 12px; ";
-        html += "box-shadow: 0 10px 30px rgba(0,0,0,0.2);";
-        html += "'>";
 
-        // Başlık
-        html += "<div style='";
-        html += "font-size: 20px; ";
-        html += "font-weight: 700; ";
-        html += "margin-bottom: 15px; ";
-        html += "border-bottom: 2px solid rgba(255,255,255,0.3); ";
-        html += "padding-bottom: 12px;";
-        html += "'>📝 " + keyword.toHtmlEscaped() + "</div>";
-
-        // Tarih bilgisi
-        if (cmdObj.contains("created")) {
-            QString created = cmdObj["created"].toString();
-            QString modified = cmdObj["modified"].toString();
-
-            html += "<div style='";
-            html += "font-size: 11px; ";
-            html += "color: rgba(255,255,255,0.8); ";
-            html += "margin-bottom: 20px; ";
-            html += "display: flex; ";
-            html += "gap: 15px;";
-            html += "'>";
-            html += "<span>📅 Oluşturulma: " + created.left(16).replace("T", " ") + "</span>";
-            if (created != modified) {
-                html += "<span>✏️ Düzenleme: " + modified.left(16).replace("T", " ") + "</span>";
-            }
-            html += "</div>";
-        }
-
-        // İçerik
-        if (cmdObj.contains("content")) {
-            QString content = cmdObj["content"].toString().toHtmlEscaped();
-            content.replace("\n", "<br>");
-
-            html += "<div style='";
-            html += "background: rgba(255,255,255,0.15); ";
-            html += "backdrop-filter: blur(10px); ";
-            html += "padding: 20px; ";
-            html += "border-radius: 8px; ";
-            html += "border-left: 4px solid rgba(255,255,255,0.5); ";
-            html += "font-size: 13px; ";
-            html += "line-height: 1.8; ";
-            html += "color: #fff; ";
-            html += "white-space: pre-wrap; ";
-            html += "word-wrap: break-word;";
-            html += "'>" + content + "</div>";
-        }
-
-        html += "</div>";
-
-        m_isShowingContent = true;
-        ui->infoBrowser->setHtml(html);
-        ui->infoBrowser->show();
-        ui->listWidget->hide();
-
-        // Focus'u infoBrowser'a ver (scroll için)
-        ui->infoBrowser->setFocus();
-        qDebug() << "[Focus] Personal Note - infoBrowser'a focus verildi";
-
-        return;
-    }
 
     // ========== Navigasyon Öğeleri (Klasörler) ==========
     if (cmdObj.contains("file")) {

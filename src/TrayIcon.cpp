@@ -4,12 +4,10 @@
 // Sistem Tepsisinde ki icon ve ozelliklerinin ayarlanmasi
 void MainWindow::createTrayIcon() {
     restoreAction = new QAction(tr("Göster/Gizle"), this);
-    quickNoteAction = new QAction(tr("Hızlı Not Ekle"), this);
     quitAction = new QAction(tr("Çıkış"), this);
 
     trayMenu = new QMenu(this);
     trayMenu->addAction(restoreAction);
-    trayMenu->addAction(quickNoteAction);
     trayMenu->addSeparator();
     trayMenu->addAction(quitAction);
 
