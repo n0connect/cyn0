@@ -72,7 +72,7 @@ private:
     void setupKeyboardShortcuts();
 
     // Payload kopyalama fonksiyonları
-    void extractPayloads(const QString &content);
+    void extractPayloads(const QJsonObject &cmdObj);
     void highlightPayload(int index);
     void copyCurrentPayload();
     void selectNextPayload();

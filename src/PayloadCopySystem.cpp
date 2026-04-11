@@ -8,9 +8,11 @@
 #include <QGuiApplication>
 #include <QTimer>
 #include <QLabel>
+#include <QJsonObject>
+#include <QJsonArray>
 
-// Payload'ları içerikten çıkar
-void MainWindow::extractPayloads(const QString &content)
+// Payload'ları JSON veri tabanından yapısal olarak çıkar
+void MainWindow::extractPayloads(const QJsonObject &cmdObj)
 {
     currentPayloads.clear();
     currentPayloadIndex = -1;
@@ -18,41 +20,42 @@ void MainWindow::extractPayloads(const QString &content)
     // Ekstra seçimleri temizle (önceden kalma vurgular silinsin)
     ui->infoBrowser->setExtraSelections(QList<QTextEdit::ExtraSelection>());
 
-    // Regex pattern: <code>, <pre>, ```, backtick veya özel karakterlerle başlayan satırlar
-    QRegularExpression payloadPattern(
-        R"((?:<code[^>]*>([^<]+)</code>|<pre[^>]*>([^<]+)</pre>|```([^`]+)```|`([^`]+)`|^[\s]*([<>$#'\"/\\=\{\}\[\]]+.*)$))",
-        QRegularExpression::MultilineOption
-    );
+    // Kopyalanabilir komutların barınabileceği JSON anahtarları
+    QStringList keysToExtract = {"usage", "use", "command", "examples", "example", "payload", "syntax"};
 
-    QRegularExpressionMatchIterator it = payloadPattern.globalMatch(content);
-    while (it.hasNext()) {
-        QRegularExpressionMatch match = it.next();
-        for (int i = 1; i <= match.lastCapturedIndex(); ++i) {
-            QString payload = match.captured(i).trimmed();
-            if (!payload.isEmpty() && payload.length() > 3) {
+    for (const QString &key : keysToExtract) {
+        if (!cmdObj.contains(key)) continue;
+
+        QJsonValue value = cmdObj[key];
+        
+        if (value.isString()) {
+            QString payload = value.toString().trimmed();
+            if (!payload.isEmpty()) {
                 currentPayloads.append(payload);
             }
-        }
-    }
-
-    // Eğer hiç payload bulunamadıysa, satır satır kontrol et
-    if (currentPayloads.isEmpty()) {
-        QStringList lines = content.split('\n', Qt::SkipEmptyParts);
-        for (const QString &line : lines) {
-            QString trimmed = line.trimmed();
-            if (trimmed.length() > 5 &&
-                (trimmed.contains('<') || trimmed.contains('>') ||
-                 trimmed.contains('$') || trimmed.contains('#') ||
-                 trimmed.contains('/') || trimmed.contains('\\') ||
-                 trimmed.contains('\'') || trimmed.contains('"') ||
-                 trimmed.contains('{') || trimmed.contains('[') ||
-                 trimmed.startsWith("http") || trimmed.startsWith("ftp"))) {
-                currentPayloads.append(trimmed);
+        } 
+        else if (value.isArray()) {
+            QJsonArray array = value.toArray();
+            for (const QJsonValue &item : array) {
+                if (item.isString()) {
+                    QString payload = item.toString().trimmed();
+                    if (!payload.isEmpty()) {
+                        currentPayloads.append(payload);
+                    }
+                } else if (item.isObject()) {
+                    QJsonObject nestedObj = item.toObject();
+                    if (nestedObj.contains("command") && nestedObj["command"].isString()) {
+                        QString payload = nestedObj["command"].toString().trimmed();
+                        if (!payload.isEmpty()) {
+                            currentPayloads.append(payload);
+                        }
+                    }
+                }
             }
         }
     }
 
-    qDebug() << "[PayloadCopy]" << currentPayloads.size() << "payload bulundu";
+    qDebug() << "[PayloadCopy]" << currentPayloads.size() << "yapısal payload bulundu";
 
     if (!currentPayloads.isEmpty()) {
         currentPayloadIndex = 0;

@@ -262,9 +262,8 @@ void MainWindow::showCommandInfo(const QString &keyword)
     ui->infoBrowser->show();
     ui->listWidget->hide();
 
-    // Payload'ları çıkar ve otomatik seç
-    QString plainText = ui->infoBrowser->toPlainText();
-    extractPayloads(plainText);
+    // Payload'ları JSON nesnesinden doğrudan çıkar ve otomatik seç
+    extractPayloads(cmdObj);
 
     // Focus'u infoBrowser'a ver (scroll için)
     ui->infoBrowser->setFocus();
