@@ -284,6 +284,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
                 if (m_isShowingContent) {
                     m_isShowingContent = false;
                     currentPayloads.clear();
+                    currentPayloadCursors.clear();
                     currentPayloadIndex = -1;
                     showMainMenu();
                     return true;
@@ -297,6 +298,20 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 
     if (obj == ui->lineEdit && event->type() == QEvent::KeyPress) {
         QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+
+        // İçerik ekranında lineEdit odakta kalsa bile Shift+Up/Down payload gezinmesini sürdür.
+        if (m_isShowingContent && (keyEvent->modifiers() & Qt::ShiftModifier)) {
+            if (keyEvent->key() == Qt::Key_Down && !currentPayloads.isEmpty()) {
+                selectNextPayload();
+                ui->infoBrowser->setFocus();
+                return true;
+            }
+            if (keyEvent->key() == Qt::Key_Up && !currentPayloads.isEmpty()) {
+                selectPreviousPayload();
+                ui->infoBrowser->setFocus();
+                return true;
+            }
+        }
 
         // YÖN TUŞLARI İÇİN NAVİGASYON (listWidget görünürse)
         if (!ui->listWidget->isHidden() && ui->listWidget->count() > 0) {

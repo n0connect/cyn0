@@ -17,6 +17,7 @@
 #include <QStack>
 #include <QStandardPaths>
 #include <QDir>
+#include <QTextCursor>
 #include "DatabaseManager.h"
 
 QT_BEGIN_NAMESPACE
@@ -55,6 +56,7 @@ private:
     QAction *quitAction;
 
     QStringList currentPayloads;
+    QList<QTextCursor> currentPayloadCursors;
     int currentPayloadIndex;
 
     void showCommandInfo(const QString &keyword);

@@ -17,6 +17,9 @@ void MainWindow::showMainMenu() {
     // İçerik gösterimi bittiğinde flag'i sıfırla
     m_isShowingContent = false;
     qDebug() << "[Debug] m_isShowingContent = false (showMainMenu)";
+    currentPayloads.clear();
+    currentPayloadCursors.clear();
+    currentPayloadIndex = -1;
 
     ui->listWidget->clear();
     ui->infoBrowser->hide();
