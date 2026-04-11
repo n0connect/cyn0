@@ -124,17 +124,6 @@ nmake
 release\Cyn0.exe
 ```
 
-### Automated Builds (GitHub Actions)
-
-Every release is automatically built for all platforms via GitHub Actions. Simply push a tag:
-
-```bash
-git tag -a v1.0.0 -m "Release v1.0.0"
-git push origin v1.0.0
-```
-
-Binaries will be automatically generated and attached to the release.
-
 ## Quick Start Guide
 
 ### First Launch
@@ -317,7 +306,6 @@ This tool is intended for:
 
 - **100% Local** - All data stored locally, no cloud connections
 - **No Telemetry** - Zero tracking or analytics
-- **Encrypted Backups** - SHA256 hashing for backup integrity
 - **Open Source** - Full transparency, audit the code yourself
 
 ## Known Issues
@@ -332,30 +320,6 @@ This tool is intended for:
 
 ### Windows
 - **Antivirus False Positives** - Some AVs flag global hotkey usage (add exception)
-
-## Roadmap
-
-### v1.1 (Planned)
-- [ ] Syntax highlighting for payloads
-- [ ] Copy history (last 10 copied items)
-- [ ] Export notes to file
-- [ ] Light theme option
-
-### v2.0 (Future)
-- [ ] Payload templates with variables
-- [ ] Cloud sync (optional)
-- [ ] Plugin system
-- [ ] Multi-language support
-
-## Contributing
-
-Contributions welcome! Please:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
 
 ### Adding Payloads/Commands
 
@@ -407,3 +371,6 @@ MIT License - See [LICENSE](LICENSE) file for details.
 Special thanks to the security community for sharing knowledge and techniques. This tool stands on the shoulders of giants.
 
 **Stay ethical. Stay legal. Happy hacking! 🔒**
+
+
+
