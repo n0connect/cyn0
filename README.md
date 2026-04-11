@@ -25,7 +25,6 @@ Cyn0 is a cross-platform desktop application designed for penetration testers, s
 - **Global Hotkey Access** - Press `Shift + Space` anywhere to instantly open Cyn0
 - **Fast Search** - Real-time search across 100+ security categories
 - **Intelligent Payload Copying** - Auto-detect and copy payloads with keyboard shortcuts
-- **Personal Notes** - Local notes with favorites, tags, and auto-backup
 - **Comprehensive Database** - Web exploits, Linux/Windows commands, OSINT tools, and more
 
 ### Keyboard-First Design
@@ -156,26 +155,6 @@ When viewing content with payloads (e.g., XSS attacks):
 3. **Copy** - `Shift + Ctrl/Cmd + C` to copy to clipboard
 4. **Quick Copy & Close** - `Shift + Enter` copies and closes window
 
-### Personal Notes
-
-**Create a Note:**
-1. Press `Ctrl/Cmd + N`
-2. Select "Quick Add Note"
-3. Fill in title, content, and tags
-4. Click Save
-
-**Manage Notes:**
-- Press `Ctrl/Cmd + N` → "View My Notes"
-- ⭐ Click star to favorite
-- 🏷️ Use tags for organization
-- Search notes by title, content, or tags
-
-**Backup & Restore:**
-- Press `Ctrl/Cmd + N` → "Backup Manager"
-- View all backups with SHA256 hashes
-- Restore from any backup point
-- Delete old backups
-
 ## Keyboard Shortcuts
 
 ### Global
@@ -199,13 +178,6 @@ When viewing content with payloads (e.g., XSS attacks):
 | `Shift + ↓/↑` | Navigate between payloads |
 | `Shift + Ctrl/Cmd + C` | Copy selected payload |
 | `Shift + Enter` | Copy and close window |
-
-### Notes
-| Shortcut | Action |
-|----------|--------|
-| `Ctrl/Cmd + N` | Quick note dialog |
-| `Ctrl/Cmd + S` | Save note |
-| `Ctrl/Cmd + F` | Search notes |
 
 ## Database Categories
 
@@ -269,13 +241,6 @@ hotkey = new QHotkey(QKeySequence("Shift+Space"), true, this);
 Available modifiers: `Ctrl`, `Shift`, `Alt`, `Meta` (Win/Cmd)
 
 ### Data Storage Locations
-
-**Personal Notes:**
-```
-macOS: ~/Library/Application Support/Cyn0/personal_notes.json
-Windows: %APPDATA%/Cyn0/personal_notes.json
-Linux: ~/.local/share/Cyn0/personal_notes.json
-```
 
 **Backups:**
 ```
