@@ -7,12 +7,16 @@
 #include <QClipboard>
 #include <QGuiApplication>
 #include <QTimer>
+#include <QLabel>
 
 // Payload'ları içerikten çıkar
 void MainWindow::extractPayloads(const QString &content)
 {
     currentPayloads.clear();
     currentPayloadIndex = -1;
+
+    // Ekstra seçimleri temizle (önceden kalma vurgular silinsin)
+    ui->infoBrowser->setExtraSelections(QList<QTextEdit::ExtraSelection>());
 
     // Regex pattern: <code>, <pre>, ```, backtick veya özel karakterlerle başlayan satırlar
     QRegularExpression payloadPattern(
@@ -36,7 +40,6 @@ void MainWindow::extractPayloads(const QString &content)
         QStringList lines = content.split('\n', Qt::SkipEmptyParts);
         for (const QString &line : lines) {
             QString trimmed = line.trimmed();
-            // Potansiyel payload özellikleri: < > $ # / \ ' " { } [ ] içerir
             if (trimmed.length() > 5 &&
                 (trimmed.contains('<') || trimmed.contains('>') ||
                  trimmed.contains('$') || trimmed.contains('#') ||
@@ -51,46 +54,65 @@ void MainWindow::extractPayloads(const QString &content)
 
     qDebug() << "[PayloadCopy]" << currentPayloads.size() << "payload bulundu";
 
-    // İlk payload'ı otomatik seç
     if (!currentPayloads.isEmpty()) {
         currentPayloadIndex = 0;
         highlightPayload(0);
     }
 }
 
-// Payload'ı vurgula
+// Payload'ı ExtraSelection ile vurgula
 void MainWindow::highlightPayload(int index)
 {
     if (index < 0 || index >= currentPayloads.size()) return;
 
     QString payload = currentPayloads[index];
-    QString htmlContent = ui->infoBrowser->toHtml();
 
-    // Tüm önceki vurgulamaları temizle
-    htmlContent.replace(QRegularExpression(R"(<span style='background-color: #7C3AED; color: #FFFFFF; padding: 2px 6px; border-radius: 4px;'>([^<]+)</span>)"),
-                       R"(\1)");
+    QList<QTextEdit::ExtraSelection> extraSelections;
+    QTextDocument *doc = ui->infoBrowser->document();
+    QTextCursor searchCursor(doc);
 
-    // Şu anki payload'ı HTML'de bul ve vurgula (sadece ilk eşleşmeyi)
-    QString escapedPayload = payload.toHtmlEscaped();
-    QString highlighted = QString("<span style='background-color: #7C3AED; color: #FFFFFF; padding: 2px 6px; border-radius: 4px;'>%1</span>")
-                             .arg(escapedPayload);
-
-    // İlk eşleşmeyi bul ve vurgula
-    int pos = htmlContent.indexOf(escapedPayload);
-    if (pos != -1) {
-        htmlContent.replace(pos, escapedPayload.length(), highlighted);
+    // Aynı payload'dan birden fazla varsa doğru olana atla
+    int occurrence = 0;
+    for (int i = 0; i <= index; ++i) {
+        if (currentPayloads[i] == payload) {
+            occurrence++;
+        }
     }
 
-    ui->infoBrowser->setHtml(htmlContent);
+    QTextCursor foundCursor;
+    for (int i = 0; i < occurrence; ++i) {
+        foundCursor = doc->find(payload, searchCursor);
+        if (!foundCursor.isNull()) {
+            searchCursor = foundCursor;
+        } else {
+            break;
+        }
+    }
 
-    // Vurgulanan yere scroll et
-    QTextCursor cursor = ui->infoBrowser->document()->find(payload);
-    if (!cursor.isNull()) {
-        ui->infoBrowser->setTextCursor(cursor);
+    if (!foundCursor.isNull()) {
+        // ExtraSelection ile HTML yapısını bozmadan vurgula
+        QTextEdit::ExtraSelection selection;
+        selection.format.setBackground(QColor("#7C3AED")); // Vurgu rengi
+        selection.format.setForeground(Qt::white);
+        selection.cursor = foundCursor;
+        extraSelections.append(selection);
+        
+        ui->infoBrowser->setExtraSelections(extraSelections);
+
+        // Native block selection (mavi renkli OS seçimi) oluşmaması için, sinyalleri kapatıp scroll yapalım.
+        QSignalBlocker blocker(ui->infoBrowser);
+        
+        // Scroll pozisyonunu ayarlamak için geçici cursor ataması
+        ui->infoBrowser->setTextCursor(foundCursor);
         ui->infoBrowser->ensureCursorVisible();
+        
+        // Kullanıcının Shift tuşuna basılı tutması sebebiyle çoklu metin bloğu seçilmemesi için:
+        QTextCursor clearCursor = foundCursor;
+        clearCursor.clearSelection(); 
+        ui->infoBrowser->setTextCursor(clearCursor);
     }
 
-    qDebug() << "[PayloadCopy] Payload vurgulandı:" << index + 1 << "/" << currentPayloads.size() << "-" << payload.left(30);
+    qDebug() << "[PayloadCopy] Payload vurgulandı:" << index + 1 << "/" << currentPayloads.size();
 }
 
 // Seçili payload'ı kopyala
@@ -104,23 +126,25 @@ void MainWindow::copyCurrentPayload()
 
     qDebug() << "[PayloadCopy] Kopyalandı:" << payload.left(50) + "...";
 
-    // Kullanıcıya bildirim (QSS ile stillendirilmiş geçici mesaj)
-    QString originalHtml = ui->infoBrowser->toHtml();
-    QString notification = QString(
-        "<div style='position: fixed; top: 10px; right: 10px; "
-        "background: rgba(124, 58, 237, 0.95); color: white; "
-        "padding: 12px 20px; border-radius: 8px; "
-        "font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.3);'>"
-        "✅ Kopyalandı! (%1/%2)"
-        "</div>").arg(currentPayloadIndex + 1).arg(currentPayloads.size());
+    // Bildirimi kalıcı kılmak için QToolTip yerine uçuşan (floating) bir QLabel kullanıyoruz.
+    // Çünkü QToolTip, klavye tuşu (Shift, C vs.) bırakıldığı an sistem tarafından otomatik gizlenir.
+    QLabel *notification = new QLabel(ui->infoBrowser);
+    QString text = QString("✅ Kopyalandı! (%1/%2)").arg(currentPayloadIndex + 1).arg(currentPayloads.size());
+    notification->setText(text);
+    notification->setStyleSheet(
+        "background: rgba(124, 58, 237, 0.95); "
+        "color: white; "
+        "padding: 12px 20px; "
+        "border-radius: 8px; "
+        "font-weight: bold;"
+    );
+    notification->adjustSize();
+    // InfoBrowser'ın sağ üst köşesine konumlandır
+    notification->move(ui->infoBrowser->width() - notification->width() - 20, 20);
+    notification->show();
 
-    ui->infoBrowser->setHtml(notification + originalHtml);
-
-    // 1 saniye sonra eski haline döndür
-    QTimer::singleShot(1000, this, [this, originalHtml]() {
-        ui->infoBrowser->setHtml(originalHtml);
-        highlightPayload(currentPayloadIndex);
-    });
+    // 1.5 saniye sonra ekrandan sil
+    QTimer::singleShot(1500, notification, &QLabel::deleteLater);
 }
 
 // Sonraki payload'a geç
@@ -134,7 +158,6 @@ void MainWindow::selectNextPayload()
     }
 
     highlightPayload(currentPayloadIndex);
-    qDebug() << "[PayloadCopy] Sonraki payload:" << currentPayloadIndex + 1 << "/" << currentPayloads.size();
 }
 
 // Önceki payload'a geç
@@ -148,5 +171,4 @@ void MainWindow::selectPreviousPayload()
     }
 
     highlightPayload(currentPayloadIndex);
-    qDebug() << "[PayloadCopy] Önceki payload:" << currentPayloadIndex + 1 << "/" << currentPayloads.size();
 }
