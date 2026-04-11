@@ -18,6 +18,7 @@
 #include <QStandardPaths>
 #include <QDir>
 #include "PersonalNotes.h"
+#include "DatabaseManager.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -66,6 +67,7 @@ private:
 
     // Personal Notes yönetimi
     QString personalNotesPath;
+    QString m_masterPassword;
 
     // Payload kopyalama sistemi
     QStringList currentPayloads;
@@ -105,6 +107,10 @@ protected:
     void keyPressEvent(QKeyEvent *event) override;
     bool eventFilter(QObject *obj, QEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
+    
+    // SQLite ve Veri Migration Yönetimi
+    void initSQLiteMigration();
+    void recursiveDBSearchMigration(const QString &searchPath, const QString &pathPrefix);
 };
 
 #endif // MAINWINDOW_H

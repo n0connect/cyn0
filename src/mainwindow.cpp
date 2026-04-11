@@ -39,6 +39,12 @@ MainWindow::MainWindow(QWidget *parent)
     // Personal Notes sistemini başlat --
     initPersonalNotes();
 
+    // Database Başlat
+    if (DatabaseManager::instance().initDatabase()) {
+        qDebug() << "[Database] Başarılı şekilde init edildi.";
+        initSQLiteMigration(); // Eğer boş ise QRC'den migrate et!
+    }
+
     // Tray Icon
     createTrayIcon();
     trayIcon->show();
@@ -120,3 +126,76 @@ MainWindow::~MainWindow()
 
 // Mevcut diğer fonksiyonların implementasyonları burada devam eder...
 // (toggleVisibility, createTrayIcon, vb. fonksiyonlar aynı kalır)
+
+// ====== SQLITE MIGRATION ======
+void MainWindow::initSQLiteMigration()
+{
+    // Veritabanı içinde search_items veya documents dolu mu kontrol et
+    // Doluysa zaten migrate edilmiştir (veya check data size)
+    // Eğer index.json verisi documents tablosunda yoksa her şeyi içeri it
+    QString rootData = DatabaseManager::instance().getDocument(":/json/index.json");
+    if (rootData.isEmpty()) {
+        qDebug() << "[Migration] Veritabanı boş, JSON'dan SQLite'a migration başlıyor...";
+        
+        // 1. Dosya tabanlı (Documents) Migration
+        QStringList allPaths;
+        getAllJsonPaths(":/json/index.json", allPaths, "");
+        
+        for (const QString &pathStr : allPaths) {
+            QStringList parts = pathStr.split("|");
+            if(parts.size() > 0) {
+                QString path = parts[0];
+                QFile file(path);
+                if (file.open(QIODevice::ReadOnly)) {
+                    QString jsonContent = QString(file.readAll());
+                    DatabaseManager::instance().saveDocument(path, jsonContent);
+                    file.close();
+                }
+            }
+        }
+        
+        qDebug() << "[Migration] Klasörler oluşturuldu. Arama tablosu (Search Items) oluşturuluyor...";
+        
+        // 2. Arama Motoru (Search Items) detaylı parçalama (recursive)
+        recursiveDBSearchMigration(":/json/index.json", "");
+        
+        qDebug() << "[Migration] Tüm içerikler başarıyla SQLite'a eklendi!";
+    } else {
+        qDebug() << "[Migration] Veritabanı zaten dolu, migration atlandı.";
+    }
+}
+
+void MainWindow::recursiveDBSearchMigration(const QString &searchPath, const QString &pathPrefix)
+{
+    // Bu sadece bir defa çalışır (QRC üzerinden okur, search tablosuna doldurur)
+    QFile file(searchPath);
+    if (!file.open(QIODevice::ReadOnly)) return;
+    
+    QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
+    file.close();
+    
+    if (doc.isNull() || !doc.isObject()) return;
+    QJsonObject jsonData = doc.object();
+    
+    for (auto it = jsonData.begin(); it != jsonData.end(); ++it) {
+        QString key = it.key();
+        QJsonObject obj = it.value().toObject();
+        
+        bool isFolder = obj.contains("file");
+        QString description = obj.contains("desc") ? obj["desc"].toString() : "";
+        
+        // Aslında description json içindeki objectleri stringe çevirerek daha karmaşık aranabilir de yapılabilir.
+        // Fakat şimdilik sadece desc kaydediyoruz. Full content aranmak istenirse "content" de eklenebilir.
+        // Hızlı arama motorumuz O(1) gibi çalışacak.
+        
+        // Arama kaydını kaydet:
+        DatabaseManager::instance().saveSearchItem(key, description, isFolder, searchPath, !isFolder);
+        
+        if (isFolder) {
+            QString fileName = obj["file"].toString();
+            QString nextPath = ":/json/" + fileName;
+            QString nextPrefix = pathPrefix.isEmpty() ? key : pathPrefix + " > " + key;
+            recursiveDBSearchMigration(nextPath, nextPrefix);
+        }
+    }
+}

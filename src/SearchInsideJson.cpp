@@ -66,57 +66,12 @@ bool searchInJsonValue(const QJsonValue &value, const QString &keyword) {
 
 // Tüm JSON dosyalarında recursive arama fonksiyonu
 void MainWindow::recursiveSearchInAllJsons(const QString &keyword, QStringList &matches, const QString &currentJsonPath, const QString &pathPrefix) {
-    QString searchPath = currentJsonPath.isEmpty() ? ":/json/index.json" : currentJsonPath;
-    QJsonObject jsonData = loadJsonFile(searchPath);
-
-    if (jsonData.isEmpty()) return;
-
-    // Mevcut JSON'daki anahtarları kontrol et
-    for (auto it = jsonData.begin(); it != jsonData.end(); ++it) {
-        QString key = it.key();
-        QJsonObject obj = it.value().toObject();
-
-        bool keyMatch = false;
-        bool contentMatch = false;
-
-        // 1. Anahtar adında arama yap (öncelikli)
-        if (key.contains(keyword, Qt::CaseInsensitive)) {
-            keyMatch = true;
-        }
-
-        // 2. İçerikte arama yap (sadece klasör değilse)
-        if (!keyMatch && !obj.contains("file")) {
-            // Bu bir komut/içerik öğesi, tüm içeriğini ara
-            contentMatch = searchInJsonValue(obj, keyword);
-        }
-
-        // Eşleşme varsa sonuçlara ekle
-        if (keyMatch || contentMatch) {
-            QString fullPath = pathPrefix.isEmpty() ? key : pathPrefix + " > " + key;
-            QString matchType = keyMatch ? "başlık" : "içerik";
-
-            if (obj.contains("file")) {
-                // Bu bir klasör (sadece başlık eşleşmesi olabilir)
-                matches.append("📁|" + fullPath + "|" + searchPath + "|" + key);
-            } else {
-                // Bu bir komut/içerik
-                if (contentMatch) {
-                    // İçerik eşleşmesi varsa (içerik) etiketi ekle
-                    matches.append("📄|" + fullPath + " (içerik eşleşmesi)|" + searchPath + "|" + key);
-                } else {
-                    matches.append("📄|" + fullPath + "|" + searchPath + "|" + key);
-                }
-            }
-        }
-
-        // Eğer bu bir alt klasörse, recursive olarak ara
-        if (obj.contains("file") && obj["file"].isString()) {
-            QString fileName = obj["file"].toString();
-            QString nextPath = ":/json/" + fileName;
-            QString nextPrefix = pathPrefix.isEmpty() ? key : pathPrefix + " > " + key;
-
-            recursiveSearchInAllJsons(keyword, matches, nextPath, nextPrefix);
-        }
+    
+    // SQLite ARKA PLANI İLE O(1) ÇAPRAZ ARAMA
+    if (pathPrefix.isEmpty()) {
+        qDebug() << "[Search] SQLite araması yapılıyor: " << keyword;
+        QStringList dbMatches = DatabaseManager::instance().search(keyword);
+        matches.append(dbMatches);
     }
 
     // PERSONAL NOTES ARAMASINI EKLE (sadece ilk çağrıda, yani index.json'da)

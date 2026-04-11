@@ -12,12 +12,13 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/ui)
 
-find_package(Qt6 COMPONENTS Core Gui Widgets REQUIRED)
+find_package(Qt6 COMPONENTS Core Gui Widgets Sql REQUIRED)
 
 # Include paths
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/third_party/QHotkey/QHotkey
+    ${CMAKE_CURRENT_SOURCE_DIR}/third_party/QAESEncryption
 )
 
 # Source files
@@ -35,7 +36,9 @@ set(SOURCES
     src/SearchInsideJson.cpp
     src/TrayIcon.cpp
     src/UiDesign.cpp
+    src/DatabaseManager.cpp
     third_party/QHotkey/QHotkey/qhotkey.cpp
+    third_party/QAESEncryption/qaesencryption.cpp
 )
 
 # Header files
@@ -45,8 +48,10 @@ set(HEADERS
     include/JsonParser.h
     include/PersonalNotes.h
     include/UiDesign.h
+    include/DatabaseManager.h
     third_party/QHotkey/QHotkey/qhotkey.h
     third_party/QHotkey/QHotkey/qhotkey_p.h
+    third_party/QAESEncryption/qaesencryption.h
 )
 
 # Form files
@@ -90,6 +95,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt::Core
     Qt::Gui
     Qt::Widgets
+    Qt::Sql
 )
 
 # Platform specific libraries

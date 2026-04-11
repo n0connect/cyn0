@@ -14,122 +14,134 @@
 #include <QListWidget>
 #include <QPushButton>
 #include <QLabel>
+#include <QInputDialog>
+#include "DatabaseManager.h"
+#include "qaesencryption.h"
 
 // Personal Notes sistemini başlat
 void MainWindow::initPersonalNotes()
 {
-    // Uygulama veri klasörünü al
+    // Cihaz veri yolunu DBManager içinde kullanıyoruz ancak eski dosya migration'ı için
     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QDir appDir(appDataPath);
-
-    // Klasör yoksa oluştur
-    if (!appDir.exists()) {
-        appDir.mkpath(".");
-        qDebug() << "[PersonalNotes] Veri klasörü oluşturuldu:" << appDataPath;
-    }
-
-    // Personal notes dosya yolu
+    if (!appDir.exists()) appDir.mkpath(".");
     personalNotesPath = appDir.filePath("personal_notes.json");
-    qDebug() << "[PersonalNotes] Not dosya yolu:" << personalNotesPath;
+    
+    // Uygulama başlatıldığında Notlar şifrelemesi için Master Key sor
+    bool ok;
+    QString pwd = QInputDialog::getText(this, "Güvenlik Duvarı - Cyn0", 
+      "Kişisel Notlar SQLite Veritabanı için AES-256 Parolanızı girin:\n(İlk defa açıyorsanız bu parola Master Key'iniz olur!)", 
+      QLineEdit::Password, "", &ok);
+      
+    if (ok && !pwd.isEmpty()) {
+        m_masterPassword = pwd;
+    } else {
+        m_masterPassword = "";
+        QMessageBox::warning(this, "Güvenlik Uyarısı", "Master Parola girilmedi. Kişisel Notlar modülü devredışı bırakıldı!");
+        return; // Devam etme
+    }
 
     // Notları yükle
     loadPersonalNotes();
 }
 
-// Personal Notes'u diskten yükle
+// Personal Notes'u DB'den veya Eski JSON dosyasından AES ile oku
 void MainWindow::loadPersonalNotes()
 {
-    QFile file(personalNotesPath);
-
-    // Dosya yoksa boş yapı oluştur
-    if (!file.exists()) {
-        qDebug() << "[PersonalNotes] Dosya bulunamadı, yeni oluşturuluyor";
-        personalNotesData = QJsonObject();
-
-        // Basit ve temiz yapı
-        QJsonObject personalNotes;
-        personalNotes["_meta"] = QJsonObject{
-            {"desc", "Kişisel notlarınız ve hızlı erişim"},
-            {"total_notes", 0},
-            {"created", QDateTime::currentDateTime().toString(Qt::ISODate)}
-        };
-        personalNotes["notes"] = QJsonArray();  // Array olarak, daha düzenli
-
-        personalNotesData["Personal Notlar"] = personalNotes;
-        savePersonalNotes();
-        return;
+    if (m_masterPassword.isEmpty()) return;
+    
+    QByteArray jsonData;
+    QString encryptedNotes = DatabaseManager::instance().getPersonalNote("ALL_NOTES_JSON");
+    
+    if (encryptedNotes.isEmpty()) {
+        // MIGRATION: Eğer SQLite veritabanında "ALL_NOTES_JSON" blob'u yoksa eski dosyaya bak
+        QFile file(personalNotesPath);
+        if (file.exists() && file.open(QIODevice::ReadOnly)) {
+            qDebug() << "[PersonalNotes] Eski JSON Notlar bulundu, SQLite+AES moduna geçirilecek!";
+            jsonData = file.readAll();
+            file.close();
+            file.remove(); // Güvenlik sebebiyle plaintext eski dosyayı diskten sil !!
+        } else {
+            qDebug() << "[PersonalNotes] DB boş, yeni yapı oluşturuluyor.";
+            personalNotesData = QJsonObject();
+            QJsonObject personalNotes;
+            personalNotes["_meta"] = QJsonObject{
+                {"desc", "Kişisel notlarınız ve hızlı erişim"},
+                {"total_notes", 0},
+                {"created", QDateTime::currentDateTime().toString(Qt::ISODate)}
+            };
+            personalNotes["notes"] = QJsonArray();
+            personalNotesData["Personal Notlar"] = personalNotes;
+            savePersonalNotes();
+            return;
+        }
+    } else {
+        // AES ŞİFRE ÇÖZME İŞLEMİ (DECRYPTION)
+        qDebug() << "[PersonalNotes] SQLite'dan AES şifreli veri çekildi. Çözülüyor...";
+        QAESEncryption encryption(QAESEncryption::AES_256, QAESEncryption::CBC, QAESEncryption::PKCS7);
+        QByteArray hashKey = QCryptographicHash::hash(m_masterPassword.toUtf8(), QCryptographicHash::Sha256);
+        QByteArray hashIV = QCryptographicHash::hash(m_masterPassword.toUtf8(), QCryptographicHash::Md5);
+        
+        QByteArray decodedText = encryption.decode(QByteArray::fromBase64(encryptedNotes.toUtf8()), hashKey, hashIV);
+        jsonData = encryption.removePadding(decodedText);
     }
-
-    // Dosyayı oku
-    if (!file.open(QIODevice::ReadOnly)) {
-        qWarning() << "[PersonalNotes] Dosya açılamadı:" << file.errorString();
-        return;
-    }
-
-    QByteArray jsonData = file.readAll();
-    file.close();
 
     // JSON parse et
     QJsonParseError parseError;
     QJsonDocument doc = QJsonDocument::fromJson(jsonData, &parseError);
 
     if (parseError.error != QJsonParseError::NoError) {
-        qWarning() << "[PersonalNotes] JSON parse hatası:" << parseError.errorString();
+        qWarning() << "[PersonalNotes] AES Çözme Veya JSON Hatası:" << parseError.errorString();
+        QMessageBox::critical(this, "Şifre Hatası?", "Notlar çözülemedi. Parolanızı yanlış girmiş olabilirsiniz!");
         return;
     }
 
     if (doc.isObject()) {
         personalNotesData = doc.object();
 
-        // Eski format kontrolü - object ise array'e çevir
+        // Eski format kontrolü var ise
         QJsonObject personalNotes = personalNotesData["Personal Notlar"].toObject();
         if (personalNotes["notes"].isObject() && !personalNotes["notes"].toObject().isEmpty()) {
-            qDebug() << "[PersonalNotes] Eski format tespit edildi, yeni formata çeviriliyor...";
-
             QJsonObject oldNotes = personalNotes["notes"].toObject();
             QJsonArray newNotes;
-
-            // Object'ten Array'e çevir
             for (auto it = oldNotes.constBegin(); it != oldNotes.constEnd(); ++it) {
                 QJsonObject note = it.value().toObject();
-                note["id"] = it.key();  // ID'yi note içine ekle
+                note["id"] = it.key();
                 newNotes.append(note);
             }
-
             personalNotes["notes"] = newNotes;
-            personalNotes["_meta"] = QJsonObject{
-                {"desc", "Kişisel notlarınız ve hızlı erişim"},
-                {"total_notes", newNotes.size()},
-                {"created", QDateTime::currentDateTime().toString(Qt::ISODate)}
-            };
-
             personalNotesData["Personal Notlar"] = personalNotes;
-            savePersonalNotes();  // Yeni formatı kaydet
+            savePersonalNotes(); 
         }
 
         int noteCount = personalNotesData["Personal Notlar"].toObject()["notes"].toArray().size();
-        qDebug() << "[PersonalNotes] Notlar başarıyla yüklendi. Toplam not:" << noteCount;
+        qDebug() << "[PersonalNotes] Notlar başarıyla çözüldü ve yüklendi. Toplam not:" << noteCount;
     }
 }
 
-// Personal Notes'u diske kaydet
+// Personal Notes'u şifreleyerek SQLite Database'e (Diske değil!) kaydet
 void MainWindow::savePersonalNotes()
 {
-    QFile file(personalNotesPath);
+    if (m_masterPassword.isEmpty()) return;
 
-    if (!file.open(QIODevice::WriteOnly)) {
-        qWarning() << "[PersonalNotes] Dosya yazılamadı:" << file.errorString();
-        QMessageBox::warning(this, "Kayıt Hatası",
-                             "Personal notlar kaydedilemedi:\n" + file.errorString());
-        return;
-    }
-
-    // JSON'a dönüştür ve yaz
+    // Önce JSON'a dönüştür
     QJsonDocument doc(personalNotesData);
-    file.write(doc.toJson(QJsonDocument::Indented));
-    file.close();
+    QByteArray rawData = doc.toJson(QJsonDocument::Compact); // Boşluksuz daha güvenli/küçük
 
-    qDebug() << "[PersonalNotes] Notlar başarıyla kaydedildi";
+    // AES ŞİFRELEME (ENCRYPTION)
+    QAESEncryption encryption(QAESEncryption::AES_256, QAESEncryption::CBC, QAESEncryption::PKCS7);
+    QByteArray hashKey = QCryptographicHash::hash(m_masterPassword.toUtf8(), QCryptographicHash::Sha256);
+    QByteArray hashIV = QCryptographicHash::hash(m_masterPassword.toUtf8(), QCryptographicHash::Md5);
+    
+    QByteArray encodedText = encryption.encode(rawData, hashKey, hashIV);
+    QString base64Data = QString::fromUtf8(encodedText.toBase64());
+
+    // Veritabanına Yaz
+    if (DatabaseManager::instance().savePersonalNote("ALL_NOTES_JSON", base64Data)) {
+        qDebug() << "[PersonalNotes] AES şifreli Note Verisi başarıyla SQLite'a kaydedildi.";
+    } else {
+        QMessageBox::critical(this, "Şifreleme Hatası", "Notlar veritabanına kayıt edilemedi!");
+    }
 }
 
 // Yeni not ekle
@@ -399,81 +411,50 @@ void MainWindow::showEditNoteDialog(const QString &noteId)
 // Notlar için yedekleme (program kapatılmadan önce)
 void MainWindow::backupPersonalNotes()
 {
+    if (m_masterPassword.isEmpty()) return;
+
     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    QDir appDir(appDataPath);
+    QDir backupDir(QDir(appDataPath).filePath("backups"));
+    if (!backupDir.exists()) backupDir.mkpath(".");
 
-    // Backup klasörü oluştur
-    QDir backupDir(appDir.filePath("backups"));
-    if (!backupDir.exists()) {
-        backupDir.mkpath(".");
-    }
-
-    // Mevcut notlar dosyasını oku
-    QFile sourceFile(personalNotesPath);
-    if (!sourceFile.open(QIODevice::ReadOnly)) {
-        qDebug() << "[Backup] Kaynak dosya okunamadı";
-        return;
-    }
-
-    QByteArray currentData = sourceFile.readAll();
-    sourceFile.close();
-
-    // Dosya boyutu kontrolü - En az bir not olmalı
-    QJsonDocument doc = QJsonDocument::fromJson(currentData);
-    if (doc.isObject()) {
-        QJsonObject root = doc.object();
-        QJsonObject personalNotes = root["Personal Notlar"].toObject();
-        QJsonArray notesArray = personalNotes["notes"].toArray();
-
-        if (notesArray.isEmpty()) {
-            qDebug() << "[Backup] Hiç not yok, backup atlandı";
-            return;
-        }
-    }
-
-    // SHA256 hash hesapla (güvenli hash algoritması)
+    // AES'li Ham Blobu veritabanından çek (Şifreli kalsın backup'ta da, bu harika)
+    QString currentData = DatabaseManager::instance().getPersonalNote("ALL_NOTES_JSON");
+    if(currentData.isEmpty()) return;
+    
     QCryptographicHash hash(QCryptographicHash::Sha256);
-    hash.addData(currentData);
+    hash.addData(currentData.toUtf8());
     QString currentHash = hash.result().toHex();
 
-    // Son backup'ın hash'ini kontrol et
     QString hashFilePath = backupDir.filePath("last_backup_hash.txt");
     QFile hashFile(hashFilePath);
-
     QString lastHash;
     if (hashFile.open(QIODevice::ReadOnly)) {
         lastHash = hashFile.readAll().trimmed();
         hashFile.close();
     }
 
-    // Hash değişmişse yeni backup al
+    // Değişiklik varsa Encrypted dosyayı JSON olarak değil SQL-Backup (veya Base64 TXT) olarak yedekle
     if (currentHash != lastHash) {
         QString timestamp = QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss");
-        QString backupFilePath = backupDir.filePath("personal_notes_" + timestamp + ".json");
+        QString backupFilePath = backupDir.filePath("personal_notes_AES_" + timestamp + ".txt");
 
         QFile backupFile(backupFilePath);
         if (backupFile.open(QIODevice::WriteOnly)) {
-            backupFile.write(currentData);
+            backupFile.write(currentData.toUtf8());
             backupFile.close();
 
-            // Hash'i kaydet
             if (hashFile.open(QIODevice::WriteOnly)) {
                 hashFile.write(currentHash.toUtf8());
                 hashFile.close();
             }
-
-            qDebug() << "[Backup] Yedekleme oluşturuldu:" << backupFilePath;
+            qDebug() << "[Backup] AES Yedeklemesi oluşturuldu:" << backupFilePath;
         }
-    } else {
-        qDebug() << "[Backup] Değişiklik yok, yedekleme atlandı";
     }
 
-    // Eski yedekleri temizle (son 10'u tut)
-    QStringList backupFiles = backupDir.entryList(QStringList() << "personal_notes_*.json", QDir::Files, QDir::Time);
+    QStringList backupFiles = backupDir.entryList(QStringList() << "personal_notes_AES_*.txt", QDir::Files, QDir::Time);
     while (backupFiles.size() > 10) {
         QString oldestBackup = backupFiles.takeLast();
         backupDir.remove(oldestBackup);
-        qDebug() << "[Backup] Eski yedek silindi:" << oldestBackup;
     }
 }
 
@@ -604,21 +585,15 @@ void MainWindow::showBackupManager()
                 QByteArray backupData = backupFile.readAll();
                 backupFile.close();
 
-                // Aktif dosyaya yaz
-                QFile activeFile(personalNotesPath);
-                if (activeFile.open(QIODevice::WriteOnly)) {
-                    activeFile.write(backupData);
-                    activeFile.close();
+                // SQLite'a geri aktar AES blob'u olarsk
+                DatabaseManager::instance().savePersonalNote("ALL_NOTES_JSON", QString(backupData));
+                
+                // Notları yeniden yükle
+                loadPersonalNotes();
+                mergePersonalNotesIntoMenu();
 
-                    // Notları yeniden yükle
-                    loadPersonalNotes();
-                    mergePersonalNotesIntoMenu();
-
-                    QMessageBox::information(backupDialog, "Başarılı", "Backup başarıyla geri yüklendi!");
-                    backupDialog->accept();
-                } else {
-                    QMessageBox::critical(backupDialog, "Hata", "Notlar dosyası yazılamadı!");
-                }
+                QMessageBox::information(backupDialog, "Başarılı", "AES Backup başarıyla geri yüklendi!");
+                backupDialog->accept();
             } else {
                 QMessageBox::critical(backupDialog, "Hata", "Backup dosyası okunamadı!");
             }
