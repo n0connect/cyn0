@@ -77,7 +77,6 @@ elseif(APPLE)
     list(APPEND RESOURCES assets/icons/app_icon.icns)
 else()
     list(APPEND SOURCES third_party/QHotkey/QHotkey/qhotkey_x11.cpp)
-    find_package(Qt6 COMPONENTS GuiPrivate REQUIRED)
 endif()
 
 # Application Icon for Mac / Plist
@@ -109,7 +108,6 @@ elseif(APPLE)
     target_link_libraries(${PROJECT_NAME} PRIVATE "-framework Carbon" "-framework CoreFoundation")
 else()
     target_link_libraries(${PROJECT_NAME} PRIVATE X11)
-    target_link_libraries(${PROJECT_NAME} PRIVATE Qt::GuiPrivate)
 endif()
 
 # Installation target
