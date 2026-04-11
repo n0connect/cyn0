@@ -14,8 +14,12 @@ void MainWindow::createTrayIcon() {
     trayIcon = new QSystemTrayIcon(this);
     trayIcon->setContextMenu(trayMenu);
 
-    // Platform-agnostic icon loading (.ico works on all platforms in Qt)
+    // Platform-specific tray icon source (avoid .ico on macOS)
+#ifdef Q_OS_MAC
+    QIcon appIcon(":/icon/tray.png");
+#else
     QIcon appIcon(":/icon/icon48x48.ico");
+#endif
     if (appIcon.isNull()) {
         qWarning() << "Failed to load application icon!";
     }

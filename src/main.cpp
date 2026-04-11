@@ -28,8 +28,11 @@ int main(int argc, char *argv[])
     QApplication::setOrganizationName("Cyn0");
     QApplication::setApplicationVersion("1.0");
     
-    // Linux (X11) ve eski Windows pencereleri için varsayılan ikon
+    // macOS'ta Dock/Finder ikonu bundle içindeki app_icon.icns'den gelmeli.
+    // Burada .ico set etmek, release DMG'de farklı ikon görünmesine neden olur.
+#ifndef Q_OS_MAC
     a.setWindowIcon(QIcon(":/icon/icon48x48.ico"));
+#endif
     
     const QString styleSheetPath = ":/qss/macos_ios_qss_themev2.qss";
 
