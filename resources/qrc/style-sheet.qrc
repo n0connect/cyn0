@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="qss/chat-detailed.qss">../../styles/qss/chat-detailed.qss</file>
+        <file alias="qss/macos_ios_qss_theme.qss">../../styles/qss/macos_ios_qss_theme.qss</file>
+        <file alias="qss/macos_ios_qss_themev2.qss">../../styles/qss/macos_ios_qss_themev2.qss</file>
+    </qresource>
+</RCC>

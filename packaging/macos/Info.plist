@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleExecutable</key>
+    <string>Cyn0</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.cyn0.app</string>
+    <key>CFBundleName</key>
+    <string>Cyn0</string>
+    <key>CFBundleDisplayName</key>
+    <string>Cyn0</string>
+    <key>CFBundleIconFile</key>
+    <string>app_icon.icns</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>10.13</string>
+    <key>NSPrincipalClass</key>
+    <string>NSApplication</string>
+    <key>NSHighResolutionCapable</key>
+    <true/>
+
+    <!-- Accessibility permissions for global hotkeys -->
+    <key>NSAppleEventsUsageDescription</key>
+    <string>Cyn0 needs Accessibility permissions to register global keyboard shortcuts for quick access to the application.</string>
+
+    <!-- Application is LSUIElement (menu bar app without dock icon - optional) -->
+    <!-- Uncomment the line below if you want the app to not show in the Dock -->
+    <!-- <key>LSUIElement</key>
+    <true/> -->
+</dict>
+</plist>

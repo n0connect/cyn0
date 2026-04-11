@@ -31,14 +31,17 @@ jobs:
 
       - name: Build
         run: |
-          qmake Cyn0.pro CONFIG+=release
-          nmake
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --config Release
 
       - name: Package
         run: |
           mkdir release-package
-          if exist release\Cyn0.exe (
-            copy release\Cyn0.exe release-package\
+          if exist build\Release\Cyn0.exe (
+            copy build\Release\Cyn0.exe release-package\
+            windeployqt release-package\Cyn0.exe --release --no-translations
+          ) else if exist build\Cyn0.exe (
+            copy build\Cyn0.exe release-package\
             windeployqt release-package\Cyn0.exe --release --no-translations
           ) else (
             echo "Executable not found"
@@ -72,12 +75,13 @@ jobs:
 
       - name: Build
         run: |
-          qmake Cyn0.pro CONFIG+=release
-          make
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --config Release
 
       - name: Create DMG
         run: |
-          macdeployqt Cyn0.app -dmg
+          macdeployqt build/Cyn0.app -dmg -always-overwrite
+          if [ -f build/Cyn0.dmg ]; then mv build/Cyn0.dmg Cyn0.dmg; fi
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
@@ -118,8 +122,8 @@ jobs:
 
       - name: Build
         run: |
-          qmake Cyn0.pro CONFIG+=release
-          make
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --config Release
 
       - name: Prepare AppImage
         run: |
@@ -140,10 +144,10 @@ jobs:
           
           # Resize icon to 512x512 (max size for linuxdeploy)
           mkdir -p .icon-tmp
-          convert icons/devilSearch.png -resize 512x512 .icon-tmp/Cyn0.png
+          convert assets/icons/devilSearch.png -resize 512x512 .icon-tmp/Cyn0.png
           
           # Make executable
-          chmod +x Cyn0
+          chmod +x build/Cyn0 || true
 
       - name: Create AppImage
         run: |
@@ -155,12 +159,12 @@ jobs:
           export QMAKE=$(which qmake)
           export QT_PLUGIN_PATH=$Qt6_DIR/plugins
           
-          if [ -f Cyn0 ]; then
+          if [ -f build/Cyn0 ]; then
             echo "QMAKE path: $QMAKE"
-            ./linuxdeploy --appdir AppDir --executable Cyn0 --desktop-file Cyn0.desktop --icon-file .icon-tmp/Cyn0.png --plugin qt --output appimage
+            ./linuxdeploy --appdir AppDir --executable build/Cyn0 --desktop-file Cyn0.desktop --icon-file .icon-tmp/Cyn0.png --plugin qt --output appimage
           else
             echo "Cyn0 executable not found"
-            ls -la
+            find build -name Cyn0 || ls -la build
             exit 1
           fi
 
@@ -203,4 +207,3 @@ jobs:
           draft: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
