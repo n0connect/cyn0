@@ -54,9 +54,6 @@ private:
     QAction *restoreAction;
     QAction *quitAction;
 
-    QStringList pathHistory;
-    QStack<int> selectedIndexHistory;               // Liste seçim hafızası
-    QJsonObject commandData;
     QStringList currentPayloads;
     int currentPayloadIndex;
 
