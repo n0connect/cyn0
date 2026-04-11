@@ -21,6 +21,16 @@ void setStyleForUi(QApplication *application, const QString &styleSheetPath)
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);         // QApplication nesnesi oluşturuluyor
+    
+    // MacOS Top-Bar, Linux ve Windows Görev Yöneticisi isimleri için meta veriler
+    QApplication::setApplicationName("Cyn0");
+    QApplication::setApplicationDisplayName("Cyn0");
+    QApplication::setOrganizationName("Cyn0");
+    QApplication::setApplicationVersion("1.0");
+    
+    // Linux (X11) ve eski Windows pencereleri için varsayılan ikon
+    a.setWindowIcon(QIcon(":/icon/icon48x48.ico"));
+    
     const QString styleSheetPath = ":/qss/macos_ios_qss_themev2.qss";
 
     // --- StyleSheet Yükle ---

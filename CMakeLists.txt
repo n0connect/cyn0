@@ -69,13 +69,18 @@ set(RESOURCES
     resources/qrc/style-sheet.qrc
 )
 
-# Platform specific hotkey sources
+# Platform specific hotkey sources & OS Icons
 if(WIN32)
     list(APPEND SOURCES third_party/QHotkey/QHotkey/qhotkey_win.cpp)
+    list(APPEND SOURCES packaging/windows/app.rc)
 elseif(APPLE)
     list(APPEND SOURCES third_party/QHotkey/QHotkey/qhotkey_mac.cpp)
     # Qt 6.9.x Mac ARM fix equivalent
     add_compile_options(-include arm_acle.h)
+    
+    # Set MacOS .icns file
+    set_source_files_properties(assets/icons/app_icon.icns PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+    list(APPEND RESOURCES assets/icons/app_icon.icns)
 else()
     list(APPEND SOURCES third_party/QHotkey/QHotkey/qhotkey_x11.cpp)
     find_package(Qt6 COMPONENTS GuiPrivate REQUIRED)
@@ -84,8 +89,13 @@ endif()
 # Application Icon for Mac / Plist
 if(APPLE)
     set_source_files_properties(packaging/macos/Info.plist PROPERTIES MACOSX_PACKAGE_LOCATION .)
-    add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${SOURCES} ${HEADERS} ${FORMS} ${RESOURCES} packaging/macos/Info.plist)
-    set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/packaging/macos/Info.plist)
+    add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${SOURCES} ${HEADERS} ${FORMS} ${RESOURCES} packaging/macos/Info.plist assets/icons/app_icon.icns)
+    set_target_properties(${PROJECT_NAME} PROPERTIES 
+        MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/packaging/macos/Info.plist
+        MACOSX_BUNDLE_ICON_FILE "app_icon.icns"
+        MACOSX_BUNDLE_BUNDLE_NAME "Cyn0"
+        MACOSX_BUNDLE_GUI_IDENTIFIER "com.cyn0.app"
+    )
 else()
     add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${FORMS} ${RESOURCES})
 endif()
